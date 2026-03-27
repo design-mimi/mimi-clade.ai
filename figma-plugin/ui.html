@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Inter', sans-serif;
+      font-size: 12px;
+      color: #1a1a1a;
+      padding: 16px;
+      background: #fff;
+    }
+    h2 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    p {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .badge-preview {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(110, 231, 83, 0.12);
+      border: 1px solid rgba(110, 231, 83, 0.35);
+      color: #3d9e1f;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .btn-primary {
+      background: #18a35a;
+      color: white;
+    }
+    .btn-primary:hover { background: #159450; }
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    .btn-secondary:hover { background: #e4e4e4; }
+    .status {
+      font-size: 11px;
+      color: #18a35a;
+      text-align: center;
+      min-height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>베타 뱃지 업데이터</h2>
+  <p>개선된 스타일로 베타 뱃지를 자동 업데이트합니다.</p>
+
+  <div class="badge-preview">베타</div>
+
+  <button class="btn-primary" id="updateAll">페이지 전체 자동 적용</button>
+  <button class="btn-secondary" id="updateSelected">선택한 노드에만 적용</button>
+  <button class="btn-secondary" id="close">닫기</button>
+
+  <div class="status" id="status"></div>
+
+  <script>
+    document.getElementById('updateAll').onclick = () => {
+      document.getElementById('status').textContent = '적용 중...';
+      parent.postMessage({ pluginMessage: { type: 'update-badge' } }, '*');
+    };
+    document.getElementById('updateSelected').onclick = () => {
+      document.getElementById('status').textContent = '적용 중...';
+      parent.postMessage({ pluginMessage: { type: 'update-selected' } }, '*');
+    };
+    document.getElementById('close').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+    };
+    window.onmessage = (e) => {
+      const msg = e.data.pluginMessage;
+      if (msg?.type === 'done') {
+        document.getElementById('status').textContent = `✅ ${msg.count}개 적용 완료`;
+      }
+    };
+  </script>
+</body>
+</html>
