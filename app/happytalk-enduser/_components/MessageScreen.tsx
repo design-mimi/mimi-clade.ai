@@ -1,0 +1,138 @@
+"use client";
+
+type MessageItem = {
+  status: string;
+  time: string;
+  body: string;
+};
+
+const MESSAGES: MessageItem[] = [
+  {
+    status: "상담 종료",
+    time: "1시간 전",
+    body: "안녕하세요. ⚽🏀 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
+  },
+  {
+    status: "상담 종료",
+    time: "5시간 전",
+    body: "안녕하세요. ⚽🏀 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
+  },
+  {
+    status: "상담 대기 후 종료",
+    time: "하루 전",
+    body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
+  },
+  {
+    status: "고객 종료",
+    time: "일주일 전",
+    body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
+  },
+  {
+    status: "상담 종료",
+    time: "2025.03.21",
+    body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
+  },
+];
+
+type Props = {
+  onOpenChat?: () => void;
+};
+
+export function MessageScreen({ onOpenChat }: Props) {
+  return (
+    <div className="relative flex flex-col w-full h-full bg-white">
+      <Header />
+      <div className="flex-1 flex flex-col px-[16px] pt-[16px] pb-[16px] gap-[8px] overflow-y-auto">
+        {MESSAGES.map((msg, i) => (
+          <div
+            key={i}
+            className="ht-reveal"
+            style={{ animationDelay: `${Math.min(i, 4) * 60}ms` }}
+          >
+            <MessageRow {...msg} onClick={onOpenChat} />
+            {i < MESSAGES.length - 1 && <Divider />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Header() {
+  return (
+    <div
+      className="flex items-center justify-between w-full px-[16px] py-[12px] bg-white border-b"
+      style={{ borderColor: "var(--ht-border-separator)" }}
+    >
+      <h1
+        className="text-[18px] leading-7 font-semibold"
+        style={{ color: "var(--ht-text-default)" }}
+      >
+        메시지
+      </h1>
+      <button
+        type="button"
+        className="px-[10px] py-[4px] rounded-[16px] border text-[14px] leading-5"
+        style={{
+          background: "var(--ht-bg-card)",
+          borderColor: "var(--ht-border-default)",
+          color: "var(--ht-text-subtle)",
+          boxShadow:
+            "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        상담 내역 삭제
+      </button>
+    </div>
+  );
+}
+
+function MessageRow({
+  status,
+  time,
+  body,
+  onClick,
+}: MessageItem & { onClick?: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="ht-card-press flex flex-col gap-[2px] w-full text-left py-[8px]"
+    >
+      <div className="flex items-center gap-[4px]">
+        <span
+          className="text-[14px] leading-5 font-semibold"
+          style={{ color: "var(--ht-text-default)" }}
+        >
+          {status}
+        </span>
+        <span
+          className="text-[12px] leading-4"
+          style={{ color: "var(--ht-text-subtle)" }}
+        >
+          {time}
+        </span>
+      </div>
+      <p
+        className="text-[14px] leading-5 h-[40px] overflow-hidden w-full"
+        style={{
+          color: "var(--ht-text-default)",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+        }}
+      >
+        {body}
+      </p>
+    </button>
+  );
+}
+
+function Divider() {
+  return (
+    <div
+      className="w-full h-px"
+      style={{ background: "rgba(0, 0, 0, 0.06)" }}
+    />
+  );
+}
