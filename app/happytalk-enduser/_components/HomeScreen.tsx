@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import type { HomeVariant } from "./types";
 import {
   SearchIcon,
@@ -13,13 +14,45 @@ import {
 
 type Props = { variant: HomeVariant; onOpenChat?: () => void };
 
-const HERO_IMAGE = "/kindersalmon.png";
+const HERO_IMAGE = "/hero.jpg";
 
 export function HomeScreen({ variant, onOpenChat }: Props) {
   const isBrandImage = variant === "brand-image" || variant === "brand-image-tall";
   const isTallHero = variant === "brand-image-tall";
   const showDescription = variant !== "default-compact";
   const brandName = isTallHero ? "KINDERSALMON" : "킨더살몬";
+
+  const heroImageRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isBrandImage) return;
+    const scroller = scrollerRef.current;
+    const heroImage = heroImageRef.current;
+    if (!scroller || !heroImage) return;
+
+    const HERO_HEIGHT = isTallHero ? 430 : 260;
+    const START_SCALE = 1.0;
+    const END_SCALE = 0.8;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const progress = Math.max(0, Math.min(1, scroller.scrollTop / HERO_HEIGHT));
+      const scale = START_SCALE + (END_SCALE - START_SCALE) * progress;
+      heroImage.style.transform = `scale(${scale})`;
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => {
+      scroller.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isBrandImage, isTallHero]);
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
@@ -32,17 +65,27 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           className="absolute top-0 left-0 right-0 z-0 overflow-hidden rounded-t-[24px]"
           style={{ height: isTallHero ? 430 : 260 }}
         >
-          <Image
-            src={HERO_IMAGE}
-            alt="브랜드 이미지"
-            fill
-            className="object-cover object-[50%_20%]"
-            sizes="375px"
-          />
+          <div
+            ref={heroImageRef}
+            className="absolute"
+            style={{
+              inset: "-12.5%",
+              transformOrigin: "center center",
+              willChange: "transform",
+            }}
+          >
+            <Image
+              src={HERO_IMAGE}
+              alt="브랜드 이미지"
+              fill
+              className="object-cover object-[50%_20%]"
+              sizes="500px"
+            />
+          </div>
         </div>
       )}
 
-      <div className="relative flex-1 min-h-0 overflow-y-auto z-10">
+      <div ref={scrollerRef} className="relative flex-1 min-h-0 overflow-y-auto z-10">
         {/* Spacer to push content below the fixed image */}
         {isBrandImage && (
           <div style={{ height: isTallHero ? 410 : 240 }} />
@@ -250,7 +293,7 @@ function VariantBackground({ variant }: { variant: HomeVariant }) {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 200% 50% at 50% 0%, #FEFFCB 0%, #F3FFEE 20%, #FAFAFA 38%)",
+            "radial-gradient(ellipse 200% 100% at 50% 0%, #FEFFCB 0%, #F3FFEE 20%, #FAFAFA 38%)",
         }}
       />
     );

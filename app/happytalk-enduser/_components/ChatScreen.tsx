@@ -21,7 +21,7 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
       <div
-        className="absolute inset-0 flex flex-col gap-[10px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]"
+        className="absolute inset-0 flex flex-col gap-[10px] overflow-y-auto pt-[40px] px-[16px] pb-[140px]"
         style={{
           backgroundImage:
             "radial-gradient(ellipse 80% 300px at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, transparent 100%)",
@@ -46,7 +46,7 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
         {!isNew && (
           <>
-            <UserBubble time="56분 전" body="러닝화 주문했는데요. 배송비가 궁금해서요." />
+            <UserBubble time="56분 전" body="옷 주문했는데요. 배송비가 궁금해서요." />
 
             <AgentBubble
               name="킨더살몬"
@@ -68,9 +68,30 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
         <div ref={bottomRef} />
       </div>
 
+      <TopBlurMask />
       <BackButton onClick={onBack} />
       <InputBar />
     </div>
+  );
+}
+
+function TopBlurMask() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute top-0 left-0 right-0 z-10"
+      style={{
+        height: 40,
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        maskImage:
+          "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0) 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0) 100%)",
+        background:
+          "linear-gradient(to bottom, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)",
+      }}
+    />
   );
 }
 
@@ -174,7 +195,7 @@ function SuggestionChips({ items }: { items: string[] }) {
         <button
           key={label}
           type="button"
-          className="ht-pressable rounded-full px-[16px] py-[8px] border bg-white text-[14px] leading-5"
+          className="ht-pressable rounded-full px-[12px] py-[6px] border bg-white text-[13px] leading-[18px]"
           style={{
             borderColor: "var(--ht-border-default)",
             color: "var(--ht-text-default)",
@@ -195,7 +216,7 @@ function SmallChips({ items }: { items: string[] }) {
         <button
           key={label}
           type="button"
-          className="ht-pressable rounded-[24px] px-[12px] py-[8px] border bg-white text-[14px] leading-5 font-medium text-[#3a3a3a]"
+          className="ht-pressable rounded-[20px] px-[10px] py-[5px] border bg-white text-[13px] leading-[18px] font-medium text-[#3a3a3a]"
           style={{ borderColor: "var(--ht-border-card)" }}
         >
           {label}
