@@ -93,11 +93,18 @@ export function EnduserFrame({ variant }: Props) {
     <div
       id="ht-enduser-root"
       className="ht-root relative flex flex-col w-[375px] h-[640px] overflow-hidden rounded-[24px] bg-white"
+      data-smooth-corners=""
       style={{
-        boxShadow:
-          "inset 0 0 0 1px var(--ht-border-inverted), var(--ht-shadow-2xl)",
+        boxShadow: "var(--ht-shadow-2xl)",
       }}
     >
+      {/* Border overlay — always on top */}
+      <div
+        className="absolute inset-0 z-50 rounded-[24px] pointer-events-none"
+        style={{
+          boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.1)",
+        }}
+      />
       {/* Tab screens — depth effect when chat is open */}
       <div
         className={`relative flex-1 min-h-0 overflow-hidden ${

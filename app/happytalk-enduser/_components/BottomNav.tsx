@@ -23,7 +23,13 @@ const TABS: { id: NavTab; label: string; outline: IconComp; fill: IconComp }[] =
   { id: "setting", label: "설정", outline: SettingOutlineIcon, fill: SettingFillIcon },
 ];
 
+const TAB_WIDTH = 64;
+const TAB_GAP = 6;
+
 export function BottomNav({ active, onChange }: Props) {
+  const activeIndex = TABS.findIndex((t) => t.id === active);
+  const inkLeft = 8 + activeIndex * (TAB_WIDTH + TAB_GAP);
+
   return (
     <div
       className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border ht-blur-backdrop"
@@ -33,6 +39,18 @@ export function BottomNav({ active, onChange }: Props) {
         boxShadow: "var(--ht-shadow-nav)",
       }}
     >
+      {/* Ink indicator */}
+      <div
+        className="absolute top-[6px] bottom-[6px] rounded-[100px]"
+        style={{
+          width: TAB_WIDTH,
+          left: inkLeft,
+          background: "rgba(255, 255, 255, 0.9)",
+          border: "1px solid var(--ht-border-default)",
+          transition: "left 350ms cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      />
+
       {TABS.map(({ id, label, outline, fill }) => {
         const isActive = active === id;
         const Icon = isActive ? fill : outline;
@@ -41,16 +59,22 @@ export function BottomNav({ active, onChange }: Props) {
             key={id}
             type="button"
             onClick={() => onChange(id)}
-            className={`ht-pressable ht-nav-tab relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px] transition-all duration-150 ${isActive ? "ht-nav-tab-active" : ""}`}
+            className="ht-pressable relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px] z-10"
           >
             <Icon
               width={20}
               height={20}
-              style={{ color: isActive ? "var(--ht-icon-default)" : "var(--ht-icon-subtle)" }}
+              style={{
+                color: isActive ? "var(--ht-icon-default)" : "var(--ht-icon-subtle)",
+                transition: "color 200ms ease-out",
+              }}
             />
             <span
               className="mt-[1px] text-[11px] leading-4"
-              style={{ color: isActive ? "var(--ht-text-default)" : "var(--ht-text-subtle)" }}
+              style={{
+                color: isActive ? "var(--ht-text-default)" : "var(--ht-text-subtle)",
+                transition: "color 200ms ease-out",
+              }}
             >
               {label}
             </span>

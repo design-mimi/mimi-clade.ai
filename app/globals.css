@@ -90,6 +90,14 @@ body {
   letter-spacing: var(--ht-tracking-normal);
 }
 
+/* Smooth rounded corners — eliminates jagged anti-aliasing on overflow-hidden */
+[data-smooth-corners] {
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
 /* ============================================== */
 /*  Motion System                                 */
 /*  Refer to DESIGN_RULES.md §Motion System       */
@@ -206,21 +214,6 @@ body {
   animation: ht-reveal 300ms ease-out both;
 }
 
-/* ---- Bottom nav tab states ---- */
-.ht-nav-tab {
-  background: transparent;
-  border: 1px solid transparent;
-}
-
-.ht-nav-tab:hover:not(.ht-nav-tab-active) {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-.ht-nav-tab-active {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: var(--ht-border-default);
-}
 
 /* ---- Pressable (button press + hover dim overlay) ---- */
 .ht-pressable {
@@ -297,6 +290,78 @@ body {
   .ht-card-press:active {
     transform: none;
   }
+}
+
+/* ---- Launcher (홈 아이콘 버튼) motion ---- */
+.ht-launcher {
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: ht-launcher-entrance 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ht-launcher-entrance {
+  from {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.ht-launcher:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 14px 28px -6px rgba(0, 0, 0, 0.18),
+    0 6px 12px -4px rgba(0, 0, 0, 0.12) !important;
+}
+
+.ht-launcher:hover svg {
+  animation: ht-launcher-pulse 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ht-launcher:active {
+  transform: scale(0.92);
+  transition-duration: 100ms;
+}
+
+@keyframes ht-launcher-pulse {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.15) rotate(-8deg); }
+  60%  { transform: scale(0.95) rotate(4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ---- CTA button (문의하기) motion ---- */
+.ht-cta-button {
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ht-cta-button:hover {
+  transform: scale(1.02);
+  box-shadow:
+    0 4px 12px 0 rgba(0, 0, 0, 0.15),
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+.ht-cta-button:hover .ht-cta-icon {
+  animation: ht-icon-wobble 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ht-cta-button:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
+@keyframes ht-icon-wobble {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(-12deg) scale(1.1); }
+  50%  { transform: rotate(6deg) scale(1.05); }
+  75%  { transform: rotate(-3deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
 }
 
 /* ---- Blur backdrop utility ---- */

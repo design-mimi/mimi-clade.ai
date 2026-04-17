@@ -29,7 +29,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
       {/* Fixed hero image behind scroll */}
       {isBrandImage && (
         <div
-          className="absolute top-0 left-0 right-0 z-0 overflow-hidden"
+          className="absolute top-0 left-0 right-0 z-0 overflow-hidden rounded-t-[24px]"
           style={{ height: isTallHero ? 430 : 260 }}
         >
           <Image
@@ -128,7 +128,7 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-pressable relative w-full flex items-center justify-center gap-[2px] py-[12px] pl-[20px] pr-[16px] rounded-[16px] text-white"
+      className="ht-cta-button relative w-full flex items-center justify-center gap-[2px] py-[12px] pl-[20px] pr-[16px] rounded-[16px] text-white overflow-hidden"
       style={{
         background: "var(--ht-bg-inverted)",
         border: "1px solid var(--ht-border-inverted)",
@@ -136,8 +136,10 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
           "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
       }}
     >
-      <span className="text-[16px] font-semibold leading-6">문의하기</span>
-      <MessengerIcon width={20} height={20} style={{ color: "#fff" }} />
+      <span className="relative z-10 text-[16px] font-semibold leading-6">문의하기</span>
+      <span className="ht-cta-icon relative z-10">
+        <MessengerIcon width={20} height={20} style={{ color: "#fff" }} />
+      </span>
     </button>
   );
 }
