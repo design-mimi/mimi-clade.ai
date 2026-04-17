@@ -7,9 +7,10 @@ import { CARDS_BY_TOPIC, type ChatTopic } from "./chatCards";
 type Props = {
   onBack: () => void;
   topic?: ChatTopic;
+  isNew?: boolean;
 };
 
-export function ChatScreen({ onBack, topic = "brand" }: Props) {
+export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   const cards = CARDS_BY_TOPIC[topic];
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -18,16 +19,15 @@ export function ChatScreen({ onBack, topic = "brand" }: Props) {
   }, []);
 
   return (
-    <div
-      className="relative flex flex-col w-full h-full overflow-hidden bg-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, rgba(250, 250, 250, 0.1) 70%)",
-      }}
-    >
-      <BackButton onClick={onBack} />
-
-      <div className="flex-1 flex flex-col gap-[10px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]">
+    <div className="relative w-full h-full overflow-hidden bg-white">
+      <div
+        className="absolute inset-0 flex flex-col gap-[10px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 80% 300px at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, transparent 100%)",
+          backgroundAttachment: "local",
+        }}
+      >
         <DateBadge label="2026년 3월 17일" />
 
         {cards.map((card, i) => (
@@ -36,7 +36,7 @@ export function ChatScreen({ onBack, topic = "brand" }: Props) {
 
         <AgentBubble
           name="킨더살몬"
-          time="1시간 전"
+          time={isNew ? "방금" : "1시간 전"}
           body="안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다."
         />
 
@@ -44,26 +44,31 @@ export function ChatScreen({ onBack, topic = "brand" }: Props) {
           items={["상품 문의", "주문 취소/변경 문의", "포인트 적립", "배송 문의", "기타 문의"]}
         />
 
-        <UserBubble time="56분 전" body="러닝화 주문했는데요. 배송비가 궁금해서요." />
+        {!isNew && (
+          <>
+            <UserBubble time="56분 전" body="러닝화 주문했는데요. 배송비가 궁금해서요." />
 
-        <AgentBubble
-          name="킨더살몬"
-          time="55분 전"
-          body={
-            <>
-              고객님. 배송비 정책을 안내드립니다.
-              <ul className="list-disc ps-[21px] mt-[2px]">
-                <li>50,000원 미만 주문 배송비 : 3,000원</li>
-                <li>50,000원 이상 주문 배송비 : 무료배송</li>
-              </ul>
-            </>
-          }
-        />
+            <AgentBubble
+              name="킨더살몬"
+              time="55분 전"
+              body={
+                <>
+                  고객님. 배송비 정책을 안내드립니다.
+                  <ul className="list-disc ps-[21px] mt-[2px]">
+                    <li>50,000원 미만 주문 배송비 : 3,000원</li>
+                    <li>50,000원 이상 주문 배송비 : 무료배송</li>
+                  </ul>
+                </>
+              }
+            />
 
-        <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+            <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+          </>
+        )}
         <div ref={bottomRef} />
       </div>
 
+      <BackButton onClick={onBack} />
       <InputBar />
     </div>
   );
@@ -91,11 +96,10 @@ function DateBadge({ label }: { label: string }) {
   return (
     <div className="flex justify-center w-full">
       <span
-        className="inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-full border text-[13px] leading-5"
+        className="inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-full text-[13px] leading-5"
         style={{
-          background: "var(--ht-bg-card)",
-          borderColor: "var(--ht-border-default)",
-          color: "var(--ht-text-subtle)",
+          background: "rgba(0, 0, 0, 0.04)",
+          color: "var(--ht-text-muted)",
         }}
       >
         <CalendarIcon width={14} height={14} />

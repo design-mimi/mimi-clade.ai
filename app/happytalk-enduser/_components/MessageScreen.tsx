@@ -42,7 +42,7 @@ export function MessageScreen({ onOpenChat }: Props) {
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col px-[16px] pt-[16px] pb-[16px] gap-[8px] overflow-y-auto">
+      <div className="flex-1 flex flex-col px-[8px] pt-[8px] pb-[16px] gap-[2px] overflow-y-auto">
         {MESSAGES.map((msg, i) => (
           <div
             key={i}
@@ -50,7 +50,6 @@ export function MessageScreen({ onOpenChat }: Props) {
             style={{ animationDelay: `${Math.min(i, 4) * 60}ms` }}
           >
             <MessageRow {...msg} onClick={onOpenChat} />
-            {i < MESSAGES.length - 1 && <Divider />}
           </div>
         ))}
       </div>
@@ -97,7 +96,7 @@ function MessageRow({
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[2px] w-full text-left py-[8px]"
+      className="ht-card-press flex flex-col gap-[2px] w-full text-left py-[8px] px-[8px] rounded-[12px]"
     >
       <div className="flex items-center gap-[4px]">
         <span
@@ -128,11 +127,3 @@ function MessageRow({
   );
 }
 
-function Divider() {
-  return (
-    <div
-      className="w-full h-px"
-      style={{ background: "rgba(0, 0, 0, 0.06)" }}
-    />
-  );
-}

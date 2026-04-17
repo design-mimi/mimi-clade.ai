@@ -25,9 +25,11 @@ export function EnduserFrame({ variant }: Props) {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatClosing, setChatClosing] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
+  const [chatIsNew, setChatIsNew] = useState(false);
   const [textSize, setTextSize] = useState<TextSize>("small");
 
-  const openChat = () => {
+  const openChat = (isNew = false) => {
+    setChatIsNew(isNew);
     setChatLoading(true);
     setChatOpen(true);
   };
@@ -82,8 +84,8 @@ export function EnduserFrame({ variant }: Props) {
 
   const renderScreen = (t: NavTab) => {
     if (t === "home")
-      return <HomeScreen variant={variant} onOpenChat={openChat} />;
-    if (t === "message") return <MessageScreen onOpenChat={openChat} />;
+      return <HomeScreen variant={variant} onOpenChat={() => openChat(true)} />;
+    if (t === "message") return <MessageScreen onOpenChat={() => openChat(false)} />;
     return <SettingScreen textSize={textSize} onTextSizeChange={setTextSize} />;
   };
 
@@ -144,7 +146,7 @@ export function EnduserFrame({ variant }: Props) {
         <div
           className={`absolute inset-0 z-30 ${chatClosing ? "ht-slide-out-right" : "ht-slide-in-right"}`}
         >
-          {chatLoading ? <ChatSkeleton /> : <ChatScreen onBack={closeChat} />}
+          {chatLoading ? <ChatSkeleton /> : <ChatScreen onBack={closeChat} isNew={chatIsNew} />}
         </div>
       )}
     </div>

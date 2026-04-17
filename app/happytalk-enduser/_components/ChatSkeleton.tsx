@@ -4,10 +4,6 @@ export function ChatSkeleton() {
   return (
     <div
       className="relative flex flex-col w-full h-full overflow-hidden bg-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, rgba(250, 250, 250, 0.1) 70%)",
-      }}
     >
       {/* Back button */}
       <div className="absolute top-[9px] left-[9px] z-20">
