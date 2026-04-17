@@ -3,6 +3,64 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Happytalk Enduser — Typography */
+  --ht-font-body: "SUIT Variable", "SUIT", -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --ht-tracking-normal: -0.25px;
+
+  /* Happytalk Enduser — Text */
+  --ht-text-default: #111115;
+  --ht-text-subtle: #4e4e55;
+  --ht-text-muted: #6f6f77;
+  --ht-text-hint: rgba(39, 39, 42, 0.3);
+  --ht-text-inverted: #ffffff;
+
+  /* Happytalk Enduser — Background */
+  --ht-bg-default: #ffffff;
+  --ht-bg-card: #ffffff;
+  --ht-bg-input: #ffffff;
+  --ht-bg-subtle: #fafafa;
+  --ht-bg-muted: #f4f4f5;
+  --ht-bg-inverted: #18181b;
+  --ht-bg-badge-default: #ffffff;
+  --ht-bg-badge-green: rgba(102, 220, 126, 0.1);
+
+  /* Happytalk Enduser — Border */
+  --ht-border-default: rgba(39, 39, 42, 0.1);
+  --ht-border-darker: rgba(39, 39, 42, 0.15);
+  --ht-border-inverted: rgba(255, 255, 255, 0.2);
+  --ht-border-separator: rgba(0, 0, 0, 0.08);
+  --ht-border-card: rgba(0, 0, 0, 0.12);
+
+  /* Happytalk Enduser — Accent */
+  --ht-green-accent: #4fc660;
+
+  /* Happytalk Enduser — Icon */
+  --ht-icon-default: #111115;
+  --ht-icon-subtle: #4e4e55;
+  --ht-icon-muted: #6f6f77;
+  --ht-icon-disabled: rgba(39, 39, 42, 0.25);
+  --ht-icon-white: #ffffff;
+
+  /* Happytalk Enduser — Shadows */
+  --ht-shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.05),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+  --ht-shadow-nav: 0 3px 3px 0 rgba(0, 0, 0, 0.12);
+  --ht-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --ht-shadow-modal-sm: 0 0 0 1px var(--ht-border-default),
+    0 12px 12px -6px rgba(0, 0, 0, 0.04),
+    0 6px 6px -3px rgba(0, 0, 0, 0.04),
+    0 3px 3px -1.5px rgba(0, 0, 0, 0.04),
+    0 1px 1px -0.5px rgba(0, 0, 0, 0.04);
+  --ht-shadow-modal-lg: 0 0 0 1px var(--ht-border-default),
+    0 16px 16px 0 rgba(0, 0, 0, 0.04),
+    0 12px 12px 0 rgba(0, 0, 0, 0.04),
+    0 6px 6px 0 rgba(0, 0, 0, 0.04),
+    0 3px 3px 0 rgba(0, 0, 0, 0.04),
+    0 1px 1px -0.5px rgba(0, 0, 0, 0.04);
+  --ht-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 @theme inline {
@@ -24,3 +82,227 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Happytalk Enduser scope */
+.ht-root,
+.ht-root * {
+  font-family: var(--ht-font-body);
+  letter-spacing: var(--ht-tracking-normal);
+}
+
+/* ============================================== */
+/*  Motion System                                 */
+/*  Refer to DESIGN_RULES.md §Motion System       */
+/* ============================================== */
+
+/* ---- Screen transitions (cross-fade dissolve, 180ms cubic-bezier) ---- */
+@keyframes ht-screen-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ht-screen-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.ht-screen-in {
+  animation: ht-screen-in 180ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.ht-screen-out {
+  animation: ht-screen-out 180ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+/* ---- Slide transitions (chat open/close, 320ms cubic-bezier) ---- */
+@keyframes ht-slide-in-right {
+  from { transform: translate3d(100%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes ht-slide-out-right {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(100%, 0, 0); }
+}
+
+.ht-slide-in-right {
+  will-change: transform;
+  animation: ht-slide-in-right 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+}
+
+.ht-slide-out-right {
+  will-change: transform;
+  animation: ht-slide-out-right 350ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ---- Backdrop dim (behind sliding chat) ---- */
+@keyframes ht-dim-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ht-dim-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.ht-backdrop-dim-in {
+  animation: ht-dim-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ht-backdrop-dim-out {
+  animation: ht-dim-out 350ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ---- Background depth (scale down behind chat) ---- */
+@keyframes ht-depth-in {
+  from { transform: scale(1); }
+  to   { transform: scale(0.97); }
+}
+
+@keyframes ht-depth-out {
+  from { transform: scale(0.97); }
+  to   { transform: scale(1); }
+}
+
+.ht-depth-in {
+  will-change: transform;
+  animation: ht-depth-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ht-depth-out {
+  will-change: transform;
+  animation: ht-depth-out 350ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ---- Skeleton shimmer ---- */
+@keyframes ht-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.ht-skeleton {
+  background-color: rgba(0, 0, 0, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.08) 25%,
+    rgba(0, 0, 0, 0.14) 50%,
+    rgba(0, 0, 0, 0.08) 75%
+  );
+  background-size: 200% 100%;
+  animation: ht-shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ---- Reveal (scroll/entry, 300ms ease-out) ---- */
+@keyframes ht-reveal {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ht-reveal {
+  animation: ht-reveal 300ms ease-out both;
+}
+
+/* ---- Bottom nav tab states ---- */
+.ht-nav-tab {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.ht-nav-tab:hover:not(.ht-nav-tab-active) {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.ht-nav-tab-active {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--ht-border-default);
+}
+
+/* ---- Pressable (button press + hover dim overlay) ---- */
+.ht-pressable {
+  position: relative;
+  transition: transform 120ms ease-out;
+}
+
+.ht-pressable::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0);
+  transition: background 150ms ease-out;
+  pointer-events: none;
+}
+
+.ht-pressable:hover::after {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ht-pressable:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
+/* ---- Card press (scale 0.98 + hover dim) ---- */
+.ht-card-press {
+  position: relative;
+  transition: transform 150ms ease-out;
+}
+
+.ht-card-press::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0);
+  transition: background 150ms ease-out;
+  pointer-events: none;
+}
+
+.ht-card-press:hover::after {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ht-card-press:active {
+  transform: scale(0.98);
+}
+
+/* ---- Reduce motion: keep opacity only, drop transforms ---- */
+@media (prefers-reduced-motion: reduce) {
+  .ht-screen-in,
+  .ht-screen-out,
+  .ht-reveal {
+    animation-duration: 180ms;
+    animation-timing-function: ease-out;
+  }
+
+  .ht-screen-in { animation-name: ht-fade-in; }
+  .ht-screen-out { animation-name: ht-fade-out; }
+  .ht-reveal { animation-name: ht-fade-in; }
+
+  @keyframes ht-fade-in {
+    from { opacity: 0; transform: none; }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes ht-fade-out {
+    from { opacity: 1; transform: none; }
+    to   { opacity: 0; transform: none; }
+  }
+
+  .ht-pressable:active,
+  .ht-card-press:active {
+    transform: none;
+  }
+}
+
+/* ---- Blur backdrop utility ---- */
+.ht-blur-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---- Text size: large (+2px) ---- */

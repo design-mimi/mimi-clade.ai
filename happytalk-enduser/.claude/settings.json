@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open /Users/mbisolution/Desktop/ux-mimi/apple-showcase.html)",
+      "Bash(curl -s \"http://localhost:3000/happytalk-enduser?v=$\\(date +%s\\)\" -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(open \"http://localhost:3000/happytalk-enduser?v=$\\(date +%s\\)\")",
+      "Bash(open \"http://localhost:3000/happytalk-enduser?t=$\\(date +%s\\)\")",
+      "Bash(lsof -ti:3000)",
+      "WebFetch(domain:animate-ui.com)",
+      "Bash(npx tailwindcss *)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}
