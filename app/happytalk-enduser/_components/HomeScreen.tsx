@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import type { HomeVariant } from "./types";
 import {
   SearchIcon,
-  MessengerIcon,
   NaverTalkIcon,
   KakaoChannelIcon,
   PhoneCircleIcon,
@@ -86,9 +85,23 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
       )}
 
       <div ref={scrollerRef} className="relative flex-1 min-h-0 overflow-y-auto z-10">
-        {/* Spacer to push content below the fixed image */}
+        {/* Spacer to push content below the fixed image; dim scrolls with content */}
         {isBrandImage && (
-          <div style={{ height: isTallHero ? 410 : 240 }} />
+          <div
+            className="relative"
+            style={{ height: isTallHero ? 410 : 240 }}
+          >
+            <div
+              aria-hidden
+              className="absolute left-0 right-0 pointer-events-none"
+              style={{
+                bottom: -20,
+                height: 184,
+                background:
+                  "linear-gradient(180deg, rgba(0, 0, 0, 0) 27.92%, rgba(0, 0, 0, 0.2) 100%)",
+              }}
+            />
+          </div>
         )}
 
         <div className={`relative flex flex-col ${isBrandImage ? "bg-white rounded-t-[20px] pb-[100px]" : "pb-[100px]"}`}>
@@ -171,7 +184,7 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-cta-button relative w-full flex items-center justify-center gap-[2px] py-[12px] pl-[20px] pr-[16px] rounded-[16px] text-white overflow-hidden"
+      className="ht-cta-button relative w-full flex items-center justify-center py-[12px] px-[20px] rounded-[16px] text-white overflow-hidden"
       style={{
         background: "var(--ht-bg-inverted)",
         border: "1px solid var(--ht-border-inverted)",
@@ -180,9 +193,6 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
       }}
     >
       <span className="relative z-10 text-[16px] font-semibold leading-6">문의하기</span>
-      <span className="ht-cta-icon relative z-10">
-        <MessengerIcon width={20} height={20} style={{ color: "#fff" }} />
-      </span>
     </button>
   );
 }

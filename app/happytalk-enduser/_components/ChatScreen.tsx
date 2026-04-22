@@ -117,13 +117,12 @@ function DateBadge({ label }: { label: string }) {
   return (
     <div className="flex justify-center w-full">
       <span
-        className="inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-full text-[13px] leading-5"
+        className="inline-flex items-center px-[10px] py-[4px] rounded-full text-[13px] leading-5"
         style={{
           background: "rgba(0, 0, 0, 0.04)",
           color: "var(--ht-text-muted)",
         }}
       >
-        <CalendarIcon width={14} height={14} />
         {label}
       </span>
     </div>
@@ -229,43 +228,37 @@ function SmallChips({ items }: { items: string[] }) {
 function InputBar() {
   return (
     <div
-      className="absolute left-[16px] right-[16px] bottom-[16px] flex items-center justify-between gap-[4px] rounded-[16px] border px-[12px] pt-[10px] pb-[12px]"
+      className="absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-[8px] rounded-[16px] border px-[14px] pt-[12px] pb-[10px]"
       style={{
         background: "var(--ht-bg-input)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-modal-sm)",
       }}
     >
-      <button
-        type="button"
-        aria-label="더보기"
-        className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-        style={{ background: "#27272a0f" }}
-      >
-        <PlusIcon width={28} height={28} style={{ color: "#6F6F77" }} />
-      </button>
-      <button
-        type="button"
-        aria-label="도움말"
-        className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-        style={{ background: "#27272a0f" }}
-      >
-        <QuestionIcon width={28} height={28} style={{ color: "#6F6F77" }} />
-      </button>
       <span
-        className="flex-1 text-[14px] leading-5 truncate"
+        className="text-[14px] leading-5 truncate"
         style={{ color: "var(--ht-text-muted)" }}
       >
         메시지를 입력해주세요.
       </span>
-      <button
-        type="button"
-        aria-label="전송"
-        className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-        style={{ background: "rgba(39, 39, 42, 0.25)" }}
-      >
-        <SendArrowIcon width={28} height={28} style={{ color: "#fff" }} />
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          aria-label="더보기"
+          className="ht-pressable w-[28px] h-[28px] rounded-full border flex items-center justify-center"
+          style={{ borderColor: "var(--ht-border-default)", background: "transparent" }}
+        >
+          <PlusIcon width={28} height={28} style={{ color: "#6F6F77" }} />
+        </button>
+        <button
+          type="button"
+          aria-label="전송"
+          className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
+          style={{ background: "rgba(39, 39, 42, 0.25)" }}
+        >
+          <SendArrowIcon width={28} height={28} style={{ color: "#fff" }} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -284,33 +277,11 @@ function ArrowLeftIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function CalendarIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 14 14" fill="none" {...props}>
-      <rect x="1.5" y="2.5" width="11" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M1.5 5.5h11" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M4 1.5v2M10 1.5v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-
 function PlusIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 28 28" fill="none" {...props}>
       <path
         d="M13.3327 13.3334V8.66675H14.666V13.3334H19.3327V14.6667H14.666V19.3334H13.3327V14.6667H8.66602V13.3334H13.3327Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function QuestionIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 28 28" fill="none" {...props}>
-      <path
-        d="M14 18.6666C14.5523 18.6666 15 19.1143 15 19.6666C15 20.2189 14.5523 20.6666 14 20.6666C13.4477 20.6666 13 20.2189 13 19.6666C13 19.1143 13.4477 18.6666 14 18.6666ZM14 7.33325C16.2091 7.33325 18 9.12411 18 11.3333C18 12.7763 17.4983 13.5271 16.2173 14.6153C14.9324 15.7069 14.6667 16.1979 14.6667 17.3333H13.3333C13.3333 15.6839 13.858 14.8701 15.354 13.5992C16.3653 12.7401 16.6667 12.2891 16.6667 11.3333C16.6667 9.86049 15.4727 8.66659 14 8.66659C12.5272 8.66659 11.3333 9.86049 11.3333 11.3333V11.9999H10V11.3333C10 9.12411 11.7909 7.33325 14 7.33325Z"
         fill="currentColor"
       />
     </svg>

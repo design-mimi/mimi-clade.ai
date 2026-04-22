@@ -71,16 +71,10 @@ function Header() {
       </h1>
       <button
         type="button"
-        className="px-[10px] py-[4px] rounded-[16px] border text-[14px] leading-5"
-        style={{
-          background: "var(--ht-bg-card)",
-          borderColor: "var(--ht-border-default)",
-          color: "var(--ht-text-subtle)",
-          boxShadow:
-            "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.1)",
-        }}
+        className="ht-pressable text-[14px] leading-5"
+        style={{ color: "var(--ht-text-subtle)" }}
       >
-        상담 내역 삭제
+        내역 삭제
       </button>
     </div>
   );
