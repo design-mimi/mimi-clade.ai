@@ -60,15 +60,20 @@ function ProfileSection() {
           borderColor: "var(--ht-border-default)",
         }}
       >
-        <ProfileField label="이름" value="레이디가가" />
-        <ProfileField label="전화 번호" value="010-0000-0000" />
-        <ProfileField label="주소" value="서울시 중구 순화동" />
+        <ProfileField label="이름" placeholder="이름을 입력해 주세요" />
+        <ProfileField label="이메일" placeholder="이메일을 입력해 주세요" />
       </div>
     </section>
   );
 }
 
-function ProfileField({ label, value }: { label: string; value: string }) {
+function ProfileField({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder: string;
+}) {
   return (
     <div className="flex flex-col gap-[4px]">
       <span
@@ -77,15 +82,15 @@ function ProfileField({ label, value }: { label: string; value: string }) {
       >
         {label}
       </span>
-      <div
-        className="px-[12px] py-[8px] rounded-[8px] bg-white border text-[14px] leading-5"
+      <input
+        type="text"
+        placeholder={placeholder}
+        className="px-[12px] py-[8px] rounded-[8px] bg-white border text-[14px] leading-5 outline-none placeholder:text-[var(--ht-text-hint)]"
         style={{
           borderColor: "var(--ht-border-default)",
           color: "var(--ht-text-default)",
         }}
-      >
-        {value}
-      </div>
+      />
     </div>
   );
 }
