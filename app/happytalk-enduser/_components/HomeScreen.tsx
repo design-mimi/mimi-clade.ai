@@ -61,7 +61,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
     <div className="relative flex flex-col w-full h-full overflow-hidden">
       <VariantBackground variant={variant} />
 
-      {/* Fixed hero image behind scroll */}
+      {/* Fixed hero image + dim — pinned to viewport, white panel slides over */}
       {isBrandImage && (
         <div
           className="absolute top-0 left-0 right-0 z-0 overflow-hidden sm:rounded-t-[24px]"
@@ -84,28 +84,21 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
               sizes="500px"
             />
           </div>
+          <div
+            aria-hidden
+            className="absolute left-0 right-0 bottom-0 pointer-events-none"
+            style={{
+              height: 184,
+              background:
+                "linear-gradient(180deg, rgba(0, 0, 0, 0) 27.92%, rgba(0, 0, 0, 0.2) 100%)",
+            }}
+          />
         </div>
       )}
 
       <div ref={scrollerRef} className="relative flex-1 min-h-0 overflow-y-auto z-10">
-        {/* Spacer to push content below the fixed image; dim scrolls with content */}
-        {isBrandImage && (
-          <div
-            className="relative"
-            style={{ height: isTallHero ? 410 : 240 }}
-          >
-            <div
-              aria-hidden
-              className="absolute left-0 right-0 pointer-events-none"
-              style={{
-                bottom: -20,
-                height: 184,
-                background:
-                  "linear-gradient(180deg, rgba(0, 0, 0, 0) 27.92%, rgba(0, 0, 0, 0.2) 100%)",
-              }}
-            />
-          </div>
-        )}
+        {/* Spacer pushes white panel below the hero */}
+        {isBrandImage && <div style={{ height: isTallHero ? 410 : 240 }} />}
 
         <div className={`pb-[100px] ${isBrandImage ? "rounded-t-[20px] bg-white" : ""}`}>
           {/* Brand area */}
