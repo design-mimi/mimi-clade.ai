@@ -179,7 +179,7 @@ function StatusRow() {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-[4px] w-full">
-      <div className="flex items-center justify-between w-full h-[28px]">
+      <div className="flex items-center justify-between w-full">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -187,7 +187,7 @@ function StatusRow() {
           className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px]"
         >
           <span
-            className="px-[2px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+            className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
             style={{ color: "#4E4E55" }}
           >
             운영 시간
@@ -203,22 +203,22 @@ function StatusRow() {
           />
         </button>
         <span
-          className="inline-flex items-center justify-center rounded-full border px-[4px] h-[24px]"
+          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px]"
           style={{
-            background: "rgba(102, 220, 126, 0.1)",
-            borderColor: "rgba(39, 39, 42, 0.1)",
+            background: "rgba(102, 220, 126, 0.10)",
+            borderColor: "rgba(39, 39, 42, 0.10)",
           }}
         >
           <span
-            className="px-[4px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
-            style={{ color: "#4FC660" }}
+            className="text-[14px] leading-4 font-medium tracking-[-0.25px]"
+            style={{ color: "#33803F" }}
           >
             상담 원활
           </span>
         </span>
       </div>
       {open && (
-        <div className="flex items-center px-[8px] h-[20px]">
+        <div className="flex items-center px-[8px]">
           <span
             className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
             style={{ color: "#111115" }}
