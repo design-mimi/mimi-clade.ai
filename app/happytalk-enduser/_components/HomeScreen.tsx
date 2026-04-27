@@ -271,7 +271,7 @@ function StatusRow() {
       {open && (
         <span
           className="px-[8px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
-          style={{ color: "#111115" }}
+          style={{ color: "#4E4E55" }}
         >
           평일 10:00~17:00
         </span>
