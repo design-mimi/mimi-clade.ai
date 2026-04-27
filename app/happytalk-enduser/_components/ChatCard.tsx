@@ -65,7 +65,7 @@ function Body({ text }: { text: string }) {
   return (
     <div className="p-[12px]">
       <p
-        className="text-[14px] leading-5 font-medium whitespace-pre-line"
+        className="text-[14px] leading-[1.65] font-medium whitespace-pre-line"
         style={{ color: "#38373e" }}
       >
         {text}

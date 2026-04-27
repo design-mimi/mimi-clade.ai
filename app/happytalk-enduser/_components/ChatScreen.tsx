@@ -155,7 +155,7 @@ function AgentBubble({
         </span>
       </div>
       <div
-        className="text-[14px] leading-5"
+        className="text-[14px] leading-[1.65]"
         style={{ color: "var(--ht-text-default)" }}
       >
         {body}
@@ -174,7 +174,7 @@ function UserBubble({ time, body }: { time: string; body: string }) {
         {time}
       </span>
       <div
-        className="max-w-[300px] px-[14px] py-[6px] border text-[14px] leading-5 text-white"
+        className="max-w-[300px] px-[14px] py-[6px] border text-[14px] leading-[1.65] text-white"
         style={{
           background: "var(--ht-bg-inverted)",
           borderColor: "var(--ht-border-default)",
