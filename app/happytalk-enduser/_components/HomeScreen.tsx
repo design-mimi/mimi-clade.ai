@@ -26,33 +26,98 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
   const brandAreaPt = isGradient ? 20 : 28;
 
   const heroImageRef = useRef<HTMLDivElement>(null);
+  const heroOuterRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isBrandImage) return;
     const scroller = scrollerRef.current;
     const heroImage = heroImageRef.current;
-    if (!scroller || !heroImage) return;
+    const heroOuter = heroOuterRef.current;
+    if (!scroller || !heroImage || !heroOuter) return;
 
     const HERO_HEIGHT = isTallHero ? 430 : 260;
-    const START_SCALE = 1.0;
-    const END_SCALE = 0.8;
+    const SCALE_MIN = 0.8;
+    const MAX_STRETCH = HERO_HEIGHT; // pull-down can up to double the hero
 
+    let touchStartY = 0;
+    let touchPullPx = 0;
+    let pulling = false;
     let raf = 0;
-    const update = () => {
+
+    const apply = () => {
       raf = 0;
-      const progress = Math.max(0, Math.min(1, scroller.scrollTop / HERO_HEIGHT));
-      const scale = START_SCALE + (END_SCALE - START_SCALE) * progress;
-      heroImage.style.transform = `scale(${scale})`;
+      const st = scroller.scrollTop;
+      // Down-scroll → shrink image (centered scale)
+      if (st > 0) {
+        const progress = Math.min(1, st / HERO_HEIGHT);
+        const scale = 1 + (SCALE_MIN - 1) * progress;
+        heroImage.style.transform = `scale(${scale})`;
+        heroOuter.style.height = HERO_HEIGHT + "px";
+        return;
+      }
+      // Overscroll (negative scrollTop or active touch pull) → grow hero downward
+      const overscroll = Math.max(-st, touchPullPx);
+      const extra = Math.min(MAX_STRETCH, overscroll);
+      heroImage.style.transform = "scale(1)";
+      heroOuter.style.height = HERO_HEIGHT + extra + "px";
     };
-    const onScroll = () => {
+
+    const queue = () => {
       if (raf) return;
-      raf = requestAnimationFrame(update);
+      raf = requestAnimationFrame(apply);
     };
-    scroller.addEventListener("scroll", onScroll, { passive: true });
-    update();
+
+    const onTouchStart = (e: TouchEvent) => {
+      pulling = scroller.scrollTop <= 0;
+      touchStartY = e.touches[0].clientY;
+      touchPullPx = 0;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!pulling) return;
+      if (scroller.scrollTop > 0) {
+        pulling = false;
+        touchPullPx = 0;
+        queue();
+        return;
+      }
+      const dy = e.touches[0].clientY - touchStartY;
+      touchPullPx = Math.max(0, dy);
+      queue();
+    };
+    const onTouchEnd = () => {
+      if (!pulling) return;
+      pulling = false;
+      const start = touchPullPx;
+      if (start <= 0) {
+        touchPullPx = 0;
+        queue();
+        return;
+      }
+      const startTime = performance.now();
+      const duration = 280;
+      const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - startTime) / duration);
+        touchPullPx = start * (1 - ease(t));
+        apply();
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    scroller.addEventListener("scroll", queue, { passive: true });
+    scroller.addEventListener("touchstart", onTouchStart, { passive: true });
+    scroller.addEventListener("touchmove", onTouchMove, { passive: true });
+    scroller.addEventListener("touchend", onTouchEnd, { passive: true });
+    scroller.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    apply();
     return () => {
-      scroller.removeEventListener("scroll", onScroll);
+      scroller.removeEventListener("scroll", queue);
+      scroller.removeEventListener("touchstart", onTouchStart);
+      scroller.removeEventListener("touchmove", onTouchMove);
+      scroller.removeEventListener("touchend", onTouchEnd);
+      scroller.removeEventListener("touchcancel", onTouchEnd);
       if (raf) cancelAnimationFrame(raf);
     };
   }, [isBrandImage, isTallHero]);
@@ -64,6 +129,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
       {/* Fixed hero image + dim — pinned to viewport, white panel slides over */}
       {isBrandImage && (
         <div
+          ref={heroOuterRef}
           className="absolute top-0 left-0 right-0 z-0 overflow-hidden sm:rounded-t-[24px]"
           style={{ height: isTallHero ? 430 : 260 }}
         >
