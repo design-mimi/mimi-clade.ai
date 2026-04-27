@@ -19,8 +19,11 @@ const HERO_IMAGE = "/hero.jpg";
 export function HomeScreen({ variant, onOpenChat }: Props) {
   const isBrandImage = variant === "brand-image" || variant === "brand-image-tall";
   const isTallHero = variant === "brand-image-tall";
+  const isGradient = variant === "gradient-line" || variant === "gradient-oval";
   const showDescription = variant !== "default-compact";
   const brandName = isTallHero ? "KINDERSALMON" : "킨더살몬";
+  // Figma spec: home_none → pt-28, home_gra_* → pt-20
+  const brandAreaPt = isGradient ? 20 : 28;
 
   const heroImageRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -110,7 +113,10 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           }`}
         >
           {/* Brand area */}
-          <div className="flex flex-col gap-[16px] px-[20px] pt-[28px] pb-[16px]">
+          <div
+            className="flex flex-col gap-[16px] px-[20px] pb-[16px]"
+            style={{ paddingTop: brandAreaPt }}
+          >
             <div className="flex flex-col w-full overflow-hidden">
               <h1
                 className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap"
