@@ -19,11 +19,9 @@ const HERO_IMAGE = "/hero.jpg";
 export function HomeScreen({ variant, onOpenChat }: Props) {
   const isBrandImage = variant === "brand-image" || variant === "brand-image-tall";
   const isTallHero = variant === "brand-image-tall";
-  const isGradient = variant === "gradient-line" || variant === "gradient-oval";
   const showDescription = variant !== "default-compact";
   const brandName = isTallHero ? "KINDERSALMON" : "킨더살몬";
-  // Figma spec: home_none → pt-28, home_gra_* → pt-20
-  const brandAreaPt = isGradient ? 20 : 28;
+  const brandAreaPt = 28;
 
   const heroImageRef = useRef<HTMLDivElement>(null);
   const heroOuterRef = useRef<HTMLDivElement>(null);

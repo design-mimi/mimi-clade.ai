@@ -8,6 +8,7 @@ import { ChatScreen } from "./ChatScreen";
 import { ChatSkeleton } from "./ChatSkeleton";
 import { BottomNav } from "./BottomNav";
 import type { HomeVariant, NavTab } from "./types";
+import type { SettingView } from "./SettingScreen";
 
 type Props = {
   variant: HomeVariant;
@@ -26,6 +27,7 @@ export function EnduserFrame({ variant, onClose }: Props) {
   const [chatClosing, setChatClosing] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatIsNew, setChatIsNew] = useState(false);
+  const [settingView, setSettingView] = useState<SettingView>("main");
   const [textSize, setTextSize] = useState<TextSize>(() =>
     typeof window !== "undefined" &&
     !window.matchMedia("(min-width: 640px)").matches
@@ -130,7 +132,14 @@ export function EnduserFrame({ variant, onClose }: Props) {
     if (t === "home")
       return <HomeScreen variant={variant} onOpenChat={() => openChat(true)} />;
     if (t === "message") return <MessageScreen onOpenChat={() => openChat(false)} />;
-    return <SettingScreen textSize={textSize} onTextSizeChange={setTextSize} />;
+    return (
+      <SettingScreen
+        textSize={textSize}
+        onTextSizeChange={setTextSize}
+        view={settingView}
+        onViewChange={setSettingView}
+      />
+    );
   };
 
   const transitioning = prevTab !== null;
@@ -149,8 +158,8 @@ export function EnduserFrame({ variant, onClose }: Props) {
         }}
       />
 
-      {/* Mobile-only close button */}
-      {onClose && (
+      {/* Mobile-only close button — hidden on setting profile sub-view */}
+      {onClose && !(tab === "setting" && settingView === "profile") && (
         <button
           type="button"
           onClick={onClose}

@@ -20,14 +20,7 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
-      <div
-        className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 80% 300px at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, transparent 100%)",
-          backgroundAttachment: "local",
-        }}
-      >
+      <div className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]">
         <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (

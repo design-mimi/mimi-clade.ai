@@ -1,27 +1,32 @@
 "use client";
 
-import { useState, type SVGProps } from "react";
+import type { SVGProps } from "react";
 import type { TextSize } from "./EnduserFrame";
+
+export type SettingView = "main" | "profile";
 
 type Props = {
   textSize: TextSize;
   onTextSizeChange: (v: TextSize) => void;
+  view: SettingView;
+  onViewChange: (v: SettingView) => void;
 };
 
-type View = "main" | "profile";
-
-export function SettingScreen({ textSize, onTextSizeChange }: Props) {
-  const [view, setView] = useState<View>("main");
-
+export function SettingScreen({
+  textSize,
+  onTextSizeChange,
+  view,
+  onViewChange,
+}: Props) {
   if (view === "profile") {
-    return <ProfileView onBack={() => setView("main")} />;
+    return <ProfileView onBack={() => onViewChange("main")} />;
   }
 
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
       <div className="flex-1 flex flex-col px-[20px] py-[16px] gap-[12px]">
-        <ProfileEntry onClick={() => setView("profile")} />
+        <ProfileEntry onClick={() => onViewChange("profile")} />
         <TextSizeRow value={textSize} onChange={onTextSizeChange} />
       </div>
     </div>
