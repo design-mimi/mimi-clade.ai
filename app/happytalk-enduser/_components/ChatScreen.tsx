@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, type SVGProps } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type SVGProps,
+} from "react";
 import { ChatCard } from "./ChatCard";
 import { CARDS_BY_TOPIC, type ChatTopic } from "./chatCards";
 
@@ -10,13 +17,108 @@ type Props = {
   isNew?: boolean;
 };
 
+type AgentItem = {
+  id: string;
+  kind: "agent";
+  body: ReactNode;
+  chips?: string[];
+  meta: { name: string; time: string };
+};
+
+type UserItem = {
+  id: string;
+  kind: "user";
+  text: string;
+};
+
+type TranscriptItem = AgentItem | UserItem;
+
+const INTRO_CHIPS = [
+  "상품 문의",
+  "주문 취소/변경 문의",
+  "포인트 적립",
+  "배송 문의",
+  "기타 문의",
+];
+
+const SHIPPING_CHIPS = ["배송 정책 자세히 보기", "예상 도착일"];
+
+const FADE_MS = 200;
+
+const SHIPPING_BODY: ReactNode = (
+  <>
+    고객님. 배송비 정책을 안내드립니다.
+    <ul className="list-disc ps-[21px] mt-[2px]">
+      <li>50,000원 미만 주문 배송비 : 3,000원</li>
+      <li>50,000원 이상 주문 배송비 : 무료배송</li>
+    </ul>
+  </>
+);
+
 export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   const cards = CARDS_BY_TOPIC[topic];
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const initial = useMemo<TranscriptItem[]>(() => {
+    const intro: AgentItem = {
+      id: "intro",
+      kind: "agent",
+      body: "안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
+      chips: INTRO_CHIPS,
+      meta: { name: "킨더살몬", time: isNew ? "방금 전" : "1시간 전" },
+    };
+    if (isNew) return [intro];
+    return [
+      { ...intro, chips: undefined },
+      { id: "user-prefill", kind: "user", text: "배송 문의" },
+      {
+        id: "shipping",
+        kind: "agent",
+        body: SHIPPING_BODY,
+        chips: SHIPPING_CHIPS,
+        meta: { name: "킨더살몬", time: "55분 전" },
+      },
+    ];
+  }, [isNew]);
+
+  const [transcript, setTranscript] = useState<TranscriptItem[]>(initial);
+  const [fadingChips, setFadingChips] = useState<Set<string>>(new Set());
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView();
-  }, []);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [transcript]);
+
+  const handleChipClick = (turnId: string, label: string) => {
+    if (fadingChips.has(turnId)) return;
+    setFadingChips((prev) => new Set(prev).add(turnId));
+
+    window.setTimeout(() => {
+      setTranscript((prev) => {
+        const next: TranscriptItem[] = prev.map((item) =>
+          item.id === turnId && item.kind === "agent"
+            ? { ...item, chips: undefined }
+            : item,
+        );
+        const stamp = Date.now();
+        next.push({ id: `user-${stamp}`, kind: "user", text: label });
+        if (label === "배송 문의") {
+          next.push({
+            id: `shipping-${stamp}`,
+            kind: "agent",
+            body: SHIPPING_BODY,
+            chips: SHIPPING_CHIPS,
+            meta: { name: "킨더살몬", time: "방금 전" },
+          });
+        }
+        return next;
+      });
+      setFadingChips((prev) => {
+        const next = new Set(prev);
+        next.delete(turnId);
+        return next;
+      });
+    }, FADE_MS);
+  };
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
@@ -24,35 +126,39 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
         <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (
-          <ChatCard key={i} data={card} />
+          <ChatCard key={`card-${i}`} data={card} />
         ))}
 
-        <AgentTurn name="킨더살몬" time={isNew ? "방금 전" : "1시간 전"}>
-          <AgentBubble body="안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다." />
-          <SuggestionChips
-            items={["상품 문의", "주문 취소/변경 문의", "포인트 적립", "배송 문의", "기타 문의"]}
-          />
-        </AgentTurn>
-
-        {!isNew && (
-          <>
-            <UserBubble body="옷 주문했는데요. 배송비가 궁금해서요." />
-
-            <AgentTurn name="킨더살몬" time="55분 전">
-              <AgentBubble
-                body={
-                  <>
-                    고객님. 배송비 정책을 안내드립니다.
-                    <ul className="list-disc ps-[21px] mt-[2px]">
-                      <li>50,000원 미만 주문 배송비 : 3,000원</li>
-                      <li>50,000원 이상 주문 배송비 : 무료배송</li>
-                    </ul>
-                  </>
-                }
-              />
-              <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+        {transcript.map((item) =>
+          item.kind === "agent" ? (
+            <AgentTurn
+              key={item.id}
+              name={item.meta.name}
+              time={item.meta.time}
+            >
+              <AgentBubble body={item.body} />
+              {item.chips && (
+                <div
+                  className="origin-top w-full"
+                  style={{
+                    transition: `opacity ${FADE_MS}ms ease-out, transform ${FADE_MS}ms ease-out`,
+                    opacity: fadingChips.has(item.id) ? 0 : 1,
+                    transform: fadingChips.has(item.id)
+                      ? "translateY(-4px) scale(0.98)"
+                      : "translateY(0) scale(1)",
+                    pointerEvents: fadingChips.has(item.id) ? "none" : "auto",
+                  }}
+                >
+                  <ChipGroup
+                    items={item.chips}
+                    onSelect={(label) => handleChipClick(item.id, label)}
+                  />
+                </div>
+              )}
             </AgentTurn>
-          </>
+          ) : (
+            <UserBubble key={item.id} body={item.text} />
+          ),
         )}
         <div ref={bottomRef} />
       </div>
@@ -126,10 +232,10 @@ function AgentTurn({
 }: {
   name: string;
   time: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-[10px] w-full">
+    <div className="ht-reveal flex flex-col gap-[10px] w-full">
       {children}
       <span
         className="text-[14px] leading-5"
@@ -141,7 +247,7 @@ function AgentTurn({
   );
 }
 
-function AgentBubble({ body }: { body: React.ReactNode }) {
+function AgentBubble({ body }: { body: ReactNode }) {
   return (
     <div
       className="text-[14px] leading-5 w-full"
@@ -154,7 +260,7 @@ function AgentBubble({ body }: { body: React.ReactNode }) {
 
 function UserBubble({ body }: { body: string }) {
   return (
-    <div className="flex justify-end w-full">
+    <div className="ht-reveal flex justify-end w-full">
       <div
         className="max-w-[300px] px-[14px] py-[6px] rounded-[10px] border text-[14px] leading-5 text-white"
         style={{
@@ -168,30 +274,37 @@ function UserBubble({ body }: { body: string }) {
   );
 }
 
-function SuggestionChips({ items }: { items: string[] }) {
+function ChipGroup({
+  items,
+  onSelect,
+}: {
+  items: string[];
+  onSelect: (label: string) => void;
+}) {
   return (
     <div className="flex flex-wrap gap-[4px] w-full content-start items-start">
       {items.map((label) => (
-        <SecondaryPill key={label} label={label} />
+        <SecondaryPill
+          key={label}
+          label={label}
+          onClick={() => onSelect(label)}
+        />
       ))}
     </div>
   );
 }
 
-function SmallChips({ items }: { items: string[] }) {
-  return (
-    <div className="flex flex-wrap gap-[4px]">
-      {items.map((label) => (
-        <SecondaryPill key={label} label={label} />
-      ))}
-    </div>
-  );
-}
-
-function SecondaryPill({ label }: { label: string }) {
+function SecondaryPill({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="ht-pressable rounded-full px-[12px] py-[6px] border bg-white text-[14px] leading-5 font-medium tracking-[-0.25px]"
       style={{
         borderColor: "rgba(39, 39, 42, 0.15)",

@@ -34,7 +34,7 @@ export function BottomNav({ active, onChange }: Props) {
     <div
       className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border ht-blur-backdrop"
       style={{
-        background: "rgba(245, 245, 245, 0.8)",
+        background: "rgba(228, 228, 232, 0.92)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-nav)",
       }}

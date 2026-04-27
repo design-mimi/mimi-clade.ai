@@ -121,13 +121,8 @@ body {
   }
 }
 
-/* Smooth rounded corners — eliminates jagged anti-aliasing on overflow-hidden */
-[data-smooth-corners] {
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
-  mask-image: radial-gradient(white, black);
-  isolation: isolate;
-  transform: translateZ(0);
-}
+/* (Removed) data-smooth-corners hack — its mask + translateZ broke iOS backdrop-filter
+   on the BottomNav. Modern browsers anti-alias rounded corners cleanly without it. */
 
 /* ============================================== */
 /*  Motion System                                 */
