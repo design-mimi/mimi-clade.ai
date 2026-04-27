@@ -107,13 +107,8 @@ function MessageRow({
         </span>
       </div>
       <p
-        className="text-[14px] leading-5 h-[40px] overflow-hidden w-full"
-        style={{
-          color: "var(--ht-text-default)",
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-        }}
+        className="text-[14px] leading-[22px] tracking-[0.01em] w-full"
+        style={{ color: "var(--ht-text-default)" }}
       >
         {body}
       </p>

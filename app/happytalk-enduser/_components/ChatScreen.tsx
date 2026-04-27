@@ -21,7 +21,7 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
       <div
-        className="absolute inset-0 flex flex-col gap-[10px] overflow-y-auto pt-[40px] px-[16px] pb-[140px]"
+        className="absolute inset-0 flex flex-col gap-[16px] overflow-y-auto pt-[40px] px-[16px] pb-[140px]"
         style={{
           backgroundImage:
             "radial-gradient(ellipse 80% 300px at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, transparent 100%)",

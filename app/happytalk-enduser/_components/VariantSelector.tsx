@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { HOME_VARIANTS, type HomeVariant } from "./types";
 
 type Props = {
@@ -8,31 +9,118 @@ type Props = {
 };
 
 export function VariantSelector({ value, onChange }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+      if (!e.matches) setExpanded(false);
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  // Desktop: original sticky panel at bottom-left, always expanded.
+  if (!isMobile) {
+    return (
+      <div
+        className="fixed bottom-6 left-6 z-50 flex flex-col gap-2 p-3 rounded-2xl bg-white/90 backdrop-blur-md border border-black/10"
+        style={{ boxShadow: "var(--ht-shadow-lg)" }}
+      >
+        <div className="px-1 pb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
+          홈 배리언트
+        </div>
+        {HOME_VARIANTS.map(({ id, label }) => (
+          <VariantButton
+            key={id}
+            active={id === value}
+            onClick={() => onChange(id)}
+            label={label}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Mobile collapsed: small pill at bottom-right.
+  const activeLabel =
+    HOME_VARIANTS.find((v) => v.id === value)?.label ?? "배리언트";
+
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        aria-label="홈 배리언트 열기"
+        className="fixed bottom-4 right-4 z-50 px-3 py-2 rounded-full bg-white/90 backdrop-blur-md border border-black/10 text-[12px] font-medium text-zinc-700"
+        style={{ boxShadow: "var(--ht-shadow-lg)" }}
+      >
+        {activeLabel}
+      </button>
+    );
+  }
+
+  // Mobile expanded: full panel at bottom-right with close button.
   return (
     <div
-      className="fixed bottom-6 left-6 z-50 flex flex-col gap-2 p-3 rounded-2xl bg-white/90 backdrop-blur-md border border-black/10"
+      className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 p-3 rounded-2xl bg-white/90 backdrop-blur-md border border-black/10"
       style={{ boxShadow: "var(--ht-shadow-lg)" }}
     >
-      <div className="px-1 pb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
-        홈 배리언트
+      <div className="flex items-center justify-between gap-[12px] px-1 pb-1">
+        <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
+          홈 배리언트
+        </span>
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          aria-label="홈 배리언트 닫기"
+          className="ht-pressable w-[18px] h-[18px] flex items-center justify-center text-zinc-400 hover:text-zinc-700"
+        >
+          <svg viewBox="0 0 12 12" width={10} height={10} fill="none">
+            <path
+              d="M2 2l8 8M10 2l-8 8"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
       </div>
-      {HOME_VARIANTS.map(({ id, label }) => {
-        const active = id === value;
-        return (
-          <button
-            key={id}
-            type="button"
-            onClick={() => onChange(id)}
-            className={`text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
-              active
-                ? "bg-zinc-900 text-white"
-                : "bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
-            }`}
-          >
-            {label}
-          </button>
-        );
-      })}
+      {HOME_VARIANTS.map(({ id, label }) => (
+        <VariantButton
+          key={id}
+          active={id === value}
+          onClick={() => onChange(id)}
+          label={label}
+        />
+      ))}
     </div>
+  );
+}
+
+function VariantButton({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+        active
+          ? "bg-zinc-900 text-white"
+          : "bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
+      }`}
+    >
+      {label}
+    </button>
   );
 }

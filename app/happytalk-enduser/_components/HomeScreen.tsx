@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { SVGProps } from "react";
 import type { HomeVariant } from "./types";
 import {
   SearchIcon,
@@ -56,12 +57,11 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
       <VariantBackground variant={variant} />
-      <StatusBadges />
 
       {/* Fixed hero image behind scroll */}
       {isBrandImage && (
         <div
-          className="absolute top-0 left-0 right-0 z-0 overflow-hidden rounded-t-[24px]"
+          className="absolute top-0 left-0 right-0 z-0 overflow-hidden sm:rounded-t-[24px]"
           style={{ height: isTallHero ? 430 : 260 }}
         >
           <div
@@ -104,77 +104,53 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           </div>
         )}
 
-        <div className={`relative flex flex-col ${isBrandImage ? "bg-white rounded-t-[20px] pb-[100px]" : "pb-[100px]"}`}>
-          <div className="flex flex-col gap-[16px] px-[20px] pb-[16px] pt-[20px]">
-            <h1
-              className="text-[24px] font-semibold leading-8"
-              style={{ color: "var(--ht-text-default)" }}
-            >
-              {brandName}
-            </h1>
-            {showDescription && (
-              <p
-                className="text-[14px] leading-5 w-[320px] h-[40px] opacity-80"
-                style={{ color: "#121212" }}
+        <div
+          className={`relative flex flex-col rounded-t-[20px] ${
+            isBrandImage ? "bg-white pb-[100px]" : "pb-[100px]"
+          }`}
+        >
+          {/* Brand area */}
+          <div className="flex flex-col gap-[16px] px-[20px] pt-[28px] pb-[16px]">
+            <div className="flex flex-col gap-[10px]">
+              <h1
+                className="text-[24px] leading-8 font-semibold tracking-[-0.25px]"
+                style={{ color: "var(--ht-text-default)" }}
               >
-                차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
-              </p>
-            )}
-
-            <div className="flex flex-col gap-[8px] w-full">
+                {brandName}
+              </h1>
+              {showDescription && (
+                <p
+                  className="text-[15px] leading-5 tracking-[-0.25px] opacity-80"
+                  style={{ color: "#121212" }}
+                >
+                  차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-[8px]">
               <PrimaryCTA onClick={onOpenChat} />
-              <ChannelRow />
+              <StatusRow />
             </div>
           </div>
 
-          <div className="px-[12px]">
-            <QnaCard />
+          {/* QnA area */}
+          <div className="flex flex-col gap-[8px] px-[20px] py-[12px]">
+            <ChannelRow />
+            <span
+              className="text-[12px] leading-4 tracking-[-0.25px] opacity-70"
+              style={{ color: "#404040" }}
+            >
+              자주 묻는 질문
+            </span>
+            <SearchInput />
+            <FaqCard />
           </div>
 
-          <div className="flex items-center justify-center pt-[14px] opacity-65">
+          <div className="flex items-center justify-center pt-[20px] opacity-65">
             <HappytalkLogo width={62} height={12} />
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function StatusBadges() {
-  return (
-    <div className="absolute top-[12px] right-[16px] flex gap-[4px] z-20">
-      <span
-        className="inline-flex items-center rounded-full border px-[4px] py-[2px]"
-        style={{
-          background: "var(--ht-bg-badge-green)",
-          borderColor: "var(--ht-border-default)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
-        }}
-      >
-        <span
-          className="px-[4px] text-[12px] leading-4 font-medium"
-          style={{ color: "var(--ht-green-accent)" }}
-        >
-          상담 원활
-        </span>
-      </span>
-      <span
-        className="inline-flex items-center rounded-full border px-[4px] py-[2px]"
-        style={{
-          background: "rgba(255, 255, 255, 0.9)",
-          borderColor: "var(--ht-border-default)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
-        }}
-      >
-        <span
-          className="px-[4px] text-[12px] leading-4 font-medium"
-          style={{ color: "var(--ht-text-muted)" }}
-        >
-          9-18시 운영
-        </span>
-      </span>
     </div>
   );
 }
@@ -184,16 +160,74 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-cta-button relative w-full flex items-center justify-center py-[12px] px-[20px] rounded-[16px] text-white overflow-hidden"
+      className="ht-cta-button relative w-full h-[48px] flex items-center justify-center rounded-[16px] text-white overflow-hidden"
       style={{
-        background: "var(--ht-bg-inverted)",
-        border: "1px solid var(--ht-border-inverted)",
+        background: "#18181B",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
         boxShadow:
-          "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
+          "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
       }}
     >
-      <span className="relative z-10 text-[16px] font-semibold leading-6">문의하기</span>
+      <span className="relative z-10 text-[16px] font-semibold leading-6 tracking-[-0.25px]">
+        문의하기
+      </span>
     </button>
+  );
+}
+
+function StatusRow() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col gap-[4px] w-full">
+      <div className="flex items-center justify-between w-full h-[28px]">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px]"
+        >
+          <span
+            className="px-[2px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+            style={{ color: "#4E4E55" }}
+          >
+            운영 시간
+          </span>
+          <ChevronDownIcon
+            width={16}
+            height={16}
+            style={{
+              color: "#6F6F77",
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 200ms ease-out",
+            }}
+          />
+        </button>
+        <span
+          className="inline-flex items-center justify-center rounded-full border px-[4px] h-[24px]"
+          style={{
+            background: "rgba(102, 220, 126, 0.1)",
+            borderColor: "rgba(39, 39, 42, 0.1)",
+          }}
+        >
+          <span
+            className="px-[4px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
+            style={{ color: "#4FC660" }}
+          >
+            상담 원활
+          </span>
+        </span>
+      </div>
+      {open && (
+        <div className="flex items-center px-[8px] h-[20px]">
+          <span
+            className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
+            style={{ color: "#111115" }}
+          >
+            평일 10:00~17:00
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -203,78 +237,92 @@ function ChannelRow() {
       className="w-full flex items-center justify-between rounded-[16px] px-[16px] py-[8px] border"
       style={{
         background: "rgba(245, 245, 245, 0.88)",
-        borderColor: "var(--ht-border-default)",
+        borderColor: "rgba(39, 39, 42, 0.1)",
       }}
     >
       <span
-        className="text-[14px] leading-5"
-        style={{ color: "var(--ht-text-subtle)" }}
+        className="text-[14px] leading-5 tracking-[-0.25px]"
+        style={{ color: "#4E4E55" }}
       >
         다른 문의하기
       </span>
       <div className="flex items-center gap-[6px]">
-        <button type="button" aria-label="네이버톡톡" className="ht-pressable w-[32px] h-[32px] rounded-[8px]">
-          <NaverTalkIcon width={32} height={32} />
+        <button
+          type="button"
+          aria-label="네이버톡톡"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+        >
+          <NaverTalkIcon width={36} height={36} />
         </button>
-        <button type="button" aria-label="카카오채널" className="ht-pressable w-[32px] h-[32px] rounded-[8px]">
-          <KakaoChannelIcon width={32} height={32} />
+        <button
+          type="button"
+          aria-label="카카오채널"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+        >
+          <KakaoChannelIcon width={36} height={36} />
         </button>
-        <button type="button" aria-label="전화" className="ht-pressable w-[32px] h-[32px] rounded-[8px]">
-          <PhoneCircleIcon width={32} height={32} />
+        <button
+          type="button"
+          aria-label="전화"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+        >
+          <PhoneCircleIcon width={36} height={36} />
         </button>
       </div>
     </div>
   );
 }
 
-function QnaCard() {
+function SearchInput() {
+  return (
+    <button
+      type="button"
+      className="flex items-center px-[8px] min-h-[36px] rounded-[8px] gap-[2px] w-full text-left"
+    >
+      <span className="flex items-center justify-center w-[20px] h-[20px]">
+        <SearchIcon
+          width={16}
+          height={16}
+          style={{ color: "#6F6F77" }}
+        />
+      </span>
+      <span
+        className="px-[4px] text-[14px] leading-5 tracking-[-0.25px]"
+        style={{ color: "rgba(39, 39, 42, 0.3)" }}
+      >
+        Search
+      </span>
+    </button>
+  );
+}
+
+function FaqCard() {
   return (
     <div
-      className="w-full flex flex-col gap-[8px] p-[12px] rounded-[20px]"
+      className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px]"
+      style={{ background: "#F4F4F5" }}
     >
-      <span
-        className="text-[12px] leading-4 opacity-70"
-        style={{ color: "#404040" }}
-      >
-        자주 묻는 질문
-      </span>
-      <button
-        type="button"
-        className="min-h-[36px] rounded-[8px] flex items-center gap-[2px] px-[8px] w-full text-left"
-      >
-        <span className="flex items-center justify-center w-[20px] h-[20px]">
-          <SearchIcon width={16} height={16} style={{ color: "var(--ht-text-hint)" }} />
-        </span>
-        <span
-          className="px-[4px] text-[14px] leading-5"
-          style={{ color: "var(--ht-text-hint)" }}
-        >
-          Search
-        </span>
-      </button>
-      <div
-        className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px]"
-        style={{ background: "var(--ht-bg-muted)" }}
-      >
-        <FaqItem category="배송" question="당일배송은 무엇인가요?" />
-        <FaqItem category="상품" question="상품 품절인 경우 재입고는 언제 알 수 있나요?" />
-      </div>
+      <FaqItem category="배송" question="당일배송은 무엇인가요?" />
+      <FaqItem
+        category="상품"
+        question="상품 품절인 경우 재입고는 언제 알 수 있나요?"
+      />
     </div>
   );
 }
 
 function FaqItem({ category, question }: { category: string; question: string }) {
   return (
-    <div className="flex flex-col gap-[4px] h-[40px] justify-center">
+    <div className="flex flex-col gap-[4px] justify-center">
       <span
-        className="text-[12px] leading-4 font-medium"
-        style={{ color: "var(--ht-text-subtle)" }}
+        className="text-[12px] leading-4 font-medium tracking-[-0.25px]"
+        style={{ color: "#4E4E55" }}
       >
         {category}
       </span>
       <p
-        className="text-[14px] leading-5 h-[20px] overflow-hidden text-ellipsis whitespace-nowrap"
-        style={{ color: "var(--ht-text-default)" }}
+        className="text-[14px] leading-5 tracking-[-0.25px]"
+        style={{ color: "#111115" }}
       >
         {question}
       </p>
@@ -310,4 +358,18 @@ function VariantBackground({ variant }: { variant: HomeVariant }) {
   }
 
   return null;
+}
+
+function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" {...props}>
+      <path
+        d="M4 6l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }

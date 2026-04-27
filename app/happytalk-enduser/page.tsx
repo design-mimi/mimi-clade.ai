@@ -26,8 +26,16 @@ export default function HappytalkEnduserPage() {
 
       <VariantSelector value={variant} onChange={setVariant} />
 
-      <div className="fixed right-8 bottom-8 z-40 flex flex-col items-end gap-[20px]">
-        {panelOpen && <EnduserFrame variant={variant} />}
+      {panelOpen && (
+        <div className="fixed z-40 inset-0 sm:inset-auto sm:right-8 sm:bottom-[112px]">
+          <EnduserFrame variant={variant} onClose={() => setPanelOpen(false)} />
+        </div>
+      )}
+      <div
+        className={`fixed right-4 bottom-4 sm:right-8 sm:bottom-8 z-50 ${
+          panelOpen ? "hidden sm:block" : ""
+        }`}
+      >
         <Launcher onClick={() => setPanelOpen((v) => !v)} />
       </div>
     </div>
