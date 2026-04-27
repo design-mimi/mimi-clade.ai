@@ -10,7 +10,7 @@ export function Launcher({ onClick }: Props) {
       type="button"
       onClick={onClick}
       aria-label="상담 열기"
-      className="w-[60px] h-[60px] rounded-[20px] bg-white flex items-center justify-center border border-black/10"
+      className="ht-launcher w-[60px] h-[60px] rounded-[20px] bg-white flex items-center justify-center border border-black/10"
       style={{ boxShadow: "var(--ht-shadow-lg)" }}
     >
       <svg viewBox="0 0 32 32" width={32} height={32}>

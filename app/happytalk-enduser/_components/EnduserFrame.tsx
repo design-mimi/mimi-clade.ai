@@ -11,6 +11,7 @@ import type { HomeVariant, NavTab } from "./types";
 
 type Props = {
   variant: HomeVariant;
+  onClose?: () => void;
 };
 
 const TRANSITION_MS = 180;
@@ -19,15 +20,17 @@ const SKELETON_MS = 300;
 
 export type TextSize = "small" | "large";
 
-export function EnduserFrame({ variant }: Props) {
+export function EnduserFrame({ variant, onClose }: Props) {
   const [tab, setTab] = useState<NavTab>("home");
   const [prevTab, setPrevTab] = useState<NavTab | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatClosing, setChatClosing] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
+  const [chatIsNew, setChatIsNew] = useState(false);
   const [textSize, setTextSize] = useState<TextSize>("small");
 
-  const openChat = () => {
+  const openChat = (isNew = false) => {
+    setChatIsNew(isNew);
     setChatLoading(true);
     setChatOpen(true);
   };
@@ -49,6 +52,7 @@ export function EnduserFrame({ variant }: Props) {
         document.head.appendChild(style);
       }
       style.textContent = `
+        #ht-enduser-root { letter-spacing: 0.01em; }
         #ht-enduser-root [class*="text-\\[11px\\]"] { font-size: 13px !important; }
         #ht-enduser-root [class*="text-\\[12px\\]"] { font-size: 14px !important; }
         #ht-enduser-root [class*="text-\\[13px\\]"] { font-size: 15px !important; }
@@ -56,6 +60,12 @@ export function EnduserFrame({ variant }: Props) {
         #ht-enduser-root [class*="text-\\[16px\\]"] { font-size: 18px !important; }
         #ht-enduser-root [class*="text-\\[18px\\]"] { font-size: 20px !important; }
         #ht-enduser-root [class*="text-\\[24px\\]"] { font-size: 26px !important; }
+        #ht-enduser-root [class~="leading-4"] { line-height: 20px !important; }
+        #ht-enduser-root [class~="leading-5"] { line-height: 24px !important; }
+        #ht-enduser-root [class~="leading-6"] { line-height: 28px !important; }
+        #ht-enduser-root [class~="leading-7"] { line-height: 32px !important; }
+        #ht-enduser-root [class~="leading-8"] { line-height: 36px !important; }
+        #ht-enduser-root [class*="leading-\\[18px\\]"] { line-height: 22px !important; }
       `;
     } else if (style) {
       style.remove();
@@ -82,8 +92,8 @@ export function EnduserFrame({ variant }: Props) {
 
   const renderScreen = (t: NavTab) => {
     if (t === "home")
-      return <HomeScreen variant={variant} onOpenChat={openChat} />;
-    if (t === "message") return <MessageScreen onOpenChat={openChat} />;
+      return <HomeScreen variant={variant} onOpenChat={() => openChat(true)} />;
+    if (t === "message") return <MessageScreen onOpenChat={() => openChat(false)} />;
     return <SettingScreen textSize={textSize} onTextSizeChange={setTextSize} />;
   };
 
@@ -92,12 +102,38 @@ export function EnduserFrame({ variant }: Props) {
   return (
     <div
       id="ht-enduser-root"
-      className="ht-root relative flex flex-col w-[375px] h-[640px] overflow-hidden rounded-[24px] bg-white"
-      style={{
-        boxShadow:
-          "inset 0 0 0 1px var(--ht-border-inverted), var(--ht-shadow-2xl)",
-      }}
+      className="ht-root ht-frame relative flex flex-col overflow-hidden bg-white"
+      data-smooth-corners=""
     >
+      {/* Border overlay — always on top */}
+      <div
+        className="ht-frame-overlay absolute inset-0 z-50 pointer-events-none"
+        style={{
+          boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.1)",
+        }}
+      />
+
+      {/* Mobile-only close button */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="닫기"
+          className="sm:hidden absolute top-[14px] right-[14px] z-[55] flex items-center justify-center"
+        >
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path
+              d="M0 6C0 2.68629 2.68629 0 6 0H22C25.3137 0 28 2.68629 28 6V22C28 25.3137 25.3137 28 22 28H6C2.68629 28 0 25.3137 0 22V6Z"
+              fill="#27272A"
+              fillOpacity="0.06"
+            />
+            <path
+              d="M13.9995 13.0577L17.2993 9.75781L18.2421 10.7006L14.9423 14.0005L18.2421 17.3003L17.2993 18.2431L13.9995 14.9433L10.6996 18.2431L9.75684 17.3003L13.0567 14.0005L9.75684 10.7006L10.6996 9.75781L13.9995 13.0577Z"
+              fill="#4E4E55"
+            />
+          </svg>
+        </button>
+      )}
       {/* Tab screens — depth effect when chat is open */}
       <div
         className={`relative flex-1 min-h-0 overflow-hidden ${
@@ -137,7 +173,7 @@ export function EnduserFrame({ variant }: Props) {
         <div
           className={`absolute inset-0 z-30 ${chatClosing ? "ht-slide-out-right" : "ht-slide-in-right"}`}
         >
-          {chatLoading ? <ChatSkeleton /> : <ChatScreen onBack={closeChat} />}
+          {chatLoading ? <ChatSkeleton /> : <ChatScreen onBack={closeChat} isNew={chatIsNew} />}
         </div>
       )}
     </div>

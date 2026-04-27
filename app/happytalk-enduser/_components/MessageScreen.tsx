@@ -42,7 +42,7 @@ export function MessageScreen({ onOpenChat }: Props) {
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col px-[16px] pt-[16px] pb-[16px] gap-[8px] overflow-y-auto">
+      <div className="flex-1 flex flex-col px-[8px] pt-[8px] pb-[16px] gap-[2px] overflow-y-auto">
         {MESSAGES.map((msg, i) => (
           <div
             key={i}
@@ -50,7 +50,6 @@ export function MessageScreen({ onOpenChat }: Props) {
             style={{ animationDelay: `${Math.min(i, 4) * 60}ms` }}
           >
             <MessageRow {...msg} onClick={onOpenChat} />
-            {i < MESSAGES.length - 1 && <Divider />}
           </div>
         ))}
       </div>
@@ -61,7 +60,7 @@ export function MessageScreen({ onOpenChat }: Props) {
 function Header() {
   return (
     <div
-      className="flex items-center justify-between w-full px-[16px] py-[12px] bg-white border-b"
+      className="flex items-center justify-between w-full pl-[16px] pr-[56px] sm:pr-[16px] py-[12px] bg-white border-b"
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
       <h1
@@ -72,16 +71,10 @@ function Header() {
       </h1>
       <button
         type="button"
-        className="px-[10px] py-[4px] rounded-[16px] border text-[14px] leading-5"
-        style={{
-          background: "var(--ht-bg-card)",
-          borderColor: "var(--ht-border-default)",
-          color: "var(--ht-text-subtle)",
-          boxShadow:
-            "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.1)",
-        }}
+        className="ht-pressable px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-subtle)" }}
       >
-        상담 내역 삭제
+        내역 삭제
       </button>
     </div>
   );
@@ -97,9 +90,9 @@ function MessageRow({
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[2px] w-full text-left py-[8px]"
+      className="ht-card-press flex flex-col gap-[4px] w-full text-left py-[8px] px-[8px] rounded-[12px]"
     >
-      <div className="flex items-center gap-[4px]">
+      <div className="flex items-center gap-[8px]">
         <span
           className="text-[14px] leading-5 font-semibold"
           style={{ color: "var(--ht-text-default)" }}
@@ -114,13 +107,8 @@ function MessageRow({
         </span>
       </div>
       <p
-        className="text-[14px] leading-5 h-[40px] overflow-hidden w-full"
-        style={{
-          color: "var(--ht-text-default)",
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-        }}
+        className="text-[14px] leading-[1.65] tracking-[0.01em] w-full"
+        style={{ color: "var(--ht-text-default)" }}
       >
         {body}
       </p>
@@ -128,11 +116,3 @@ function MessageRow({
   );
 }
 
-function Divider() {
-  return (
-    <div
-      className="w-full h-px"
-      style={{ background: "rgba(0, 0, 0, 0.06)" }}
-    />
-  );
-}

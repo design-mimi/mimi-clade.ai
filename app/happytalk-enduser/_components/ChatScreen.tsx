@@ -7,9 +7,10 @@ import { CARDS_BY_TOPIC, type ChatTopic } from "./chatCards";
 type Props = {
   onBack: () => void;
   topic?: ChatTopic;
+  isNew?: boolean;
 };
 
-export function ChatScreen({ onBack, topic = "brand" }: Props) {
+export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   const cards = CARDS_BY_TOPIC[topic];
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -18,16 +19,15 @@ export function ChatScreen({ onBack, topic = "brand" }: Props) {
   }, []);
 
   return (
-    <div
-      className="relative flex flex-col w-full h-full overflow-hidden bg-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, rgba(250, 250, 250, 0.1) 70%)",
-      }}
-    >
-      <BackButton onClick={onBack} />
-
-      <div className="flex-1 flex flex-col gap-[10px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]">
+    <div className="relative w-full h-full overflow-hidden bg-white">
+      <div
+        className="absolute inset-0 flex flex-col gap-[16px] overflow-y-auto pt-[40px] px-[16px] pb-[140px]"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 80% 300px at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, transparent 100%)",
+          backgroundAttachment: "local",
+        }}
+      >
         <DateBadge label="2026년 3월 17일" />
 
         {cards.map((card, i) => (
@@ -36,7 +36,7 @@ export function ChatScreen({ onBack, topic = "brand" }: Props) {
 
         <AgentBubble
           name="킨더살몬"
-          time="1시간 전"
+          time={isNew ? "방금" : "1시간 전"}
           body="안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다."
         />
 
@@ -44,28 +44,54 @@ export function ChatScreen({ onBack, topic = "brand" }: Props) {
           items={["상품 문의", "주문 취소/변경 문의", "포인트 적립", "배송 문의", "기타 문의"]}
         />
 
-        <UserBubble time="56분 전" body="러닝화 주문했는데요. 배송비가 궁금해서요." />
+        {!isNew && (
+          <>
+            <UserBubble time="56분 전" body="옷 주문했는데요. 배송비가 궁금해서요." />
 
-        <AgentBubble
-          name="킨더살몬"
-          time="55분 전"
-          body={
-            <>
-              고객님. 배송비 정책을 안내드립니다.
-              <ul className="list-disc ps-[21px] mt-[2px]">
-                <li>50,000원 미만 주문 배송비 : 3,000원</li>
-                <li>50,000원 이상 주문 배송비 : 무료배송</li>
-              </ul>
-            </>
-          }
-        />
+            <AgentBubble
+              name="킨더살몬"
+              time="55분 전"
+              body={
+                <>
+                  고객님. 배송비 정책을 안내드립니다.
+                  <ul className="list-disc ps-[21px] mt-[2px]">
+                    <li>50,000원 미만 주문 배송비 : 3,000원</li>
+                    <li>50,000원 이상 주문 배송비 : 무료배송</li>
+                  </ul>
+                </>
+              }
+            />
 
-        <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+            <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+          </>
+        )}
         <div ref={bottomRef} />
       </div>
 
+      <TopBlurMask />
+      <BackButton onClick={onBack} />
       <InputBar />
     </div>
+  );
+}
+
+function TopBlurMask() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute top-0 left-0 right-0 z-10"
+      style={{
+        height: 40,
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        maskImage:
+          "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0) 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0) 100%)",
+        background:
+          "linear-gradient(to bottom, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)",
+      }}
+    />
   );
 }
 
@@ -91,14 +117,12 @@ function DateBadge({ label }: { label: string }) {
   return (
     <div className="flex justify-center w-full">
       <span
-        className="inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-full border text-[13px] leading-5"
+        className="inline-flex items-center px-[10px] py-[4px] rounded-full text-[13px] leading-5"
         style={{
-          background: "var(--ht-bg-card)",
-          borderColor: "var(--ht-border-default)",
-          color: "var(--ht-text-subtle)",
+          background: "rgba(0, 0, 0, 0.04)",
+          color: "var(--ht-text-muted)",
         }}
       >
-        <CalendarIcon width={14} height={14} />
         {label}
       </span>
     </div>
@@ -131,7 +155,7 @@ function AgentBubble({
         </span>
       </div>
       <div
-        className="text-[14px] leading-5"
+        className="text-[14px] leading-[1.65]"
         style={{ color: "var(--ht-text-default)" }}
       >
         {body}
@@ -150,7 +174,7 @@ function UserBubble({ time, body }: { time: string; body: string }) {
         {time}
       </span>
       <div
-        className="max-w-[300px] px-[14px] py-[6px] border text-[14px] leading-5 text-white"
+        className="max-w-[300px] px-[14px] py-[6px] border text-[14px] leading-[1.65] text-white"
         style={{
           background: "var(--ht-bg-inverted)",
           borderColor: "var(--ht-border-default)",
@@ -170,7 +194,7 @@ function SuggestionChips({ items }: { items: string[] }) {
         <button
           key={label}
           type="button"
-          className="ht-pressable rounded-full px-[16px] py-[8px] border bg-white text-[14px] leading-5"
+          className="ht-pressable rounded-full px-[12px] py-[6px] border bg-white text-[13px] leading-[18px]"
           style={{
             borderColor: "var(--ht-border-default)",
             color: "var(--ht-text-default)",
@@ -191,7 +215,7 @@ function SmallChips({ items }: { items: string[] }) {
         <button
           key={label}
           type="button"
-          className="ht-pressable rounded-[24px] px-[12px] py-[8px] border bg-white text-[14px] leading-5 font-medium text-[#3a3a3a]"
+          className="ht-pressable rounded-[20px] px-[10px] py-[5px] border bg-white text-[13px] leading-[18px] font-medium text-[#3a3a3a]"
           style={{ borderColor: "var(--ht-border-card)" }}
         >
           {label}
@@ -204,43 +228,37 @@ function SmallChips({ items }: { items: string[] }) {
 function InputBar() {
   return (
     <div
-      className="absolute left-[16px] right-[16px] bottom-[16px] flex items-center justify-between gap-[4px] rounded-[16px] border px-[12px] pt-[10px] pb-[12px]"
+      className="absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-[8px] rounded-[16px] border px-[14px] pt-[12px] pb-[10px]"
       style={{
         background: "var(--ht-bg-input)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-modal-sm)",
       }}
     >
-      <button
-        type="button"
-        aria-label="더보기"
-        className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-        style={{ background: "#27272a0f" }}
-      >
-        <PlusIcon width={28} height={28} style={{ color: "#6F6F77" }} />
-      </button>
-      <button
-        type="button"
-        aria-label="도움말"
-        className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-        style={{ background: "#27272a0f" }}
-      >
-        <QuestionIcon width={28} height={28} style={{ color: "#6F6F77" }} />
-      </button>
       <span
-        className="flex-1 text-[14px] leading-5 truncate"
+        className="text-[14px] leading-5 truncate"
         style={{ color: "var(--ht-text-muted)" }}
       >
         메시지를 입력해주세요.
       </span>
-      <button
-        type="button"
-        aria-label="전송"
-        className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-        style={{ background: "rgba(39, 39, 42, 0.25)" }}
-      >
-        <SendArrowIcon width={28} height={28} style={{ color: "#fff" }} />
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          aria-label="더보기"
+          className="ht-pressable w-[28px] h-[28px] rounded-full border flex items-center justify-center"
+          style={{ borderColor: "var(--ht-border-default)", background: "transparent" }}
+        >
+          <PlusIcon width={28} height={28} style={{ color: "#6F6F77" }} />
+        </button>
+        <button
+          type="button"
+          aria-label="전송"
+          className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
+          style={{ background: "rgba(39, 39, 42, 0.25)" }}
+        >
+          <SendArrowIcon width={28} height={28} style={{ color: "#fff" }} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -259,33 +277,11 @@ function ArrowLeftIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function CalendarIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 14 14" fill="none" {...props}>
-      <rect x="1.5" y="2.5" width="11" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M1.5 5.5h11" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M4 1.5v2M10 1.5v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-
 function PlusIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 28 28" fill="none" {...props}>
       <path
         d="M13.3327 13.3334V8.66675H14.666V13.3334H19.3327V14.6667H14.666V19.3334H13.3327V14.6667H8.66602V13.3334H13.3327Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function QuestionIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 28 28" fill="none" {...props}>
-      <path
-        d="M14 18.6666C14.5523 18.6666 15 19.1143 15 19.6666C15 20.2189 14.5523 20.6666 14 20.6666C13.4477 20.6666 13 20.2189 13 19.6666C13 19.1143 13.4477 18.6666 14 18.6666ZM14 7.33325C16.2091 7.33325 18 9.12411 18 11.3333C18 12.7763 17.4983 13.5271 16.2173 14.6153C14.9324 15.7069 14.6667 16.1979 14.6667 17.3333H13.3333C13.3333 15.6839 13.858 14.8701 15.354 13.5992C16.3653 12.7401 16.6667 12.2891 16.6667 11.3333C16.6667 9.86049 15.4727 8.66659 14 8.66659C12.5272 8.66659 11.3333 9.86049 11.3333 11.3333V11.9999H10V11.3333C10 9.12411 11.7909 7.33325 14 7.33325Z"
         fill="currentColor"
       />
     </svg>

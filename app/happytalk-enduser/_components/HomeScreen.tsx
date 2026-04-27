@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import type { SVGProps } from "react";
 import type { HomeVariant } from "./types";
 import {
   SearchIcon,
-  MessengerIcon,
   NaverTalkIcon,
   KakaoChannelIcon,
   PhoneCircleIcon,
@@ -13,112 +14,138 @@ import {
 
 type Props = { variant: HomeVariant; onOpenChat?: () => void };
 
-const HERO_IMAGE = "/kindersalmon.png";
+const HERO_IMAGE = "/hero.jpg";
 
 export function HomeScreen({ variant, onOpenChat }: Props) {
   const isBrandImage = variant === "brand-image" || variant === "brand-image-tall";
   const isTallHero = variant === "brand-image-tall";
+  const isGradient = variant === "gradient-line" || variant === "gradient-oval";
   const showDescription = variant !== "default-compact";
   const brandName = isTallHero ? "KINDERSALMON" : "킨더살몬";
+  // Figma spec: home_none → pt-28, home_gra_* → pt-20
+  const brandAreaPt = isGradient ? 20 : 28;
+
+  const heroImageRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isBrandImage) return;
+    const scroller = scrollerRef.current;
+    const heroImage = heroImageRef.current;
+    if (!scroller || !heroImage) return;
+
+    const HERO_HEIGHT = isTallHero ? 430 : 260;
+    const START_SCALE = 1.0;
+    const END_SCALE = 0.8;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const progress = Math.max(0, Math.min(1, scroller.scrollTop / HERO_HEIGHT));
+      const scale = START_SCALE + (END_SCALE - START_SCALE) * progress;
+      heroImage.style.transform = `scale(${scale})`;
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => {
+      scroller.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isBrandImage, isTallHero]);
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
       <VariantBackground variant={variant} />
-      <StatusBadges />
 
-      {/* Fixed hero image behind scroll */}
+      {/* Fixed hero image + dim — pinned to viewport, white panel slides over */}
       {isBrandImage && (
         <div
-          className="absolute top-0 left-0 right-0 z-0 overflow-hidden"
+          className="absolute top-0 left-0 right-0 z-0 overflow-hidden sm:rounded-t-[24px]"
           style={{ height: isTallHero ? 430 : 260 }}
         >
-          <Image
-            src={HERO_IMAGE}
-            alt="브랜드 이미지"
-            fill
-            className="object-cover object-[50%_20%]"
-            sizes="375px"
+          <div
+            ref={heroImageRef}
+            className="absolute"
+            style={{
+              inset: "-12.5%",
+              transformOrigin: "center center",
+              willChange: "transform",
+            }}
+          >
+            <Image
+              src={HERO_IMAGE}
+              alt="브랜드 이미지"
+              fill
+              className="object-cover object-[50%_20%]"
+              sizes="500px"
+            />
+          </div>
+          <div
+            aria-hidden
+            className="absolute left-0 right-0 bottom-0 pointer-events-none"
+            style={{
+              height: 184,
+              background:
+                "linear-gradient(180deg, rgba(0, 0, 0, 0) 27.92%, rgba(0, 0, 0, 0.2) 100%)",
+            }}
           />
         </div>
       )}
 
-      <div className="relative flex-1 min-h-0 overflow-y-auto z-10">
-        {/* Spacer to push content below the fixed image */}
-        {isBrandImage && (
-          <div style={{ height: isTallHero ? 410 : 240 }} />
-        )}
+      <div ref={scrollerRef} className="relative flex-1 min-h-0 overflow-y-auto z-10">
+        {/* Spacer pushes white panel below the hero */}
+        {isBrandImage && <div style={{ height: isTallHero ? 410 : 240 }} />}
 
-        <div className={`relative flex flex-col ${isBrandImage ? "bg-white rounded-t-[20px] pb-[100px]" : "pb-[100px]"}`}>
-          <div className="flex flex-col gap-[16px] px-[20px] pb-[16px] pt-[20px]">
+        <div className={`pb-[100px] ${isBrandImage ? "rounded-t-[20px] bg-white" : ""}`}>
+          {/* Brand area */}
+          <div
+            className="flex flex-col gap-[16px] px-[20px] pb-[16px]"
+            style={{ paddingTop: brandAreaPt }}
+          >
             <h1
-              className="text-[24px] font-semibold leading-8"
+              className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap overflow-hidden"
               style={{ color: "var(--ht-text-default)" }}
             >
               {brandName}
             </h1>
             {showDescription && (
               <p
-                className="text-[14px] leading-5 w-[320px] h-[40px] opacity-80"
+                className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-[320px] max-w-full"
                 style={{ color: "#121212" }}
               >
                 차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
               </p>
             )}
-
-            <div className="flex flex-col gap-[8px] w-full">
+            <div className="flex flex-col gap-[8px]">
               <PrimaryCTA onClick={onOpenChat} />
-              <ChannelRow />
+              <StatusRow />
             </div>
           </div>
 
-          <div className="px-[12px]">
-            <QnaCard />
+          {/* QnA area */}
+          <div className="flex flex-col gap-[16px] px-[20px] pb-[12px]">
+            <ChannelRow />
+            <div className="flex flex-col gap-[4px]">
+              <span
+                className="pl-[12px] text-[12px] leading-4 tracking-[-0.25px] opacity-70"
+                style={{ color: "#404040" }}
+              >
+                자주 묻는 질문
+              </span>
+              <SearchInput />
+              <FaqCard />
+            </div>
           </div>
 
-          <div className="flex items-center justify-center pt-[14px] opacity-65">
+          <div className="flex items-center justify-center pt-[20px] opacity-65">
             <HappytalkLogo width={62} height={12} />
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function StatusBadges() {
-  return (
-    <div className="absolute top-[12px] right-[16px] flex gap-[4px] z-20">
-      <span
-        className="inline-flex items-center rounded-full border px-[4px] py-[2px]"
-        style={{
-          background: "var(--ht-bg-badge-green)",
-          borderColor: "var(--ht-border-default)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
-        }}
-      >
-        <span
-          className="px-[4px] text-[12px] leading-4 font-medium"
-          style={{ color: "var(--ht-green-accent)" }}
-        >
-          상담 원활
-        </span>
-      </span>
-      <span
-        className="inline-flex items-center rounded-full border px-[4px] py-[2px]"
-        style={{
-          background: "rgba(255, 255, 255, 0.9)",
-          borderColor: "var(--ht-border-default)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
-        }}
-      >
-        <span
-          className="px-[4px] text-[12px] leading-4 font-medium"
-          style={{ color: "var(--ht-text-muted)" }}
-        >
-          9-18시 운영
-        </span>
-      </span>
     </div>
   );
 }
@@ -128,17 +155,62 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-pressable relative w-full flex items-center justify-center gap-[2px] py-[12px] pl-[20px] pr-[16px] rounded-[16px] text-white"
+      className="ht-cta-button w-full h-[48px] flex items-center justify-center rounded-[16px] text-[16px] font-semibold leading-6 tracking-[-0.25px] text-white"
       style={{
-        background: "var(--ht-bg-inverted)",
-        border: "1px solid var(--ht-border-inverted)",
+        background: "#18181B",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
         boxShadow:
-          "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
+          "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
       }}
     >
-      <span className="text-[16px] font-semibold leading-6">문의하기</span>
-      <MessengerIcon width={20} height={20} style={{ color: "#fff" }} />
+      문의하기
     </button>
+  );
+}
+
+function StatusRow() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col gap-[4px]">
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+          style={{ color: "#4E4E55" }}
+        >
+          운영 시간
+          <ChevronDownIcon
+            width={16}
+            height={16}
+            style={{
+              color: "#6F6F77",
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 200ms ease-out",
+            }}
+          />
+        </button>
+        <span
+          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px] text-[14px] leading-4 font-medium tracking-[-0.25px]"
+          style={{
+            background: "rgba(102, 220, 126, 0.10)",
+            borderColor: "rgba(39, 39, 42, 0.10)",
+            color: "#33803F",
+          }}
+        >
+          상담 원활
+        </span>
+      </div>
+      {open && (
+        <span
+          className="px-[8px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+          style={{ color: "#111115" }}
+        >
+          평일 10:00~17:00
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -148,78 +220,92 @@ function ChannelRow() {
       className="w-full flex items-center justify-between rounded-[16px] px-[16px] py-[8px] border"
       style={{
         background: "rgba(245, 245, 245, 0.88)",
-        borderColor: "var(--ht-border-default)",
+        borderColor: "rgba(39, 39, 42, 0.1)",
       }}
     >
       <span
-        className="text-[14px] leading-5"
-        style={{ color: "var(--ht-text-subtle)" }}
+        className="text-[14px] leading-5 tracking-[-0.25px]"
+        style={{ color: "#4E4E55" }}
       >
         다른 문의하기
       </span>
       <div className="flex items-center gap-[6px]">
-        <button type="button" aria-label="네이버톡톡" className="ht-pressable w-[32px] h-[32px] rounded-[8px]">
-          <NaverTalkIcon width={32} height={32} />
+        <button
+          type="button"
+          aria-label="네이버톡톡"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+        >
+          <NaverTalkIcon width={36} height={36} />
         </button>
-        <button type="button" aria-label="카카오채널" className="ht-pressable w-[32px] h-[32px] rounded-[8px]">
-          <KakaoChannelIcon width={32} height={32} />
+        <button
+          type="button"
+          aria-label="카카오채널"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+        >
+          <KakaoChannelIcon width={36} height={36} />
         </button>
-        <button type="button" aria-label="전화" className="ht-pressable w-[32px] h-[32px] rounded-[8px]">
-          <PhoneCircleIcon width={32} height={32} />
+        <button
+          type="button"
+          aria-label="전화"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+        >
+          <PhoneCircleIcon width={36} height={36} />
         </button>
       </div>
     </div>
   );
 }
 
-function QnaCard() {
+function SearchInput() {
+  return (
+    <button
+      type="button"
+      className="flex items-center px-[8px] min-h-[36px] rounded-[8px] gap-[2px] w-full text-left"
+    >
+      <span className="flex items-center justify-center w-[20px] h-[20px]">
+        <SearchIcon
+          width={16}
+          height={16}
+          style={{ color: "#6F6F77" }}
+        />
+      </span>
+      <span
+        className="px-[4px] text-[14px] leading-5 tracking-[-0.25px]"
+        style={{ color: "rgba(39, 39, 42, 0.3)" }}
+      >
+        Search
+      </span>
+    </button>
+  );
+}
+
+function FaqCard() {
   return (
     <div
-      className="w-full flex flex-col gap-[8px] p-[12px] rounded-[20px]"
+      className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px]"
+      style={{ background: "#F4F4F5" }}
     >
-      <span
-        className="text-[12px] leading-4 opacity-70"
-        style={{ color: "#404040" }}
-      >
-        자주 묻는 질문
-      </span>
-      <button
-        type="button"
-        className="min-h-[36px] rounded-[8px] flex items-center gap-[2px] px-[8px] w-full text-left"
-      >
-        <span className="flex items-center justify-center w-[20px] h-[20px]">
-          <SearchIcon width={16} height={16} style={{ color: "var(--ht-text-hint)" }} />
-        </span>
-        <span
-          className="px-[4px] text-[14px] leading-5"
-          style={{ color: "var(--ht-text-hint)" }}
-        >
-          Search
-        </span>
-      </button>
-      <div
-        className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px]"
-        style={{ background: "var(--ht-bg-muted)" }}
-      >
-        <FaqItem category="배송" question="당일배송은 무엇인가요?" />
-        <FaqItem category="상품" question="상품 품절인 경우 재입고는 언제 알 수 있나요?" />
-      </div>
+      <FaqItem category="배송" question="당일배송은 무엇인가요?" />
+      <FaqItem
+        category="상품"
+        question="상품 품절인 경우 재입고는 언제 알 수 있나요?"
+      />
     </div>
   );
 }
 
 function FaqItem({ category, question }: { category: string; question: string }) {
   return (
-    <div className="flex flex-col gap-[4px] h-[40px] justify-center">
+    <div className="flex flex-col gap-[4px] justify-center">
       <span
-        className="text-[12px] leading-4 font-medium"
-        style={{ color: "var(--ht-text-subtle)" }}
+        className="text-[12px] leading-4 font-medium tracking-[-0.25px]"
+        style={{ color: "#4E4E55" }}
       >
         {category}
       </span>
       <p
-        className="text-[14px] leading-5 h-[20px] overflow-hidden text-ellipsis whitespace-nowrap"
-        style={{ color: "var(--ht-text-default)" }}
+        className="text-[14px] leading-5 tracking-[-0.25px]"
+        style={{ color: "#111115" }}
       >
         {question}
       </p>
@@ -248,11 +334,25 @@ function VariantBackground({ variant }: { variant: HomeVariant }) {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 200% 50% at 50% 0%, #FEFFCB 0%, #F3FFEE 20%, #FAFAFA 38%)",
+            "radial-gradient(ellipse 200% 100% at 50% 0%, #FEFFCB 0%, #F3FFEE 20%, #FAFAFA 38%)",
         }}
       />
     );
   }
 
   return null;
+}
+
+function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" {...props}>
+      <path
+        d="M4 6l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
