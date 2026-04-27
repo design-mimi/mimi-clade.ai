@@ -134,16 +134,18 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           </div>
 
           {/* QnA area */}
-          <div className="flex flex-col gap-[8px] px-[20px] py-[12px]">
+          <div className="flex flex-col gap-[16px] px-[20px] pb-[12px]">
             <ChannelRow />
-            <span
-              className="text-[12px] leading-4 tracking-[-0.25px] opacity-70"
-              style={{ color: "#404040" }}
-            >
-              자주 묻는 질문
-            </span>
-            <SearchInput />
-            <FaqCard />
+            <div className="flex flex-col gap-[4px]">
+              <span
+                className="pl-[12px] text-[12px] leading-4 tracking-[-0.25px] opacity-70"
+                style={{ color: "#404040" }}
+              >
+                자주 묻는 질문
+              </span>
+              <SearchInput />
+              <FaqCard />
+            </div>
           </div>
 
           <div className="flex items-center justify-center pt-[20px] opacity-65">

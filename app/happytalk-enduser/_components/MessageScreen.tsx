@@ -60,7 +60,7 @@ export function MessageScreen({ onOpenChat }: Props) {
 function Header() {
   return (
     <div
-      className="flex items-center justify-between w-full px-[16px] py-[12px] bg-white border-b"
+      className="flex items-center justify-between w-full pl-[16px] pr-[56px] sm:pr-[16px] py-[12px] bg-white border-b"
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
       <h1
