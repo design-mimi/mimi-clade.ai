@@ -107,24 +107,18 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           </div>
         )}
 
-        <div
-          className={`relative flex flex-col rounded-t-[20px] ${
-            isBrandImage ? "bg-white pb-[100px]" : "pb-[100px]"
-          }`}
-        >
+        <div className={`pb-[100px] ${isBrandImage ? "rounded-t-[20px] bg-white" : ""}`}>
           {/* Brand area */}
           <div
             className="flex flex-col gap-[16px] px-[20px] pb-[16px]"
             style={{ paddingTop: brandAreaPt }}
           >
-            <div className="flex flex-col w-full overflow-hidden">
-              <h1
-                className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap"
-                style={{ color: "var(--ht-text-default)" }}
-              >
-                {brandName}
-              </h1>
-            </div>
+            <h1
+              className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap overflow-hidden"
+              style={{ color: "var(--ht-text-default)" }}
+            >
+              {brandName}
+            </h1>
             {showDescription && (
               <p
                 className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-[320px] max-w-full"
@@ -133,7 +127,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
                 차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
               </p>
             )}
-            <div className="flex flex-col gap-[8px] w-full">
+            <div className="flex flex-col gap-[8px]">
               <PrimaryCTA onClick={onOpenChat} />
               <StatusRow />
             </div>
@@ -166,7 +160,7 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-cta-button relative w-full h-[48px] flex items-center justify-center rounded-[16px] text-white overflow-hidden"
+      className="ht-cta-button w-full h-[48px] flex items-center justify-center rounded-[16px] text-[16px] font-semibold leading-6 tracking-[-0.25px] text-white"
       style={{
         background: "#18181B",
         border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -174,9 +168,7 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
           "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
       }}
     >
-      <span className="relative z-10 text-[16px] font-semibold leading-6 tracking-[-0.25px]">
-        문의하기
-      </span>
+      문의하기
     </button>
   );
 }
@@ -184,20 +176,16 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
 function StatusRow() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex flex-col gap-[4px] w-full">
-      <div className="flex items-center justify-between w-full">
+    <div className="flex flex-col gap-[4px]">
+      <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px]"
+          className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+          style={{ color: "#4E4E55" }}
         >
-          <span
-            className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
-            style={{ color: "#4E4E55" }}
-          >
-            운영 시간
-          </span>
+          운영 시간
           <ChevronDownIcon
             width={16}
             height={16}
@@ -209,29 +197,23 @@ function StatusRow() {
           />
         </button>
         <span
-          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px]"
+          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px] text-[14px] leading-4 font-medium tracking-[-0.25px]"
           style={{
             background: "rgba(102, 220, 126, 0.10)",
             borderColor: "rgba(39, 39, 42, 0.10)",
+            color: "#33803F",
           }}
         >
-          <span
-            className="text-[14px] leading-4 font-medium tracking-[-0.25px]"
-            style={{ color: "#33803F" }}
-          >
-            상담 원활
-          </span>
+          상담 원활
         </span>
       </div>
       {open && (
-        <div className="flex items-center px-[8px]">
-          <span
-            className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
-            style={{ color: "#111115" }}
-          >
-            평일 10:00~17:00
-          </span>
-        </div>
+        <span
+          className="px-[8px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+          style={{ color: "#111115" }}
+        >
+          평일 10:00~17:00
+        </span>
       )}
     </div>
   );
