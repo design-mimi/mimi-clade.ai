@@ -32,11 +32,13 @@ export function BottomNav({ active, onChange }: Props) {
 
   return (
     <div
-      className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border ht-blur-backdrop"
+      className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border overflow-hidden"
       style={{
-        background: "rgba(228, 228, 232, 0.92)",
+        background: "rgba(245, 245, 245, 0.8)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-nav)",
+        backdropFilter: "blur(2px)",
+        WebkitBackdropFilter: "blur(2px)",
       }}
     >
       {/* Ink indicator */}
@@ -46,9 +48,8 @@ export function BottomNav({ active, onChange }: Props) {
           width: TAB_WIDTH,
           left: inkLeft,
           background: "#ffffff",
-          border: "1px solid rgba(39, 39, 42, 0.15)",
-          boxShadow:
-            "0 2px 6px 0 rgba(0, 0, 0, 0.10), 0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(0, 0, 0, 0.04)",
+          border: "1px solid var(--ht-border-default)",
+          boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.06)",
           transition: "left 350ms cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       />
