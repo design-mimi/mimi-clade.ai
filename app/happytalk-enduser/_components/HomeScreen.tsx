@@ -174,7 +174,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
         <div className={`pb-[100px] ${isBrandImage ? "rounded-t-[20px] bg-white" : ""}`}>
           {/* Brand area */}
           <div
-            className="flex flex-col gap-[16px] px-[20px] pb-[16px]"
+            className="flex flex-col gap-[16px] px-[20px] pb-[20px]"
             style={{ paddingTop: brandAreaPt }}
           >
             <h1
@@ -191,25 +191,22 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
                 차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
               </p>
             )}
-            <div className="flex flex-col gap-[8px]">
+            <div className="flex flex-col gap-[10px]">
               <PrimaryCTA onClick={onOpenChat} />
               <StatusRow />
             </div>
           </div>
 
           {/* QnA area */}
-          <div className="flex flex-col gap-[16px] px-[20px] pb-[12px]">
+          <div className="flex flex-col gap-[20px] px-[20px] pb-[12px]">
             <ChannelRow />
-            <div className="flex flex-col gap-[4px]">
-              <span
-                className="pl-[12px] text-[12px] leading-4 tracking-[-0.25px] opacity-70"
-                style={{ color: "#404040" }}
-              >
-                자주 묻는 질문
-              </span>
+            <SectionGroup title="공지">
+              <NoticeCard text="2026 추석 명절 배송 일정 안내드립니다." />
+            </SectionGroup>
+            <SectionGroup title="자주 묻는 질문">
               <SearchInput />
               <FaqCard />
-            </div>
+            </SectionGroup>
           </div>
 
           <div className="flex items-center justify-center pt-[20px] opacity-65">
@@ -361,6 +358,39 @@ function FaqCard() {
         category="상품"
         question="상품 품절인 경우 재입고는 언제 알 수 있나요?"
       />
+    </div>
+  );
+}
+
+function SectionGroup({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-[4px] w-full">
+      <span
+        className="pl-[12px] text-[12px] leading-4 tracking-[-0.25px] opacity-70"
+        style={{ color: "#404040" }}
+      >
+        {title}
+      </span>
+      {children}
+    </div>
+  );
+}
+
+function NoticeCard({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px] w-full">
+      <p
+        className="h-[20px] text-[14px] leading-5 tracking-[-0.25px] truncate w-full"
+        style={{ color: "var(--ht-text-default)" }}
+      >
+        {text}
+      </p>
     </div>
   );
 }
