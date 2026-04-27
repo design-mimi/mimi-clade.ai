@@ -90,9 +90,9 @@ function MessageRow({
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[2px] w-full text-left py-[8px] px-[8px] rounded-[12px]"
+      className="ht-card-press flex flex-col gap-[4px] w-full text-left py-[8px] px-[8px] rounded-[12px]"
     >
-      <div className="flex items-center gap-[4px]">
+      <div className="flex items-center gap-[8px]">
         <span
           className="text-[14px] leading-5 font-semibold"
           style={{ color: "var(--ht-text-default)" }}
