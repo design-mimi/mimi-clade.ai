@@ -71,7 +71,7 @@ function Header() {
       </h1>
       <button
         type="button"
-        className="ht-pressable text-[14px] leading-5"
+        className="ht-pressable px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
         style={{ color: "var(--ht-text-subtle)" }}
       >
         내역 삭제
