@@ -111,23 +111,23 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
         >
           {/* Brand area */}
           <div className="flex flex-col gap-[16px] px-[20px] pt-[28px] pb-[16px]">
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col w-full overflow-hidden">
               <h1
-                className="text-[24px] leading-8 font-semibold tracking-[-0.25px]"
+                className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap"
                 style={{ color: "var(--ht-text-default)" }}
               >
                 {brandName}
               </h1>
-              {showDescription && (
-                <p
-                  className="text-[15px] leading-5 tracking-[-0.25px] opacity-80"
-                  style={{ color: "#121212" }}
-                >
-                  차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
-                </p>
-              )}
             </div>
-            <div className="flex flex-col gap-[8px]">
+            {showDescription && (
+              <p
+                className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-[320px] max-w-full"
+                style={{ color: "#121212" }}
+              >
+                차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
+              </p>
+            )}
+            <div className="flex flex-col gap-[8px] w-full">
               <PrimaryCTA onClick={onOpenChat} />
               <StatusRow />
             </div>
