@@ -41,15 +41,20 @@ export function BottomNav({ active, onChange }: Props) {
         WebkitBackdropFilter: "blur(2px)",
       }}
     >
-      {/* Ink indicator */}
+      {/* Ink indicator —
+          On mobile, white-on-light-gray contrast is too low and 1px @ 0.1 borders
+          render too faint at high DPI. Strengthen the ink's own definition (border
+          0.16 + soft drop + 0.5px outline) just enough to read clearly on any
+          screen background while staying close to the Figma look. */}
       <div
         className="absolute top-[6px] bottom-[6px] rounded-[100px] z-[1]"
         style={{
           width: TAB_WIDTH,
           left: inkLeft,
           background: "#ffffff",
-          border: "1px solid var(--ht-border-default)",
-          boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+          border: "1px solid rgba(39, 39, 42, 0.16)",
+          boxShadow:
+            "0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.04)",
           transition: "left 350ms cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       />
