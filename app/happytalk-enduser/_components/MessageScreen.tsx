@@ -107,7 +107,7 @@ function MessageRow({
         </span>
       </div>
       <p
-        className="text-[14px] leading-[22px] tracking-[0.01em] w-full"
+        className="text-[14px] leading-[1.7] tracking-[0.01em] w-full"
         style={{ color: "var(--ht-text-default)" }}
       >
         {body}
