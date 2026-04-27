@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, type SVGProps } from "react";
 import type { TextSize } from "./EnduserFrame";
 
 type Props = {
@@ -7,90 +8,80 @@ type Props = {
   onTextSizeChange: (v: TextSize) => void;
 };
 
+type View = "main" | "profile";
+
 export function SettingScreen({ textSize, onTextSizeChange }: Props) {
+  const [view, setView] = useState<View>("main");
+
+  if (view === "profile") {
+    return <ProfileView onBack={() => setView("main")} />;
+  }
+
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col px-[20px] py-[16px] gap-[20px]">
-        <ProfileSection />
+      <div className="flex-1 flex flex-col px-[20px] py-[16px] gap-[12px]">
+        <ProfileEntry onClick={() => setView("profile")} />
         <TextSizeRow value={textSize} onChange={onTextSizeChange} />
       </div>
     </div>
   );
 }
 
-function Header() {
+function Header({
+  onBack,
+}: {
+  onBack?: () => void;
+}) {
   return (
     <div
-      className="flex items-center w-full px-[16px] py-[12px] bg-white border-b"
+      className="flex items-center w-full px-[20px] py-[12px] bg-white border-b"
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
-      <h1
-        className="text-[18px] leading-7 font-semibold"
-        style={{ color: "var(--ht-text-default)" }}
-      >
-        설정
-      </h1>
+      {onBack ? (
+        <button
+          type="button"
+          onClick={onBack}
+          className="ht-pressable -ml-[6px] flex items-center px-[6px] py-[2px] rounded-[6px]"
+          style={{ color: "var(--ht-text-default)" }}
+        >
+          <ChevronLeftIcon width={20} height={20} />
+          <h1 className="text-[18px] leading-7 font-semibold tracking-[-0.25px]">
+            설정
+          </h1>
+        </button>
+      ) : (
+        <h1
+          className="text-[18px] leading-7 font-semibold tracking-[-0.25px]"
+          style={{ color: "var(--ht-text-default)" }}
+        >
+          설정
+        </h1>
+      )}
     </div>
   );
 }
 
-function ProfileSection() {
+function ProfileEntry({ onClick }: { onClick: () => void }) {
   return (
-    <section className="flex flex-col gap-[8px]">
-      <div className="flex items-center justify-between">
+    <div className="flex items-center w-full">
+      <button
+        type="button"
+        onClick={onClick}
+        className="ht-pressable flex items-center gap-[2px] px-[12px] py-[8px] rounded-[8px]"
+      >
         <span
-          className="text-[16px] leading-6"
+          className="text-[16px] leading-6 font-medium tracking-[-0.25px]"
           style={{ color: "var(--ht-text-default)" }}
         >
-          개인 정보
+          나의 정보
         </span>
-        <button
-          type="button"
-          className="ht-pressable text-[14px] leading-5"
-          style={{ color: "var(--ht-text-subtle)" }}
-        >
-          수정
-        </button>
-      </div>
-      <div
-        className="flex flex-col gap-[10px] p-[12px] rounded-[12px] border"
-        style={{
-          background: "var(--ht-bg-subtle)",
-          borderColor: "var(--ht-border-default)",
-        }}
-      >
-        <ProfileField label="이름" placeholder="이름을 입력해 주세요" />
-        <ProfileField label="이메일" placeholder="이메일을 입력해 주세요" />
-      </div>
-    </section>
-  );
-}
-
-function ProfileField({
-  label,
-  placeholder,
-}: {
-  label: string;
-  placeholder: string;
-}) {
-  return (
-    <div className="flex flex-col gap-[4px]">
-      <span
-        className="text-[14px] leading-5"
-        style={{ color: "var(--ht-text-default)" }}
-      >
-        {label}
-      </span>
-      <input
-        type="text"
-        placeholder={placeholder}
-        className="px-[12px] py-[8px] rounded-[8px] bg-white border text-[14px] leading-5 outline-none placeholder:text-[var(--ht-text-hint)]"
-        style={{
-          borderColor: "var(--ht-border-default)",
-          color: "var(--ht-text-default)",
-        }}
-      />
+        <ChevronRightIcon
+          width={20}
+          height={20}
+          style={{ color: "var(--ht-text-default)" }}
+        />
+      </button>
     </div>
   );
 }
@@ -103,9 +94,9 @@ function TextSizeRow({
   onChange: (v: TextSize) => void;
 }) {
   return (
-    <div className="flex items-center justify-between w-full min-h-[32px]">
+    <div className="flex items-center justify-between w-full min-h-[32px] pl-[12px]">
       <span
-        className="text-[16px] leading-6"
+        className="text-[16px] leading-6 font-medium tracking-[-0.25px]"
         style={{ color: "var(--ht-text-default)" }}
       >
         텍스트 크기
@@ -167,5 +158,88 @@ function SegmentedControl<T extends string>({
         );
       })}
     </div>
+  );
+}
+
+function ProfileView({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="relative flex flex-col w-full h-full bg-white">
+      <Header onBack={onBack} />
+      <div className="flex-1 flex flex-col px-[20px] py-[16px] gap-[12px]">
+        <div className="flex flex-col gap-[24px] w-full">
+          <ProfileField label="이름" placeholder="이름을 입력해 주세요" />
+          <ProfileField label="이메일" placeholder="이메일을 입력해 주세요" />
+          <div className="flex justify-end w-full">
+            <button
+              type="button"
+              className="ht-pressable px-[12px] py-[8px] rounded-[8px] text-[16px] leading-6 font-medium tracking-[-0.25px]"
+              style={{
+                background: "rgba(39, 39, 42, 0.06)",
+                color: "var(--ht-text-default)",
+              }}
+            >
+              저장
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileField({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder: string;
+}) {
+  return (
+    <div className="flex flex-col gap-[8px] w-full">
+      <span
+        className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-default)" }}
+      >
+        {label}
+      </span>
+      <input
+        type="text"
+        placeholder={placeholder}
+        className="w-full px-[12px] py-[8px] rounded-[8px] border outline-none text-[14px] leading-5 tracking-[-0.25px] placeholder:text-[var(--ht-text-muted)]"
+        style={{
+          background: "var(--ht-bg-input)",
+          borderColor: "var(--ht-border-darker)",
+          color: "var(--ht-text-default)",
+        }}
+      />
+    </div>
+  );
+}
+
+function ChevronLeftIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" {...props}>
+      <path
+        d="M12.5 4L7 10L12.5 16"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" {...props}>
+      <path
+        d="M7.5 4L13 10L7.5 16"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

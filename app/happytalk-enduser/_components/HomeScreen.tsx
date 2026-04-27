@@ -27,6 +27,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
 
   const heroImageRef = useRef<HTMLDivElement>(null);
   const heroOuterRef = useRef<HTMLDivElement>(null);
+  const heroDimRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +35,8 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
     const scroller = scrollerRef.current;
     const heroImage = heroImageRef.current;
     const heroOuter = heroOuterRef.current;
-    if (!scroller || !heroImage || !heroOuter) return;
+    const heroDim = heroDimRef.current;
+    if (!scroller || !heroImage || !heroOuter || !heroDim) return;
 
     const HERO_HEIGHT = isTallHero ? 430 : 260;
     const SCALE_MIN = 0.8;
@@ -48,11 +50,12 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
     const apply = () => {
       raf = 0;
       const st = scroller.scrollTop;
-      // Down-scroll → shrink image (centered scale)
+      // Down-scroll → shrink image (centered scale); dim follows with same scale anchored to bottom
       if (st > 0) {
         const progress = Math.min(1, st / HERO_HEIGHT);
         const scale = 1 + (SCALE_MIN - 1) * progress;
         heroImage.style.transform = `scale(${scale})`;
+        heroDim.style.transform = `scale(${scale})`;
         heroOuter.style.height = HERO_HEIGHT + "px";
         return;
       }
@@ -60,6 +63,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
       const overscroll = Math.max(-st, touchPullPx);
       const extra = Math.min(MAX_STRETCH, overscroll);
       heroImage.style.transform = "scale(1)";
+      heroDim.style.transform = "scale(1)";
       heroOuter.style.height = HERO_HEIGHT + extra + "px";
     };
 
@@ -151,10 +155,13 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
             />
           </div>
           <div
+            ref={heroDimRef}
             aria-hidden
             className="absolute left-0 right-0 bottom-0 pointer-events-none"
             style={{
               height: 184,
+              transformOrigin: "center bottom",
+              willChange: "transform",
               background:
                 "linear-gradient(180deg, rgba(0, 0, 0, 0) 27.92%, rgba(0, 0, 0, 0.2) 100%)",
             }}
@@ -180,7 +187,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
             </h1>
             {showDescription && (
               <p
-                className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-[320px] max-w-full"
+                className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-full"
                 style={{ color: "#121212" }}
               >
                 차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
@@ -258,11 +265,11 @@ function StatusRow() {
           />
         </button>
         <span
-          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px] text-[14px] leading-4 font-medium tracking-[-0.25px]"
+          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
           style={{
             background: "rgba(102, 220, 126, 0.10)",
             borderColor: "rgba(39, 39, 42, 0.10)",
-            color: "#33803F",
+            color: "#4fc660",
           }}
         >
           상담 원활

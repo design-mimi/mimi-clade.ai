@@ -42,11 +42,11 @@ export function MessageScreen({ onOpenChat }: Props) {
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col px-[8px] pt-[8px] pb-[16px] gap-[2px] overflow-y-auto">
+      <div className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[16px] gap-[20px] overflow-y-auto">
         {MESSAGES.map((msg, i) => (
           <div
             key={i}
-            className="ht-reveal"
+            className="ht-reveal w-full"
             style={{ animationDelay: `${Math.min(i, 4) * 60}ms` }}
           >
             <MessageRow {...msg} onClick={onOpenChat} />
@@ -60,7 +60,7 @@ export function MessageScreen({ onOpenChat }: Props) {
 function Header() {
   return (
     <div
-      className="flex items-center justify-between w-full pl-[16px] pr-[56px] sm:pr-[16px] py-[12px] bg-white border-b"
+      className="flex items-center justify-between w-full pl-[20px] pr-[56px] sm:pr-[20px] py-[12px] bg-white border-b"
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
       <h1
@@ -90,7 +90,7 @@ function MessageRow({
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[4px] w-full text-left py-[8px] px-[8px] rounded-[12px]"
+      className="ht-card-press flex flex-col gap-[4px] w-full text-left"
     >
       <div className="flex items-center gap-[8px]">
         <span
@@ -107,7 +107,7 @@ function MessageRow({
         </span>
       </div>
       <p
-        className="text-[14px] leading-[1.65] tracking-[0.01em] w-full"
+        className="text-[14px] leading-[1.65] w-full"
         style={{ color: "var(--ht-text-default)" }}
       >
         {body}

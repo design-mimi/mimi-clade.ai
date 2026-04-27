@@ -21,48 +21,44 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
       <div
-        className="absolute inset-0 flex flex-col gap-[16px] overflow-y-auto pt-[40px] px-[16px] pb-[140px]"
+        className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]"
         style={{
           backgroundImage:
             "radial-gradient(ellipse 80% 300px at 50% 0%, rgba(214, 255, 192, 0.4) 0%, rgba(255, 246, 206, 0.2) 40%, transparent 100%)",
           backgroundAttachment: "local",
         }}
       >
-        <DateBadge label="2026년 3월 17일" />
+        <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (
           <ChatCard key={i} data={card} />
         ))}
 
-        <AgentBubble
-          name="킨더살몬"
-          time={isNew ? "방금" : "1시간 전"}
-          body="안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다."
-        />
-
-        <SuggestionChips
-          items={["상품 문의", "주문 취소/변경 문의", "포인트 적립", "배송 문의", "기타 문의"]}
-        />
+        <AgentTurn name="킨더살몬" time={isNew ? "방금 전" : "1시간 전"}>
+          <AgentBubble body="안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다." />
+          <SuggestionChips
+            items={["상품 문의", "주문 취소/변경 문의", "포인트 적립", "배송 문의", "기타 문의"]}
+          />
+        </AgentTurn>
 
         {!isNew && (
           <>
-            <UserBubble time="56분 전" body="옷 주문했는데요. 배송비가 궁금해서요." />
+            <UserBubble body="옷 주문했는데요. 배송비가 궁금해서요." />
 
-            <AgentBubble
-              name="킨더살몬"
-              time="55분 전"
-              body={
-                <>
-                  고객님. 배송비 정책을 안내드립니다.
-                  <ul className="list-disc ps-[21px] mt-[2px]">
-                    <li>50,000원 미만 주문 배송비 : 3,000원</li>
-                    <li>50,000원 이상 주문 배송비 : 무료배송</li>
-                  </ul>
-                </>
-              }
-            />
-
-            <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+            <AgentTurn name="킨더살몬" time="55분 전">
+              <AgentBubble
+                body={
+                  <>
+                    고객님. 배송비 정책을 안내드립니다.
+                    <ul className="list-disc ps-[21px] mt-[2px]">
+                      <li>50,000원 미만 주문 배송비 : 3,000원</li>
+                      <li>50,000원 이상 주문 배송비 : 무료배송</li>
+                    </ul>
+                  </>
+                }
+              />
+              <SmallChips items={["배송 정책 자세히 보기", "예상 도착일"]} />
+            </AgentTurn>
           </>
         )}
         <div ref={bottomRef} />
@@ -117,10 +113,11 @@ function DateBadge({ label }: { label: string }) {
   return (
     <div className="flex justify-center w-full">
       <span
-        className="inline-flex items-center px-[10px] py-[4px] rounded-full text-[13px] leading-5"
+        className="inline-flex items-center justify-center min-h-[24px] py-[4px] px-[8px] rounded-full border text-[12px] leading-4 font-medium tracking-[-0.25px]"
         style={{
-          background: "rgba(0, 0, 0, 0.04)",
-          color: "var(--ht-text-muted)",
+          background: "rgba(39, 39, 42, 0.06)",
+          borderColor: "rgba(39, 39, 42, 0.10)",
+          color: "var(--ht-text-subtle)",
         }}
       >
         {label}
@@ -129,56 +126,47 @@ function DateBadge({ label }: { label: string }) {
   );
 }
 
-function AgentBubble({
+function AgentTurn({
   name,
   time,
-  body,
+  children,
 }: {
   name: string;
   time: string;
-  body: React.ReactNode;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-[4px] w-full">
-      <div className="flex items-center gap-[8px]">
-        <span
-          className="text-[14px] leading-5 font-semibold"
-          style={{ color: "var(--ht-text-default)" }}
-        >
-          {name}
-        </span>
-        <span
-          className="text-[12px] leading-4"
-          style={{ color: "var(--ht-text-subtle)" }}
-        >
-          {time}
-        </span>
-      </div>
-      <div
-        className="text-[14px] leading-[1.65]"
-        style={{ color: "var(--ht-text-default)" }}
+    <div className="flex flex-col gap-[10px] w-full">
+      {children}
+      <span
+        className="text-[14px] leading-5"
+        style={{ color: "var(--ht-text-subtle)" }}
       >
-        {body}
-      </div>
+        {name} • {time}
+      </span>
     </div>
   );
 }
 
-function UserBubble({ time, body }: { time: string; body: string }) {
+function AgentBubble({ body }: { body: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-end gap-[2px] w-full">
-      <span
-        className="text-[12px] leading-4"
-        style={{ color: "#303030" }}
-      >
-        {time}
-      </span>
+    <div
+      className="text-[14px] leading-5 w-full"
+      style={{ color: "var(--ht-text-default)" }}
+    >
+      {body}
+    </div>
+  );
+}
+
+function UserBubble({ body }: { body: string }) {
+  return (
+    <div className="flex justify-end w-full">
       <div
-        className="max-w-[300px] px-[14px] py-[6px] border text-[14px] leading-[1.65] text-white"
+        className="max-w-[300px] px-[14px] py-[6px] rounded-[10px] border text-[14px] leading-5 text-white"
         style={{
           background: "var(--ht-bg-inverted)",
           borderColor: "var(--ht-border-default)",
-          borderRadius: "12px 12px 0 12px",
         }}
       >
         {body}
@@ -189,20 +177,9 @@ function UserBubble({ time, body }: { time: string; body: string }) {
 
 function SuggestionChips({ items }: { items: string[] }) {
   return (
-    <div className="flex flex-wrap gap-[4px] justify-end w-[320px] self-end">
+    <div className="flex flex-wrap gap-[4px] w-full content-start items-start">
       {items.map((label) => (
-        <button
-          key={label}
-          type="button"
-          className="ht-pressable rounded-full px-[12px] py-[6px] border bg-white text-[13px] leading-[18px]"
-          style={{
-            borderColor: "var(--ht-border-default)",
-            color: "var(--ht-text-default)",
-            boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          {label}
-        </button>
+        <SecondaryPill key={label} label={label} />
       ))}
     </div>
   );
@@ -212,16 +189,26 @@ function SmallChips({ items }: { items: string[] }) {
   return (
     <div className="flex flex-wrap gap-[4px]">
       {items.map((label) => (
-        <button
-          key={label}
-          type="button"
-          className="ht-pressable rounded-[20px] px-[10px] py-[5px] border bg-white text-[13px] leading-[18px] font-medium text-[#3a3a3a]"
-          style={{ borderColor: "var(--ht-border-card)" }}
-        >
-          {label}
-        </button>
+        <SecondaryPill key={label} label={label} />
       ))}
     </div>
+  );
+}
+
+function SecondaryPill({ label }: { label: string }) {
+  return (
+    <button
+      type="button"
+      className="ht-pressable rounded-full px-[12px] py-[6px] border bg-white text-[14px] leading-5 font-medium tracking-[-0.25px]"
+      style={{
+        borderColor: "rgba(39, 39, 42, 0.15)",
+        color: "var(--ht-text-default)",
+        boxShadow:
+          "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
+      }}
+    >
+      {label}
+    </button>
   );
 }
 

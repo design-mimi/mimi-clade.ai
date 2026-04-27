@@ -15,7 +15,6 @@ type Props = {
 };
 
 const TRANSITION_MS = 180;
-const SLIDE_MS = 400;
 const SKELETON_MS = 300;
 
 export type TextSize = "small" | "large";
@@ -27,7 +26,12 @@ export function EnduserFrame({ variant, onClose }: Props) {
   const [chatClosing, setChatClosing] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatIsNew, setChatIsNew] = useState(false);
-  const [textSize, setTextSize] = useState<TextSize>("small");
+  const [textSize, setTextSize] = useState<TextSize>(() =>
+    typeof window !== "undefined" &&
+    !window.matchMedia("(min-width: 640px)").matches
+      ? "large"
+      : "small",
+  );
 
   const openChat = (isNew = false) => {
     setChatIsNew(isNew);
@@ -45,30 +49,62 @@ export function EnduserFrame({ variant, onClose }: Props) {
   useEffect(() => {
     const id = "ht-text-size-style";
     let style = document.getElementById(id) as HTMLStyleElement | null;
-    if (textSize === "large") {
-      if (!style) {
-        style = document.createElement("style");
-        style.id = id;
-        document.head.appendChild(style);
-      }
+    if (!style) {
+      style = document.createElement("style");
+      style.id = id;
+      document.head.appendChild(style);
+    }
+    if (textSize === "small") {
+      // Mobile small = +1 on body sizes (15/16/17/19) for closer-distance readability;
+      // captions/heading hold to preserve layout. Web small = Figma default (no override).
+      style.textContent = `
+        @media (max-width: 639.98px) {
+          #ht-enduser-root [class*="text-\\[14px\\]"] { font-size: 15px !important; }
+          #ht-enduser-root [class*="text-\\[15px\\]"] { font-size: 16px !important; }
+          #ht-enduser-root [class*="text-\\[16px\\]"] { font-size: 17px !important; }
+          #ht-enduser-root [class*="text-\\[18px\\]"] { font-size: 19px !important; }
+          #ht-enduser-root [class~="leading-5"] { line-height: 22px !important; }
+          #ht-enduser-root [class~="leading-6"] { line-height: 26px !important; }
+          #ht-enduser-root [class~="leading-7"] { line-height: 30px !important; }
+        }
+      `;
+    } else {
+      // Large = small-mode boost +2; captions get +2 across both viewports.
       style.textContent = `
         #ht-enduser-root { letter-spacing: 0.01em; }
-        #ht-enduser-root [class*="text-\\[11px\\]"] { font-size: 13px !important; }
-        #ht-enduser-root [class*="text-\\[12px\\]"] { font-size: 14px !important; }
-        #ht-enduser-root [class*="text-\\[13px\\]"] { font-size: 15px !important; }
-        #ht-enduser-root [class*="text-\\[14px\\]"] { font-size: 16px !important; }
-        #ht-enduser-root [class*="text-\\[16px\\]"] { font-size: 18px !important; }
-        #ht-enduser-root [class*="text-\\[18px\\]"] { font-size: 20px !important; }
-        #ht-enduser-root [class*="text-\\[24px\\]"] { font-size: 26px !important; }
-        #ht-enduser-root [class~="leading-4"] { line-height: 20px !important; }
-        #ht-enduser-root [class~="leading-5"] { line-height: 24px !important; }
-        #ht-enduser-root [class~="leading-6"] { line-height: 28px !important; }
-        #ht-enduser-root [class~="leading-7"] { line-height: 32px !important; }
-        #ht-enduser-root [class~="leading-8"] { line-height: 36px !important; }
-        #ht-enduser-root [class*="leading-\\[18px\\]"] { line-height: 22px !important; }
+        @media (min-width: 640px) {
+          #ht-enduser-root [class*="text-\\[11px\\]"] { font-size: 13px !important; }
+          #ht-enduser-root [class*="text-\\[12px\\]"] { font-size: 14px !important; }
+          #ht-enduser-root [class*="text-\\[13px\\]"] { font-size: 15px !important; }
+          #ht-enduser-root [class*="text-\\[14px\\]"] { font-size: 16px !important; }
+          #ht-enduser-root [class*="text-\\[15px\\]"] { font-size: 17px !important; }
+          #ht-enduser-root [class*="text-\\[16px\\]"] { font-size: 18px !important; }
+          #ht-enduser-root [class*="text-\\[18px\\]"] { font-size: 20px !important; }
+          #ht-enduser-root [class*="text-\\[24px\\]"] { font-size: 26px !important; }
+          #ht-enduser-root [class~="leading-4"] { line-height: 20px !important; }
+          #ht-enduser-root [class~="leading-5"] { line-height: 24px !important; }
+          #ht-enduser-root [class~="leading-6"] { line-height: 28px !important; }
+          #ht-enduser-root [class~="leading-7"] { line-height: 32px !important; }
+          #ht-enduser-root [class~="leading-8"] { line-height: 36px !important; }
+          #ht-enduser-root [class*="leading-\\[18px\\]"] { line-height: 22px !important; }
+        }
+        @media (max-width: 639.98px) {
+          #ht-enduser-root [class*="text-\\[11px\\]"] { font-size: 13px !important; }
+          #ht-enduser-root [class*="text-\\[12px\\]"] { font-size: 14px !important; }
+          #ht-enduser-root [class*="text-\\[13px\\]"] { font-size: 15px !important; }
+          #ht-enduser-root [class*="text-\\[14px\\]"] { font-size: 17px !important; }
+          #ht-enduser-root [class*="text-\\[15px\\]"] { font-size: 18px !important; }
+          #ht-enduser-root [class*="text-\\[16px\\]"] { font-size: 19px !important; }
+          #ht-enduser-root [class*="text-\\[18px\\]"] { font-size: 21px !important; }
+          #ht-enduser-root [class*="text-\\[24px\\]"] { font-size: 26px !important; }
+          #ht-enduser-root [class~="leading-4"] { line-height: 20px !important; }
+          #ht-enduser-root [class~="leading-5"] { line-height: 25px !important; }
+          #ht-enduser-root [class~="leading-6"] { line-height: 29px !important; }
+          #ht-enduser-root [class~="leading-7"] { line-height: 33px !important; }
+          #ht-enduser-root [class~="leading-8"] { line-height: 36px !important; }
+          #ht-enduser-root [class*="leading-\\[18px\\]"] { line-height: 23px !important; }
+        }
       `;
-    } else if (style) {
-      style.remove();
     }
     return () => {
       document.getElementById(id)?.remove();
