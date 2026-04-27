@@ -25,7 +25,7 @@ export function SettingScreen({
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col px-[20px] py-[16px] gap-[12px]">
+      <div className="flex-1 flex flex-col pl-[6px] pr-[16px] py-[16px] gap-[12px]">
         <ProfileEntry onClick={() => onViewChange("profile")} />
         <TextSizeRow value={textSize} onChange={onTextSizeChange} />
       </div>
@@ -79,7 +79,7 @@ function ProfileEntry({ onClick }: { onClick: () => void }) {
           className="text-[16px] leading-6 font-medium tracking-[-0.25px]"
           style={{ color: "var(--ht-text-default)" }}
         >
-          나의 정보
+          개인 정보
         </span>
         <ChevronRightIcon
           width={20}
@@ -177,10 +177,10 @@ function ProfileView({ onBack }: { onBack: () => void }) {
           <div className="flex justify-end w-full">
             <button
               type="button"
-              className="ht-pressable px-[12px] py-[8px] rounded-[8px] text-[16px] leading-6 font-medium tracking-[-0.25px]"
+              className="ht-pressable px-[10px] py-[6px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
               style={{
                 background: "rgba(39, 39, 42, 0.06)",
-                color: "var(--ht-text-default)",
+                color: "var(--ht-text-subtle)",
               }}
             >
               저장
