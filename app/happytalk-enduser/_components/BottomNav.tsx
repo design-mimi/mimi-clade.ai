@@ -46,9 +46,9 @@ export function BottomNav({ active, onChange }: Props) {
           width: TAB_WIDTH,
           left: inkLeft,
           background: "#ffffff",
-          border: "1px solid var(--ht-border-default)",
+          border: "1px solid rgba(39, 39, 42, 0.15)",
           boxShadow:
-            "0 1px 2px 0 rgba(0, 0, 0, 0.10), 0 0 0 0.5px rgba(0, 0, 0, 0.04)",
+            "0 2px 6px 0 rgba(0, 0, 0, 0.10), 0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(0, 0, 0, 0.04)",
           transition: "left 350ms cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       />
