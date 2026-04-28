@@ -28,11 +28,14 @@ export function BottomNav({ active, onChange }: Props) {
     <div
       className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border overflow-hidden"
       style={{
-        background: "rgba(245, 245, 245, 0.8)",
+        // No backdrop-filter — its render layer was causing iOS WebKit to
+        // composite child button backgrounds into the parent's blurred tint,
+        // which is exactly why the white active pill kept disappearing on
+        // mobile browsers. Slightly higher alpha (0.95) preserves the tone
+        // without depending on blur.
+        background: "rgba(245, 245, 245, 0.95)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-nav)",
-        backdropFilter: "blur(2px)",
-        WebkitBackdropFilter: "blur(2px)",
       }}
     >
       {TABS.map(({ id, label, outline, fill }) => {
@@ -55,6 +58,11 @@ export function BottomNav({ active, onChange }: Props) {
               transition:
                 "background-color 220ms ease-out, border-color 220ms ease-out, box-shadow 220ms ease-out",
               WebkitTapHighlightColor: "transparent",
+              // Force-reset native button rendering on iOS Safari so the
+              // explicit background actually paints (Tailwind preflight sets
+              // -webkit-appearance: button which can suppress custom bg).
+              appearance: "none",
+              WebkitAppearance: "none",
             }}
           >
             <Icon
