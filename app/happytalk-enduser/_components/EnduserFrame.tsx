@@ -269,20 +269,27 @@ function EndChatConfirm({
         onClick={onCancel}
       />
       <div
-        className="relative bg-white rounded-[24px] w-full max-w-[320px] px-[24px] py-[28px] flex flex-col gap-[20px]"
+        className="relative bg-white rounded-[16px] w-full max-w-[360px] flex flex-col overflow-hidden"
         style={{ boxShadow: "var(--ht-shadow-modal-lg)" }}
       >
-        <p
-          className="text-center text-[16px] leading-6 font-medium tracking-[-0.25px]"
-          style={{ color: "var(--ht-text-default)" }}
+        {/* Header */}
+        <div
+          className="flex flex-col items-start justify-center min-h-[60px] p-[24px] border-b"
+          style={{ borderColor: "var(--ht-border-default)" }}
         >
-          상담을 종료하시겠습니까?
-        </p>
-        <div className="flex gap-[8px]">
+          <p
+            className="text-[16px] leading-6 font-semibold tracking-[-0.25px]"
+            style={{ color: "var(--ht-text-default)" }}
+          >
+            상담을 종료하시겠습니까?
+          </p>
+        </div>
+        {/* Footer — right-aligned actions */}
+        <div className="flex items-center justify-end gap-[8px] min-h-[60px] p-[16px]">
           <button
             type="button"
             onClick={onCancel}
-            className="ht-pressable flex-1 h-[44px] rounded-full text-[15px] font-medium tracking-[-0.25px]"
+            className="ht-pressable px-[14px] py-[8px] rounded-full text-[14px] leading-5 font-medium tracking-[-0.25px]"
             style={{
               background: "rgba(39, 39, 42, 0.06)",
               color: "var(--ht-text-default)",
@@ -296,9 +303,9 @@ function EndChatConfirm({
           <button
             type="button"
             onClick={onConfirm}
-            className="ht-pressable flex-1 h-[44px] rounded-full text-[15px] font-medium tracking-[-0.25px] text-white"
+            className="ht-pressable px-[14px] py-[8px] rounded-full text-[14px] leading-5 font-medium tracking-[-0.25px] text-white"
             style={{
-              background: "#6f6f77",
+              background: "var(--ht-bg-inverted)",
               appearance: "none",
               WebkitAppearance: "none",
               WebkitTapHighlightColor: "transparent",
