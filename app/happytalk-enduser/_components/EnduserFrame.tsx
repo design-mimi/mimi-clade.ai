@@ -10,9 +10,12 @@ import { BottomNav } from "./BottomNav";
 import type { HomeVariant, NavTab } from "./types";
 import type { SettingView } from "./SettingScreen";
 
+export type ActiveScreen = NavTab | "chat";
+
 type Props = {
   variant: HomeVariant;
   onClose?: () => void;
+  onActiveScreenChange?: (screen: ActiveScreen) => void;
 };
 
 const TRANSITION_MS = 180;
@@ -20,7 +23,11 @@ const SKELETON_MS = 300;
 
 export type TextSize = "small" | "large";
 
-export function EnduserFrame({ variant, onClose }: Props) {
+export function EnduserFrame({
+  variant,
+  onClose,
+  onActiveScreenChange,
+}: Props) {
   const [tab, setTab] = useState<NavTab>("home");
   const [prevTab, setPrevTab] = useState<NavTab | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -48,6 +55,10 @@ export function EnduserFrame({ variant, onClose }: Props) {
       return () => clearTimeout(t);
     }
   }, [chatLoading]);
+
+  useEffect(() => {
+    onActiveScreenChange?.(chatOpen ? "chat" : tab);
+  }, [tab, chatOpen, onActiveScreenChange]);
 
   useEffect(() => {
     const id = "ht-text-size-style";

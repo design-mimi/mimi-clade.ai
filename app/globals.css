@@ -371,53 +371,31 @@ body {
   transition-duration: 100ms;
 }
 
-/* Continuous float on the icon wrapper (separate from button hover scale
-   to avoid transform conflict with .ht-launcher's entrance/hover) */
-.ht-launcher-float {
-  display: inline-flex;
-  animation: ht-launcher-float 3s ease-in-out infinite;
-}
-
-@keyframes ht-launcher-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-6px); }
-}
-
-/* Pencil-drawing entrance: stroke renders, then fills */
-.ht-launcher-icon-path {
-  stroke: #231916;
-  stroke-width: 0.5;
-  fill: transparent;
-  stroke-dasharray: 500;
-  stroke-dashoffset: 500;
-  animation: ht-launcher-draw 2.2s ease-out forwards;
-}
-
-@keyframes ht-launcher-draw {
-  to {
-    stroke-dashoffset: 0;
-    fill: #231916;
-  }
-}
-
-/* Smile (mouth path) lifts on hover for friendly feedback */
-.ht-launcher-smile {
+/* Launcher icon hover micro-motion — only the mouth lifts and the eye
+   rounds slightly, the rest of the figure stays still. */
+.ht-launcher-smile,
+.ht-launcher-eye {
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transform-origin: center;
+  transform-box: fill-box;
 }
 
 .ht-launcher:hover .ht-launcher-smile {
-  transform: translateY(-3px) scaleY(1.1);
+  transform: translateY(-1.5px) scaleY(1.05);
+}
+
+.ht-launcher:hover .ht-launcher-eye {
+  transform: scale(1.12);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ht-launcher-float { animation: none; }
-  .ht-launcher-icon-path {
-    stroke: none;
-    fill: #231916;
-    stroke-dasharray: none;
-    stroke-dashoffset: 0;
-    animation: none;
+  .ht-launcher-smile,
+  .ht-launcher-eye {
+    transition: none;
+  }
+  .ht-launcher:hover .ht-launcher-smile,
+  .ht-launcher:hover .ht-launcher-eye {
+    transform: none;
   }
 }
 

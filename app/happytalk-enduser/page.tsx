@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { EnduserFrame } from "./_components/EnduserFrame";
+import { EnduserFrame, type ActiveScreen } from "./_components/EnduserFrame";
 import { VariantSelector } from "./_components/VariantSelector";
 import { Launcher } from "./_components/Launcher";
 import type { HomeVariant } from "./_components/types";
@@ -10,6 +10,12 @@ import type { HomeVariant } from "./_components/types";
 export default function HappytalkEnduserPage() {
   const [variant, setVariant] = useState<HomeVariant>("default");
   const [panelOpen, setPanelOpen] = useState(true);
+  const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
+
+  // VariantSelector is a dev affordance — only useful while the user is
+  // actually looking at the home screen (widget open + home tab + no chat
+  // overlay covering it).
+  const showVariantSelector = panelOpen && activeScreen === "home";
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#eeeeee]">
@@ -24,11 +30,17 @@ export default function HappytalkEnduserPage() {
         />
       </div>
 
-      <VariantSelector value={variant} onChange={setVariant} />
+      {showVariantSelector && (
+        <VariantSelector value={variant} onChange={setVariant} />
+      )}
 
       {panelOpen && (
         <div className="fixed z-40 inset-0 sm:inset-auto sm:right-8 sm:bottom-[112px]">
-          <EnduserFrame variant={variant} onClose={() => setPanelOpen(false)} />
+          <EnduserFrame
+            variant={variant}
+            onClose={() => setPanelOpen(false)}
+            onActiveScreenChange={setActiveScreen}
+          />
         </div>
       )}
       <div
