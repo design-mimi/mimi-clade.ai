@@ -412,7 +412,7 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
           aria-label="전송"
           className="ht-pressable w-[32px] h-[32px] rounded-full flex items-center justify-center"
           style={{
-            background: canSend ? "#437dfc" : "rgba(39, 39, 42, 0.25)",
+            background: canSend ? "var(--ht-bg-inverted)" : "rgba(39, 39, 42, 0.25)",
             transition: "background-color 150ms ease-out",
           }}
         >
