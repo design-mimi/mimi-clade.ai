@@ -366,20 +366,59 @@ body {
     0 6px 12px -4px rgba(0, 0, 0, 0.12) !important;
 }
 
-.ht-launcher:hover svg {
-  animation: ht-launcher-pulse 800ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 .ht-launcher:active {
   transform: scale(0.92);
   transition-duration: 100ms;
 }
 
-@keyframes ht-launcher-pulse {
-  0%   { transform: scale(1); }
-  30%  { transform: scale(1.15) rotate(-8deg); }
-  60%  { transform: scale(0.95) rotate(4deg); }
-  100% { transform: scale(1) rotate(0deg); }
+/* Continuous float on the icon wrapper (separate from button hover scale
+   to avoid transform conflict with .ht-launcher's entrance/hover) */
+.ht-launcher-float {
+  display: inline-flex;
+  animation: ht-launcher-float 3s ease-in-out infinite;
+}
+
+@keyframes ht-launcher-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* Pencil-drawing entrance: stroke renders, then fills */
+.ht-launcher-icon-path {
+  stroke: #231916;
+  stroke-width: 0.5;
+  fill: transparent;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: ht-launcher-draw 2.2s ease-out forwards;
+}
+
+@keyframes ht-launcher-draw {
+  to {
+    stroke-dashoffset: 0;
+    fill: #231916;
+  }
+}
+
+/* Smile (mouth path) lifts on hover for friendly feedback */
+.ht-launcher-smile {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: center;
+}
+
+.ht-launcher:hover .ht-launcher-smile {
+  transform: translateY(-3px) scaleY(1.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ht-launcher-float { animation: none; }
+  .ht-launcher-icon-path {
+    stroke: none;
+    fill: #231916;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    animation: none;
+  }
 }
 
 /* ---- CTA button (문의하기) motion ---- */
