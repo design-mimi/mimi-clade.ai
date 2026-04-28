@@ -268,7 +268,7 @@ function AgentBubble({ body }: { body: ReactNode }) {
 
 function UserBubble({ body }: { body: string }) {
   return (
-    <div className="ht-reveal flex justify-end w-full">
+    <div className="ht-reveal ht-user-row flex justify-end w-full">
       <div
         className="max-w-[300px] px-[14px] py-[6px] rounded-[10px] border text-[14px] leading-[1.6] text-white"
         style={{
