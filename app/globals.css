@@ -305,6 +305,10 @@ body {
   background: rgba(0, 0, 0, 0.04);
 }
 
+.ht-card-press:active::after {
+  background: rgba(0, 0, 0, 0.06);
+}
+
 .ht-card-press:active {
   transform: scale(0.98);
 }

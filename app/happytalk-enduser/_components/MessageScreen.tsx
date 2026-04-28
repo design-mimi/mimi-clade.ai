@@ -42,7 +42,7 @@ export function MessageScreen({ onOpenChat }: Props) {
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[16px] gap-[20px] overflow-y-auto">
+      <div className="flex-1 flex flex-col px-[8px] pt-[16px] pb-[16px] gap-[8px] overflow-y-auto">
         {MESSAGES.map((msg, i) => (
           <div
             key={i}
@@ -90,7 +90,7 @@ function MessageRow({
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[4px] w-full text-left"
+      className="ht-card-press flex flex-col gap-[4px] w-full text-left rounded-[12px] px-[12px] py-[6px]"
     >
       <div className="flex items-center gap-[8px]">
         <span
