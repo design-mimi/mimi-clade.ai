@@ -258,7 +258,7 @@ function AgentTurn({
 function AgentBubble({ body }: { body: ReactNode }) {
   return (
     <div
-      className="text-[14px] leading-5 w-full"
+      className="text-[14px] leading-[1.6] w-full"
       style={{ color: "var(--ht-text-default)" }}
     >
       {body}
@@ -270,7 +270,7 @@ function UserBubble({ body }: { body: string }) {
   return (
     <div className="ht-reveal flex justify-end w-full">
       <div
-        className="max-w-[300px] px-[14px] py-[6px] rounded-[10px] border text-[14px] leading-5 text-white"
+        className="max-w-[300px] px-[14px] py-[6px] rounded-[10px] border text-[14px] leading-[1.6] text-white"
         style={{
           background: "var(--ht-bg-inverted)",
           borderColor: "var(--ht-border-default)",

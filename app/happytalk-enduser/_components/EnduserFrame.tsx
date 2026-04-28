@@ -88,7 +88,6 @@ export function EnduserFrame({ variant, onClose }: Props) {
           #ht-enduser-root [class~="leading-6"] { line-height: 28px !important; }
           #ht-enduser-root [class~="leading-7"] { line-height: 32px !important; }
           #ht-enduser-root [class~="leading-8"] { line-height: 36px !important; }
-          #ht-enduser-root [class*="leading-\\[18px\\]"] { line-height: 22px !important; }
         }
         @media (max-width: 639.98px) {
           #ht-enduser-root [class*="text-\\[11px\\]"] { font-size: 13px !important; }
@@ -104,7 +103,6 @@ export function EnduserFrame({ variant, onClose }: Props) {
           #ht-enduser-root [class~="leading-6"] { line-height: 29px !important; }
           #ht-enduser-root [class~="leading-7"] { line-height: 33px !important; }
           #ht-enduser-root [class~="leading-8"] { line-height: 36px !important; }
-          #ht-enduser-root [class*="leading-\\[18px\\]"] { line-height: 23px !important; }
         }
       `;
     }
