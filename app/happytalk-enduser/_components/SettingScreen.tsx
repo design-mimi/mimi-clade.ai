@@ -25,7 +25,7 @@ export function SettingScreen({
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col pl-[6px] pr-[16px] py-[16px] gap-[12px]">
+      <div className="flex-1 flex flex-col items-start p-[16px] gap-[12px]">
         <ProfileEntry onClick={() => onViewChange("profile")} />
         <TextSizeRow value={textSize} onChange={onTextSizeChange} />
       </div>
@@ -69,25 +69,23 @@ function Header({
 
 function ProfileEntry({ onClick }: { onClick: () => void }) {
   return (
-    <div className="flex items-center w-full">
-      <button
-        type="button"
-        onClick={onClick}
-        className="ht-pressable flex items-center gap-[2px] px-[12px] py-[8px] rounded-[8px]"
+    <button
+      type="button"
+      onClick={onClick}
+      className="ht-pressable flex h-[36px] items-center gap-[6px]"
+    >
+      <span
+        className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-default)" }}
       >
-        <span
-          className="text-[16px] leading-6 font-medium tracking-[-0.25px]"
-          style={{ color: "var(--ht-text-default)" }}
-        >
-          개인 정보
-        </span>
-        <ChevronRightIcon
-          width={20}
-          height={20}
-          style={{ color: "var(--ht-text-default)" }}
-        />
-      </button>
-    </div>
+        개인 정보
+      </span>
+      <ChevronRightIcon
+        width={16}
+        height={16}
+        style={{ color: "var(--ht-text-default)" }}
+      />
+    </button>
   );
 }
 
@@ -99,9 +97,9 @@ function TextSizeRow({
   onChange: (v: TextSize) => void;
 }) {
   return (
-    <div className="flex items-center justify-between w-full min-h-[32px] pl-[12px]">
+    <div className="flex items-center justify-between w-full">
       <span
-        className="text-[16px] leading-6 font-medium tracking-[-0.25px]"
+        className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
         style={{ color: "var(--ht-text-default)" }}
       >
         텍스트 크기
