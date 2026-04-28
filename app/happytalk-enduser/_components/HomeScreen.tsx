@@ -248,7 +248,7 @@ function StatusRow() {
           className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
           style={{ color: "#4E4E55" }}
         >
-          9-18시 운영
+          9-18시 운영 중
           <ChevronDownIcon
             width={16}
             height={16}

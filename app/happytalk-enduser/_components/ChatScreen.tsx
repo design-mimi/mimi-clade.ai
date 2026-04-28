@@ -58,7 +58,7 @@ const SHIPPING_BODY: ReactNode = (
 
 export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   const cards = CARDS_BY_TOPIC[topic];
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
   const initial = useMemo<TranscriptItem[]>(() => {
     const intro: AgentItem = {
@@ -87,15 +87,25 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
   const hasAnchoredRef = useRef(false);
 
   useEffect(() => {
-    if (!bottomRef.current) return;
-    // First render on chat open: jump instantly to the latest message so
-    // the user lands at the bottom of the conversation. Subsequent updates
-    // (new messages from chip click or text input) animate smoothly.
-    bottomRef.current.scrollIntoView({
-      behavior: hasAnchoredRef.current ? "smooth" : "auto",
-      block: "end",
-    });
-    hasAnchoredRef.current = true;
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    if (!hasAnchoredRef.current) {
+      // First mount: jump to the latest instantly. Re-anchor on the next
+      // animation frame and again after 240ms to catch layout shifts from
+      // images (ChatCard) loading after the initial paint.
+      const jump = () => {
+        el.scrollTop = el.scrollHeight;
+      };
+      jump();
+      requestAnimationFrame(jump);
+      const t = window.setTimeout(jump, 240);
+      hasAnchoredRef.current = true;
+      return () => clearTimeout(t);
+    }
+
+    // Subsequent updates (chip click, send): smooth follow.
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [transcript]);
 
   const handleChipClick = (turnId: string, label: string) => {
@@ -132,7 +142,10 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
-      <div className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[28px] px-[16px] pb-[140px]">
+      <div
+        ref={scrollerRef}
+        className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[28px] px-[16px] pb-[140px]"
+      >
         <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (
@@ -170,7 +183,6 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
             <UserBubble key={item.id} body={item.text} />
           ),
         )}
-        <div ref={bottomRef} />
       </div>
 
       <TopBlurMask />
