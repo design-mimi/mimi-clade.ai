@@ -46,7 +46,7 @@ export function BottomNav({ active, onChange }: Props) {
             key={id}
             type="button"
             onClick={() => onChange(id)}
-            data-active={isActive}
+            data-active={isActive ? "true" : "false"}
             className="ht-pressable ht-nav-tab relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px]"
             style={{
               WebkitTapHighlightColor: "transparent",

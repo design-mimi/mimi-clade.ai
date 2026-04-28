@@ -129,18 +129,18 @@ body {
    shown intermittent failures applying inline style changes for bg/box-shadow
    in transitioned, appearance:none buttons after the first state change. */
 .ht-nav-tab {
-  background-color: transparent;
-  border: 1px solid transparent;
-  box-shadow: none;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
   transition: background-color 220ms ease-out, border-color 220ms ease-out,
     box-shadow 220ms ease-out;
 }
 .ht-nav-tab[data-active="true"] {
-  background-color: #ffffff;
-  border-color: rgba(39, 39, 42, 0.16);
+  background-color: #ffffff !important;
+  border-color: rgba(39, 39, 42, 0.16) !important;
   box-shadow:
     0 1px 3px 0 rgba(0, 0, 0, 0.08),
-    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+    0 0 0 0.5px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* ============================================== */
