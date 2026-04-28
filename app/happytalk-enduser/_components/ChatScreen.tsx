@@ -84,9 +84,18 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
   const [transcript, setTranscript] = useState<TranscriptItem[]>(initial);
   const [fadingChips, setFadingChips] = useState<Set<string>>(new Set());
+  const hasAnchoredRef = useRef(false);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    if (!bottomRef.current) return;
+    // First render on chat open: jump instantly to the latest message so
+    // the user lands at the bottom of the conversation. Subsequent updates
+    // (new messages from chip click or text input) animate smoothly.
+    bottomRef.current.scrollIntoView({
+      behavior: hasAnchoredRef.current ? "smooth" : "auto",
+      block: "end",
+    });
+    hasAnchoredRef.current = true;
   }, [transcript]);
 
   const handleChipClick = (turnId: string, label: string) => {
