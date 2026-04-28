@@ -162,7 +162,7 @@ export function EnduserFrame({ variant, onClose }: Props) {
           type="button"
           onClick={onClose}
           aria-label="닫기"
-          className="sm:hidden absolute top-[14px] right-[14px] z-[55] flex items-center justify-center"
+          className="sm:hidden absolute top-[10px] right-[14px] z-[55] flex items-center justify-center"
         >
           <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
             <path
