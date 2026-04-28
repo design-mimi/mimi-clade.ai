@@ -182,7 +182,7 @@ function TopBlurMask() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute top-0 left-0 right-0 z-10"
+      className="pointer-events-none absolute top-0 left-0 right-0 z-10 sm:rounded-t-[24px] overflow-hidden"
       style={{
         height: 40,
         backdropFilter: "blur(10px)",

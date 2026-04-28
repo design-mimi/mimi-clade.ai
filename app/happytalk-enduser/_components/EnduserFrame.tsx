@@ -28,6 +28,7 @@ export function EnduserFrame({ variant, onClose }: Props) {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatIsNew, setChatIsNew] = useState(false);
   const [settingView, setSettingView] = useState<SettingView>("main");
+  const [endChatConfirm, setEndChatConfirm] = useState(false);
   const [textSize, setTextSize] = useState<TextSize>(() =>
     typeof window !== "undefined" &&
     !window.matchMedia("(min-width: 640px)").matches
@@ -160,7 +161,15 @@ export function EnduserFrame({ variant, onClose }: Props) {
       {onClose && !(tab === "setting" && settingView === "profile") && (
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            // While chat is open, X asks for confirmation to end the
+            // consultation. Otherwise it closes the entire widget.
+            if (chatOpen) {
+              setEndChatConfirm(true);
+            } else {
+              onClose();
+            }
+          }}
           aria-label="닫기"
           className="sm:hidden absolute top-[10px] right-[14px] z-[55] flex items-center justify-center"
         >
@@ -219,6 +228,75 @@ export function EnduserFrame({ variant, onClose }: Props) {
           {chatLoading ? <ChatSkeleton /> : <ChatScreen onBack={closeChat} isNew={chatIsNew} />}
         </div>
       )}
+
+      {/* End-chat confirmation modal */}
+      {endChatConfirm && (
+        <EndChatConfirm
+          onCancel={() => setEndChatConfirm(false)}
+          onConfirm={() => {
+            setEndChatConfirm(false);
+            closeChat();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function EndChatConfirm({
+  onCancel,
+  onConfirm,
+}: {
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="absolute inset-0 z-[60] flex items-center justify-center px-[24px]">
+      <div
+        className="absolute inset-0"
+        style={{ background: "rgba(0, 0, 0, 0.4)" }}
+        onClick={onCancel}
+      />
+      <div
+        className="relative bg-white rounded-[24px] w-full max-w-[320px] px-[24px] py-[28px] flex flex-col gap-[20px]"
+        style={{ boxShadow: "var(--ht-shadow-modal-lg)" }}
+      >
+        <p
+          className="text-center text-[16px] leading-6 font-medium tracking-[-0.25px]"
+          style={{ color: "var(--ht-text-default)" }}
+        >
+          상담을 종료하시겠습니까?
+        </p>
+        <div className="flex gap-[8px]">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="ht-pressable flex-1 h-[44px] rounded-full text-[15px] font-medium tracking-[-0.25px]"
+            style={{
+              background: "rgba(39, 39, 42, 0.06)",
+              color: "var(--ht-text-default)",
+              appearance: "none",
+              WebkitAppearance: "none",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="ht-pressable flex-1 h-[44px] rounded-full text-[15px] font-medium tracking-[-0.25px] text-white"
+            style={{
+              background: "#6f6f77",
+              appearance: "none",
+              WebkitAppearance: "none",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            확인
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
