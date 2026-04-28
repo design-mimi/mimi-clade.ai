@@ -123,7 +123,7 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-white">
-      <div className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[16px] px-[16px] pb-[140px]">
+      <div className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[28px] px-[16px] pb-[140px]">
         <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (
@@ -246,7 +246,7 @@ function AgentTurn({
     <div className="ht-reveal flex flex-col gap-[10px] w-full">
       {children}
       <span
-        className="text-[14px] leading-5"
+        className="text-[12px] leading-4 font-medium tracking-[-0.25px]"
         style={{ color: "var(--ht-text-subtle)" }}
       >
         {name} • {time}
