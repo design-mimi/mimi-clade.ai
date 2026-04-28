@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type KeyboardEvent,
   type ReactNode,
   type SVGProps,
 } from "react";
@@ -165,7 +166,14 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
       <TopBlurMask />
       <BackButton onClick={onBack} />
-      <InputBar />
+      <InputBar
+        onSend={(text) =>
+          setTranscript((prev) => [
+            ...prev,
+            { id: `user-${Date.now()}`, kind: "user", text },
+          ])
+        }
+      />
     </div>
   );
 }
@@ -318,36 +326,74 @@ function SecondaryPill({
   );
 }
 
-function InputBar() {
+function InputBar({ onSend }: { onSend: (text: string) => void }) {
+  const [value, setValue] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const trimmed = value.trim();
+  const canSend = trimmed.length > 0;
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${Math.min(ta.scrollHeight, 100)}px`;
+  }, [value]);
+
+  const handleSend = () => {
+    if (!canSend) return;
+    onSend(trimmed);
+    setValue("");
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
     <div
-      className="absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-[8px] rounded-[16px] border px-[14px] pt-[12px] pb-[10px]"
+      className="absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-[8px] rounded-[16px] border px-[12px] pt-[10px] pb-[12px]"
       style={{
         background: "var(--ht-bg-input)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-modal-sm)",
       }}
     >
-      <span
-        className="text-[14px] leading-5 truncate"
-        style={{ color: "var(--ht-text-muted)" }}
-      >
-        메시지를 입력해주세요.
-      </span>
+      <textarea
+        ref={textareaRef}
+        rows={1}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="메시지를 입력해주세요."
+        className="resize-none outline-none w-full text-[14px] leading-5 tracking-[-0.25px] bg-transparent placeholder:text-[var(--ht-text-muted)]"
+        style={{
+          color: "var(--ht-text-default)",
+          minHeight: 20,
+          maxHeight: 100,
+        }}
+      />
       <div className="flex items-center justify-between">
         <button
           type="button"
           aria-label="더보기"
-          className="ht-pressable w-[28px] h-[28px] rounded-full border flex items-center justify-center"
+          className="ht-pressable w-[32px] h-[32px] rounded-full border flex items-center justify-center"
           style={{ borderColor: "var(--ht-border-default)", background: "transparent" }}
         >
           <PlusIcon width={28} height={28} style={{ color: "#6F6F77" }} />
         </button>
         <button
           type="button"
+          onClick={handleSend}
+          disabled={!canSend}
           aria-label="전송"
-          className="ht-pressable w-[28px] h-[28px] rounded-full flex items-center justify-center"
-          style={{ background: "rgba(39, 39, 42, 0.25)" }}
+          className="ht-pressable w-[32px] h-[32px] rounded-full flex items-center justify-center"
+          style={{
+            background: canSend ? "#437dfc" : "rgba(39, 39, 42, 0.25)",
+            transition: "background-color 150ms ease-out",
+          }}
         >
           <SendArrowIcon width={28} height={28} style={{ color: "#fff" }} />
         </button>
