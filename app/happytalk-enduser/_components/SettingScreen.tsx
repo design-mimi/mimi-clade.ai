@@ -40,7 +40,7 @@ function Header({
 }) {
   return (
     <div
-      className="flex items-center w-full px-[20px] py-[12px] bg-white border-b"
+      className="flex items-center w-full h-[56px] pl-[20px] pr-[64px] sm:pr-[20px] py-[12px] bg-white border-b"
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
       {onBack ? (

@@ -46,21 +46,10 @@ export function BottomNav({ active, onChange }: Props) {
             key={id}
             type="button"
             onClick={() => onChange(id)}
-            className="ht-pressable relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px]"
+            data-active={isActive}
+            className="ht-pressable ht-nav-tab relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px]"
             style={{
-              background: isActive ? "#ffffff" : "transparent",
-              border: isActive
-                ? "1px solid rgba(39, 39, 42, 0.16)"
-                : "1px solid transparent",
-              boxShadow: isActive
-                ? "0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.04)"
-                : "none",
-              transition:
-                "background-color 220ms ease-out, border-color 220ms ease-out, box-shadow 220ms ease-out",
               WebkitTapHighlightColor: "transparent",
-              // Force-reset native button rendering on iOS Safari so the
-              // explicit background actually paints (Tailwind preflight sets
-              // -webkit-appearance: button which can suppress custom bg).
               appearance: "none",
               WebkitAppearance: "none",
             }}

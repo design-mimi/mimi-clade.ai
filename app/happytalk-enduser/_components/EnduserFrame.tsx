@@ -166,7 +166,7 @@ export function EnduserFrame({ variant, onClose }: Props) {
           aria-label="닫기"
           className="sm:hidden absolute top-[14px] right-[14px] z-[55] flex items-center justify-center"
         >
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
             <path
               d="M0 6C0 2.68629 2.68629 0 6 0H22C25.3137 0 28 2.68629 28 6V22C28 25.3137 25.3137 28 22 28H6C2.68629 28 0 25.3137 0 22V6Z"
               fill="#27272A"

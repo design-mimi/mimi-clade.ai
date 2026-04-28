@@ -124,6 +124,25 @@ body {
 /* (Removed) data-smooth-corners hack — its mask + translateZ broke iOS backdrop-filter
    on the BottomNav. Modern browsers anti-alias rounded corners cleanly without it. */
 
+/* BottomNav tab — state-driven via data-active attribute so the browser, not
+   React inline style diff, drives the active background paint. iOS Safari has
+   shown intermittent failures applying inline style changes for bg/box-shadow
+   in transitioned, appearance:none buttons after the first state change. */
+.ht-nav-tab {
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  transition: background-color 220ms ease-out, border-color 220ms ease-out,
+    box-shadow 220ms ease-out;
+}
+.ht-nav-tab[data-active="true"] {
+  background-color: #ffffff;
+  border-color: rgba(39, 39, 42, 0.16);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.08),
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+
 /* ============================================== */
 /*  Motion System                                 */
 /*  Refer to DESIGN_RULES.md §Motion System       */
