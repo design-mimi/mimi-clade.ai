@@ -248,7 +248,7 @@ function StatusRow() {
           className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
           style={{ color: "#4E4E55" }}
         >
-          운영 시간
+          9-18시 운영
           <ChevronDownIcon
             width={16}
             height={16}
@@ -271,12 +271,14 @@ function StatusRow() {
         </span>
       </div>
       {open && (
-        <span
-          className="px-[8px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+        <div
+          className="px-[8px] flex flex-col gap-[2px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
           style={{ color: "#4E4E55" }}
         >
-          평일 10:00~17:00
-        </span>
+          <span>평일 9-18시 운영</span>
+          <span>토요일 10-17시 운영</span>
+          <span>일요일 10-17시 운영</span>
+        </div>
       )}
     </div>
   );

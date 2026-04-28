@@ -8,27 +8,27 @@ type MessageItem = {
 
 const MESSAGES: MessageItem[] = [
   {
-    status: "상담 종료",
+    status: "2026년 4월 28일",
     time: "1시간 전",
     body: "안녕하세요. ⚽🏀 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
   },
   {
-    status: "상담 종료",
+    status: "2026년 4월 28일",
     time: "5시간 전",
     body: "안녕하세요. ⚽🏀 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
   },
   {
-    status: "상담 대기 후 종료",
+    status: "2026년 4월 27일",
     time: "하루 전",
     body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
   },
   {
-    status: "고객 종료",
+    status: "2026년 4월 21일",
     time: "일주일 전",
     body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
   },
   {
-    status: "상담 종료",
+    status: "2025년 3월 21일",
     time: "2025.03.21",
     body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
   },
@@ -60,12 +60,16 @@ export function MessageScreen({ onOpenChat }: Props) {
 function Header() {
   return (
     <div
-      className="flex items-center justify-between w-full h-[56px] pl-[20px] pr-[56px] sm:pr-[20px] py-[12px] bg-white border-b"
+      className="flex items-center justify-between w-full h-[56px] pl-[20px] pr-[56px] sm:pr-[20px] py-[12px] bg-white border-b overflow-hidden"
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
       <h1
-        className="text-[18px] leading-7 font-semibold"
-        style={{ color: "var(--ht-text-default)" }}
+        className="font-semibold tracking-[-0.25px]"
+        style={{
+          fontSize: 18,
+          lineHeight: "28px",
+          color: "var(--ht-text-default)",
+        }}
       >
         메시지
       </h1>
@@ -107,7 +111,7 @@ function MessageRow({
         </span>
       </div>
       <p
-        className="text-[14px] leading-[1.6] w-full"
+        className="text-[14px] leading-[1.6] w-full line-clamp-2"
         style={{ color: "var(--ht-text-default)" }}
       >
         {body}
