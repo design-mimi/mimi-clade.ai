@@ -388,10 +388,33 @@ body {
   transform: scale(1.12);
 }
 
+/* Touch devices have no hover — show the same micro-smile periodically so
+   the icon still feels alive on mobile. Same peak transform values as
+   hover, brief 씨익 pulse every ~3.6s. */
+@media (hover: none) {
+  .ht-launcher-smile {
+    animation: ht-launcher-smile-loop 3.6s ease-in-out infinite;
+  }
+  .ht-launcher-eye {
+    animation: ht-launcher-eye-loop 3.6s ease-in-out infinite;
+  }
+}
+
+@keyframes ht-launcher-smile-loop {
+  0%, 65%, 100% { transform: translateY(0) scaleY(1); }
+  80%          { transform: translateY(-1.5px) scaleY(1.05); }
+}
+
+@keyframes ht-launcher-eye-loop {
+  0%, 65%, 100% { transform: scale(1); }
+  80%          { transform: scale(1.12); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ht-launcher-smile,
   .ht-launcher-eye {
     transition: none;
+    animation: none;
   }
   .ht-launcher:hover .ht-launcher-smile,
   .ht-launcher:hover .ht-launcher-eye {
