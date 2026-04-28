@@ -96,7 +96,7 @@ function MessageRow({
       onClick={onClick}
       className="ht-card-press flex flex-col gap-[4px] w-full text-left rounded-[12px] px-[12px] py-[6px]"
     >
-      <div className="flex items-center gap-[8px]">
+      <div className="flex items-center justify-between gap-[8px] w-full">
         <span
           className="text-[14px] leading-5 font-semibold"
           style={{ color: "var(--ht-text-default)" }}
@@ -104,7 +104,7 @@ function MessageRow({
           {status}
         </span>
         <span
-          className="text-[12px] leading-4"
+          className="text-[12px] leading-4 shrink-0"
           style={{ color: "var(--ht-text-subtle)" }}
         >
           {time}
