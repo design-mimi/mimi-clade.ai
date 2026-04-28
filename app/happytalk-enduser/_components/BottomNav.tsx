@@ -23,13 +23,7 @@ const TABS: { id: NavTab; label: string; outline: IconComp; fill: IconComp }[] =
   { id: "setting", label: "설정", outline: SettingOutlineIcon, fill: SettingFillIcon },
 ];
 
-const TAB_WIDTH = 64;
-const TAB_GAP = 6;
-
 export function BottomNav({ active, onChange }: Props) {
-  const activeIndex = TABS.findIndex((t) => t.id === active);
-  const inkLeft = 8 + activeIndex * (TAB_WIDTH + TAB_GAP);
-
   return (
     <div
       className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border overflow-hidden"
@@ -41,24 +35,6 @@ export function BottomNav({ active, onChange }: Props) {
         WebkitBackdropFilter: "blur(2px)",
       }}
     >
-      {/* Ink indicator —
-          On mobile, white-on-light-gray contrast is too low and 1px @ 0.1 borders
-          render too faint at high DPI. Strengthen the ink's own definition (border
-          0.16 + soft drop + 0.5px outline) just enough to read clearly on any
-          screen background while staying close to the Figma look. */}
-      <div
-        className="absolute top-[6px] bottom-[6px] rounded-[100px] z-[1]"
-        style={{
-          width: TAB_WIDTH,
-          left: inkLeft,
-          background: "#ffffff",
-          border: "1px solid rgba(39, 39, 42, 0.16)",
-          boxShadow:
-            "0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.04)",
-          transition: "left 350ms cubic-bezier(0.22, 1, 0.36, 1)",
-        }}
-      />
-
       {TABS.map(({ id, label, outline, fill }) => {
         const isActive = active === id;
         const Icon = isActive ? fill : outline;
@@ -67,7 +43,19 @@ export function BottomNav({ active, onChange }: Props) {
             key={id}
             type="button"
             onClick={() => onChange(id)}
-            className="ht-pressable relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px] z-10"
+            className="ht-pressable relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px]"
+            style={{
+              background: isActive ? "#ffffff" : "transparent",
+              border: isActive
+                ? "1px solid rgba(39, 39, 42, 0.16)"
+                : "1px solid transparent",
+              boxShadow: isActive
+                ? "0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.04)"
+                : "none",
+              transition:
+                "background-color 220ms ease-out, border-color 220ms ease-out, box-shadow 220ms ease-out",
+              WebkitTapHighlightColor: "transparent",
+            }}
           >
             <Icon
               width={20}
