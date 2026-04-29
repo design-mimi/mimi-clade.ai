@@ -25,7 +25,7 @@ export function SettingScreen({
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header />
-      <div className="flex-1 flex flex-col items-start p-[16px] gap-[12px]">
+      <div className="flex-1 flex flex-col items-start px-[20px] py-[16px] gap-[12px]">
         <ProfileEntry onClick={() => onViewChange("profile")} />
         <TextSizeRow value={textSize} onChange={onTextSizeChange} />
       </div>
