@@ -19,7 +19,19 @@ export default function HappytalkEnduserPage() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#eeeeee]">
-      <div className="absolute inset-0">
+      {/* Mobile-only background */}
+      <div className="absolute inset-0 sm:hidden">
+        <Image
+          src="/kindersalmonshop.com_Mobile.png"
+          alt="킨더살몬 쇼핑몰"
+          fill
+          priority
+          className="object-cover object-top"
+          sizes="100vw"
+        />
+      </div>
+      {/* Web (≥640px) background */}
+      <div className="absolute inset-0 hidden sm:block">
         <Image
           src="/kindersalmonshop.png"
           alt="킨더살몬 쇼핑몰"
