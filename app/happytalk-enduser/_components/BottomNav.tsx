@@ -26,16 +26,13 @@ const TABS: { id: NavTab; label: string; outline: IconComp; fill: IconComp }[] =
 export function BottomNav({ active, onChange }: Props) {
   return (
     <div
-      className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border overflow-hidden"
+      className="absolute left-1/2 bottom-[11px] -translate-x-1/2 z-20 flex items-center py-[6px] px-[8px] gap-[6px] rounded-full border overflow-hidden isolate"
       style={{
-        // No backdrop-filter — its render layer was causing iOS WebKit to
-        // composite child button backgrounds into the parent's blurred tint,
-        // which is exactly why the white active pill kept disappearing on
-        // mobile browsers. Slightly higher alpha (0.95) preserves the tone
-        // without depending on blur.
-        background: "rgba(245, 245, 245, 0.95)",
+        background: "rgba(245, 245, 245, 0.8)",
         borderColor: "var(--ht-border-default)",
         boxShadow: "var(--ht-shadow-nav)",
+        backdropFilter: "blur(2px)",
+        WebkitBackdropFilter: "blur(2px)",
       }}
     >
       {TABS.map(({ id, label, outline, fill }) => {
@@ -46,27 +43,35 @@ export function BottomNav({ active, onChange }: Props) {
             key={id}
             type="button"
             onClick={() => onChange(id)}
-            data-active={isActive ? "true" : "false"}
-            className="ht-pressable ht-nav-tab relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px]"
+            className="relative flex flex-col items-center justify-center w-[64px] py-[6px] rounded-[100px]"
             style={{
-              WebkitTapHighlightColor: "transparent",
-              appearance: "none",
-              WebkitAppearance: "none",
+              border: isActive
+                ? "1px solid var(--ht-border-default)"
+                : "1px solid transparent",
+              background: "transparent",
             }}
           >
+            {isActive && (
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-[100px] pointer-events-none"
+                style={{
+                  background: "rgba(255, 255, 255, 0.12)",
+                  mixBlendMode: "plus-lighter",
+                }}
+              />
+            )}
             <Icon
               width={20}
               height={20}
               style={{
                 color: isActive ? "var(--ht-icon-default)" : "var(--ht-icon-subtle)",
-                transition: "color 200ms ease-out",
               }}
             />
             <span
-              className="mt-[1px] text-[11px] leading-4"
+              className="mt-[1px] text-[11px] leading-4 tracking-[-0.25px]"
               style={{
                 color: isActive ? "var(--ht-text-default)" : "var(--ht-text-subtle)",
-                transition: "color 200ms ease-out",
               }}
             >
               {label}
