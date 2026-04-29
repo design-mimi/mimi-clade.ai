@@ -31,7 +31,7 @@ export function MessageScreen({
       {isEmpty ? (
         <EmptyContent />
       ) : (
-        <div className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[16px] gap-[20px] overflow-y-auto">
+        <div className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[160px] gap-[20px] overflow-y-auto">
           {conversations.map((c, i) => (
             <div
               key={c.id}
@@ -48,7 +48,10 @@ export function MessageScreen({
           ))}
         </div>
       )}
-      <div className="flex justify-center shrink-0 pb-[100px]">
+      {/* InquireButton floats above list/nav. Wrapper is full-width centered
+          and pointer-events-none so wheel/touch scroll passes through to the
+          list below; the button itself opts back into pointer events. */}
+      <div className="absolute left-0 right-0 bottom-[100px] z-10 flex justify-center pointer-events-none">
         <InquireButton onClick={onStartNewChat} />
       </div>
     </div>
@@ -117,7 +120,7 @@ function InquireButton({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-pressable inline-flex items-center justify-center gap-[4px] rounded-[16px] px-[24px] py-[12px] border text-white"
+      className="ht-pressable pointer-events-auto inline-flex items-center justify-center gap-[4px] rounded-[16px] px-[24px] py-[12px] border text-white"
       style={{
         background: "var(--ht-bg-inverted)",
         borderColor: "rgba(255, 255, 255, 0.2)",

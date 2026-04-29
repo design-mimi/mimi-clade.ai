@@ -1,6 +1,6 @@
 "use client";
 
-import type { SVGProps } from "react";
+import { useState, type SVGProps } from "react";
 import type { TextSize } from "./EnduserFrame";
 
 export type SettingView = "main" | "profile";
@@ -165,24 +165,59 @@ function SegmentedControl<T extends string>({
 }
 
 function ProfileView({ onBack }: { onBack: () => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const canSave = name.trim().length > 0 && email.trim().length > 0;
+
+  const handleSave = () => {
+    if (!canSave) return;
+    setSaved(true);
+  };
+
+  const handleEdit = () => {
+    setSaved(false);
+  };
+
+  const handleDelete = () => {
+    setName("");
+    setEmail("");
+    setSaved(false);
+  };
+
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
       <Header onBack={onBack} />
       <div className="flex-1 flex flex-col px-[20px] py-[16px] gap-[12px]">
         <div className="flex flex-col gap-[24px] w-full">
-          <ProfileField label="이름" placeholder="이름을 입력해 주세요" />
-          <ProfileField label="이메일" placeholder="이메일을 입력해 주세요" />
-          <div className="flex justify-end w-full">
-            <button
-              type="button"
-              className="ht-pressable px-[10px] py-[6px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
-              style={{
-                background: "rgba(39, 39, 42, 0.06)",
-                color: "var(--ht-text-subtle)",
-              }}
-            >
-              저장
-            </button>
+          <ProfileField
+            label="이름"
+            placeholder="이름을 입력해 주세요"
+            value={name}
+            onChange={setName}
+            readOnly={saved}
+          />
+          <ProfileField
+            label="이메일"
+            placeholder="이메일을 입력해 주세요"
+            value={email}
+            onChange={setEmail}
+            readOnly={saved}
+          />
+          <div className="flex justify-end gap-[8px] w-full">
+            {saved ? (
+              <>
+                <ProfileActionButton label="수정" onClick={handleEdit} />
+                <ProfileActionButton label="정보 삭제" onClick={handleDelete} />
+              </>
+            ) : (
+              <ProfileActionButton
+                label="저장"
+                onClick={handleSave}
+                disabled={!canSave}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -190,12 +225,45 @@ function ProfileView({ onBack }: { onBack: () => void }) {
   );
 }
 
+function ProfileActionButton({
+  label,
+  onClick,
+  disabled = false,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="ht-pressable px-[10px] py-[6px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+      style={{
+        background: "rgba(39, 39, 42, 0.06)",
+        color: "var(--ht-text-subtle)",
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : "pointer",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 function ProfileField({
   label,
   placeholder,
+  value,
+  onChange,
+  readOnly = false,
 }: {
   label: string;
   placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  readOnly?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-[8px] w-full">
@@ -207,6 +275,9 @@ function ProfileField({
       </span>
       <input
         type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        readOnly={readOnly}
         placeholder={placeholder}
         className="w-full px-[12px] py-[8px] rounded-[8px] border outline-none text-[14px] leading-5 tracking-[-0.25px] placeholder:text-[var(--ht-text-muted)]"
         style={{
