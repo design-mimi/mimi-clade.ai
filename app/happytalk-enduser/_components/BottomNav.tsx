@@ -56,7 +56,7 @@ export function BottomNav({ active, onChange }: Props) {
                 aria-hidden
                 className="absolute inset-0 rounded-[100px] pointer-events-none"
                 style={{
-                  background: "rgba(255, 255, 255, 0.12)",
+                  background: "#ffffff",
                   mixBlendMode: "plus-lighter",
                 }}
               />
