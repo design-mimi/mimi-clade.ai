@@ -71,12 +71,8 @@ function Header({
       style={{ borderColor: "var(--ht-border-separator)" }}
     >
       <h1
-        className="font-semibold tracking-[-0.25px]"
-        style={{
-          fontSize: 18,
-          lineHeight: "28px",
-          color: "var(--ht-text-default)",
-        }}
+        className="text-[18px] leading-7 font-semibold tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-default)" }}
       >
         메시지
       </h1>
@@ -95,8 +91,12 @@ function Header({
 }
 
 function EmptyContent() {
+  // pb-[148px] reserves the floating 문의하기 button + nav area so vertical
+  // centering happens in the visible content area (matches Figma 27158:30643
+  // intent), instead of the full screen height which would push the icon/text
+  // toward the bottom on tall devices and overlap with the button on short ones.
   return (
-    <div className="flex-1 flex flex-col items-center justify-center w-full px-[20px] gap-[20px]">
+    <div className="flex-1 flex flex-col items-center justify-center w-full px-[20px] pb-[148px] gap-[20px]">
       <Image
         src="/blum-empty.svg"
         alt=""
