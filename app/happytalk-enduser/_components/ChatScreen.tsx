@@ -293,7 +293,7 @@ export function ChatScreen({
     <div className="relative w-full h-full overflow-hidden bg-white">
       <div
         ref={scrollerRef}
-        className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[28px] px-[16px] pb-[140px]"
+        className="absolute inset-0 flex flex-col gap-[24px] overflow-y-auto pt-[28px] px-[20px] pb-[140px]"
       >
         <DateBadge label="2026년 4월 27일" />
 
@@ -527,7 +527,7 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
 
   return (
     <div
-      className="absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-[8px] rounded-[16px] border px-[12px] pt-[10px] pb-[12px]"
+      className="absolute left-[20px] right-[20px] bottom-[16px] flex flex-col gap-[8px] rounded-[16px] border px-[12px] pt-[10px] pb-[12px]"
       style={{
         background: "var(--ht-bg-input)",
         borderColor: "var(--ht-border-default)",
