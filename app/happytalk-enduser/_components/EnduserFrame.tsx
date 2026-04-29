@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { HomeScreen } from "./HomeScreen";
 import { MessageScreen } from "./MessageScreen";
 import { SettingScreen } from "./SettingScreen";
-import { ChatScreen } from "./ChatScreen";
+import { ChatScreen, type TranscriptItem } from "./ChatScreen";
 import { ChatSkeleton } from "./ChatSkeleton";
 import { BottomNav } from "./BottomNav";
-import type { HomeVariant, NavTab } from "./types";
+import type { ConversationSummary, HomeVariant, NavTab } from "./types";
 import type { SettingView } from "./SettingScreen";
+import { INTRO_BODY } from "./chatCards";
 
 export type ActiveScreen = NavTab | "chat";
 
@@ -20,6 +21,11 @@ type Props = {
 
 const TRANSITION_MS = 180;
 const SKELETON_MS = 300;
+
+function formatTodayKR(): string {
+  const d = new Date();
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
 
 export type TextSize = "small" | "large";
 
@@ -36,14 +42,47 @@ export function EnduserFrame({
   const [chatIsNew, setChatIsNew] = useState(false);
   const [settingView, setSettingView] = useState<SettingView>("main");
   const [endChatConfirm, setEndChatConfirm] = useState(false);
+  const [deleteAllConfirm, setDeleteAllConfirm] = useState(false);
   const [textSize, setTextSize] = useState<TextSize>(() =>
     typeof window !== "undefined" &&
     !window.matchMedia("(min-width: 640px)").matches
       ? "large"
       : "small",
   );
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const chatHadActivityRef = useRef(false);
+  const lastChatPreviewRef = useRef("");
+  // null = brand new chat (create row on close); string = resuming an existing
+  // row (update that row in-place on close instead of duplicating).
+  const activeConversationIdRef = useRef<string | null>(null);
+  // Saved transcripts keyed by conversation id, so re-entering a room loads
+  // the actual previous chat instead of any hardcoded prefilled fallback.
+  const transcriptsRef = useRef<Map<string, TranscriptItem[]>>(new Map());
+  // Latest transcript snapshot from the open ChatScreen, captured each time
+  // ChatScreen reports a change. Persisted under the room id at closeChat.
+  const pendingTranscriptRef = useRef<TranscriptItem[] | null>(null);
+  // Initial transcript handed to ChatScreen when resuming a room — null for
+  // a fresh new chat (ChatScreen seeds default intro).
+  const [activeInitialTranscript, setActiveInitialTranscript] = useState<
+    TranscriptItem[] | null
+  >(null);
 
-  const openChat = (isNew = false) => {
+  const openChat = (isNew = false, conversationId: string | null = null) => {
+    // Creating a fresh chat room (via 문의하기) counts as activity on its own,
+    // so the room appears in the message list even if the user closes
+    // immediately. Initial preview = intro greeting; later interactions
+    // overwrite it through onUserActivity.
+    chatHadActivityRef.current = isNew;
+    lastChatPreviewRef.current = isNew ? INTRO_BODY : "";
+    activeConversationIdRef.current = conversationId;
+    pendingTranscriptRef.current = null;
+    // Resuming a room → hydrate from saved transcript. Fresh chat → null
+    // (ChatScreen will seed the intro itself).
+    setActiveInitialTranscript(
+      !isNew && conversationId
+        ? transcriptsRef.current.get(conversationId) ?? null
+        : null,
+    );
     setChatIsNew(isNew);
     setChatLoading(true);
     setChatOpen(true);
@@ -124,6 +163,46 @@ export function EnduserFrame({
   }, [textSize]);
 
   const closeChat = () => {
+    // Persist this session as a new conversation row only if the user
+    // actually interacted (chip / card CTA / send). Idle open-then-close
+    // doesn't add a row.
+    if (chatHadActivityRef.current && lastChatPreviewRef.current) {
+      const now = Date.now();
+      const newBody = lastChatPreviewRef.current;
+      const existingId = activeConversationIdRef.current;
+      const targetId = existingId ?? `conv-${now}`;
+      // Persist transcript before mutating list so re-entry sees fresh state.
+      if (pendingTranscriptRef.current) {
+        transcriptsRef.current.set(targetId, pendingTranscriptRef.current);
+      }
+      setConversations((prev) => {
+        if (existingId) {
+          const idx = prev.findIndex((c) => c.id === existingId);
+          if (idx !== -1) {
+            const updated: ConversationSummary = {
+              ...prev[idx],
+              status: formatTodayKR(),
+              createdAt: now,
+              body: newBody,
+            };
+            return [updated, ...prev.slice(0, idx), ...prev.slice(idx + 1)];
+          }
+        }
+        return [
+          {
+            id: targetId,
+            status: formatTodayKR(),
+            createdAt: now,
+            body: newBody,
+          },
+          ...prev,
+        ];
+      });
+      chatHadActivityRef.current = false;
+      lastChatPreviewRef.current = "";
+      activeConversationIdRef.current = null;
+      pendingTranscriptRef.current = null;
+    }
     setChatClosing(true);
     window.setTimeout(() => {
       setChatOpen(false);
@@ -141,7 +220,15 @@ export function EnduserFrame({
   const renderScreen = (t: NavTab) => {
     if (t === "home")
       return <HomeScreen variant={variant} onOpenChat={() => openChat(true)} />;
-    if (t === "message") return <MessageScreen onOpenChat={() => openChat(false)} />;
+    if (t === "message")
+      return (
+        <MessageScreen
+          conversations={conversations}
+          onStartNewChat={() => openChat(true)}
+          onOpenHistory={(conversationId) => openChat(false, conversationId)}
+          onRequestDeleteAll={() => setDeleteAllConfirm(true)}
+        />
+      );
     return (
       <SettingScreen
         textSize={textSize}
@@ -236,13 +323,29 @@ export function EnduserFrame({
         <div
           className={`absolute inset-0 z-30 ${chatClosing ? "ht-slide-out-right" : "ht-slide-in-right"}`}
         >
-          {chatLoading ? <ChatSkeleton /> : <ChatScreen onBack={closeChat} isNew={chatIsNew} />}
+          {chatLoading ? (
+            <ChatSkeleton />
+          ) : (
+            <ChatScreen
+              onBack={closeChat}
+              isNew={chatIsNew}
+              initialTranscript={activeInitialTranscript}
+              onUserActivity={(latestPreview) => {
+                chatHadActivityRef.current = true;
+                lastChatPreviewRef.current = latestPreview;
+              }}
+              onTranscriptUpdate={(transcript) => {
+                pendingTranscriptRef.current = transcript;
+              }}
+            />
+          )}
         </div>
       )}
 
       {/* End-chat confirmation modal */}
       {endChatConfirm && (
-        <EndChatConfirm
+        <ConfirmModal
+          title="상담을 종료하시겠습니까?"
           onCancel={() => setEndChatConfirm(false)}
           onConfirm={() => {
             setEndChatConfirm(false);
@@ -250,14 +353,32 @@ export function EnduserFrame({
           }}
         />
       )}
+
+      {/* Delete-all-conversations confirmation modal */}
+      {deleteAllConfirm && (
+        <ConfirmModal
+          title="전체 메시지를 삭제하시겠습니까?"
+          onCancel={() => setDeleteAllConfirm(false)}
+          onConfirm={() => {
+            setConversations([]);
+            setDeleteAllConfirm(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function EndChatConfirm({
+function ConfirmModal({
+  title,
+  cancelLabel = "취소",
+  confirmLabel = "확인",
   onCancel,
   onConfirm,
 }: {
+  title: string;
+  cancelLabel?: string;
+  confirmLabel?: string;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
@@ -281,7 +402,7 @@ function EndChatConfirm({
             className="text-[16px] leading-6 font-semibold tracking-[-0.25px]"
             style={{ color: "var(--ht-text-default)" }}
           >
-            상담을 종료하시겠습니까?
+            {title}
           </p>
         </div>
         {/* Footer — right-aligned actions */}
@@ -298,7 +419,7 @@ function EndChatConfirm({
               WebkitTapHighlightColor: "transparent",
             }}
           >
-            취소
+            {cancelLabel}
           </button>
           <button
             type="button"
@@ -311,7 +432,7 @@ function EndChatConfirm({
               WebkitTapHighlightColor: "transparent",
             }}
           >
-            확인
+            {confirmLabel}
           </button>
         </div>
       </div>

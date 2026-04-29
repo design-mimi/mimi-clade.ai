@@ -10,16 +10,21 @@ import type {
   CardCarousel,
 } from "./chatCards";
 
-export function ChatCard({ data }: { data: ChatCardData }) {
+type Props = {
+  data: ChatCardData;
+  onAction?: (label: string) => void;
+};
+
+export function ChatCard({ data, onAction }: Props) {
   switch (data.type) {
     case "img-01":
-      return <Img01Card {...data} />;
+      return <Img01Card {...data} onAction={onAction} />;
     case "img-02":
-      return <Img02Card {...data} />;
+      return <Img02Card {...data} onAction={onAction} />;
     case "img-wide":
-      return <ImgWideCard {...data} />;
+      return <ImgWideCard {...data} onAction={onAction} />;
     case "carousel":
-      return <CarouselCard {...data} />;
+      return <CarouselCard {...data} onAction={onAction} />;
   }
 }
 
@@ -74,10 +79,11 @@ function Body({ text }: { text: string }) {
   );
 }
 
-function CtaButton({ label }: { label: string }) {
+function CtaButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="ht-pressable w-full h-[36px] rounded-[6px] border text-[14px] leading-5 text-[#333]"
       style={{
         background: "var(--ht-bg-subtle)",
@@ -91,10 +97,18 @@ function CtaButton({ label }: { label: string }) {
   );
 }
 
-function CouponButton({ coupon }: { coupon: { title: string; desc: string } }) {
+function CouponButton({
+  coupon,
+  onClick,
+}: {
+  coupon: { title: string; desc: string };
+  onClick?: () => void;
+}) {
   return (
-    <div
-      className="flex items-stretch rounded-[6px] overflow-hidden border"
+    <button
+      type="button"
+      onClick={onClick}
+      className="ht-pressable flex items-stretch rounded-[6px] overflow-hidden border text-left w-full"
       style={{ borderColor: "var(--ht-border-card)" }}
     >
       <div
@@ -117,60 +131,83 @@ function CouponButton({ coupon }: { coupon: { title: string; desc: string } }) {
       >
         <GiftIcon width={20} height={20} style={{ color: "#4e4e55" }} />
       </div>
-    </div>
+    </button>
   );
 }
 
-function Img01Card({ image, body, primary, coupon, secondary }: CardImg01) {
+type CardActionProps = { onAction?: (label: string) => void };
+
+function Img01Card({
+  image,
+  body,
+  primary,
+  coupon,
+  secondary,
+  onAction,
+}: CardImg01 & CardActionProps) {
   return (
     <CardShell width={256}>
       <HeroImage src={image} width={256} height={208} />
       <Body text={body} />
       <div className="flex flex-col gap-[6px] px-[12px] pb-[12px]">
-        <CtaButton label={primary} />
-        <CouponButton coupon={coupon} />
-        <CtaButton label={secondary} />
+        <CtaButton label={primary} onClick={() => onAction?.(primary)} />
+        <CouponButton coupon={coupon} onClick={() => onAction?.(coupon.desc)} />
+        <CtaButton label={secondary} onClick={() => onAction?.(secondary)} />
       </div>
     </CardShell>
   );
 }
 
-function Img02Card({ image, body, primary, coupon, secondary }: CardImg02) {
+function Img02Card({
+  image,
+  body,
+  primary,
+  coupon,
+  secondary,
+  onAction,
+}: CardImg02 & CardActionProps) {
   return (
     <CardShell width={256}>
       <HeroImage src={image} width={256} height={280} />
       <Body text={body} />
       <div className="flex flex-col gap-[6px] px-[12px] pb-[12px]">
-        <CtaButton label={primary} />
-        <CouponButton coupon={coupon} />
-        <CtaButton label={secondary} />
+        <CtaButton label={primary} onClick={() => onAction?.(primary)} />
+        <CouponButton coupon={coupon} onClick={() => onAction?.(coupon.desc)} />
+        <CtaButton label={secondary} onClick={() => onAction?.(secondary)} />
       </div>
     </CardShell>
   );
 }
 
-function ImgWideCard({ image, body, primaryA, primaryB, coupon }: CardImgWide) {
+function ImgWideCard({
+  image,
+  body,
+  primaryA,
+  primaryB,
+  coupon,
+  onAction,
+}: CardImgWide & CardActionProps) {
   return (
     <CardShell width={328}>
       <HeroImage src={image} width={328} height={220} />
       <Body text={body} />
       <div className="flex flex-col gap-[6px] px-[12px] pb-[12px]">
         <div className="grid grid-cols-2 gap-[6px]">
-          <CtaButton label={primaryA} />
-          <CtaButton label={primaryB} />
+          <CtaButton label={primaryA} onClick={() => onAction?.(primaryA)} />
+          <CtaButton label={primaryB} onClick={() => onAction?.(primaryB)} />
         </div>
-        <CouponButton coupon={coupon} />
+        <CouponButton coupon={coupon} onClick={() => onAction?.(coupon.desc)} />
       </div>
     </CardShell>
   );
 }
 
-function CarouselCard({ items }: CardCarousel) {
+function CarouselCard({ items, onAction }: CardCarousel & CardActionProps) {
   return (
     <div className="overflow-x-auto -mx-[16px] px-[16px] pb-[4px]">
       <div className="flex gap-[8px] w-max">
         {items.map((item, i) => (
-          <Img01Card key={i} {...item} />
+          <Img01Card key={i} {...item} onAction={onAction} />
         ))}
       </div>
     </div>

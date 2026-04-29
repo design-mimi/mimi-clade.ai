@@ -10,15 +10,34 @@ import {
   type SVGProps,
 } from "react";
 import { ChatCard } from "./ChatCard";
-import { CARDS_BY_TOPIC, type ChatTopic } from "./chatCards";
+import { CARDS_BY_TOPIC, INTRO_BODY, type ChatTopic } from "./chatCards";
 
 type Props = {
   onBack: () => void;
   topic?: ChatTopic;
   isNew?: boolean;
+  // Hydrate the chat from a saved transcript when resuming an existing room.
+  // null/undefined → seed with intro greeting + INTRO_CHIPS (fresh room).
+  initialTranscript?: TranscriptItem[] | null;
+  // Fires whenever the user takes an action (chip / card CTA / send).
+  // Argument is a flat-text preview of the latest message after the action
+  // resolves — used as the body of the message list row when chat closes.
+  onUserActivity?: (latestPreview: string) => void;
+  // Fires on every transcript change so the parent can persist the running
+  // session and reload it on re-entry.
+  onTranscriptUpdate?: (transcript: TranscriptItem[]) => void;
 };
 
-type AgentItem = {
+// Flat-text fallback for non-string agent bodies (e.g. shipping body uses JSX
+// with bullet list).
+const SHIPPING_PREVIEW =
+  "고객님. 배송비 정책을 안내드립니다. 50,000원 미만 주문 배송비 3,000원 / 50,000원 이상 무료배송";
+
+function previewOfBody(body: ReactNode): string {
+  return typeof body === "string" ? body : SHIPPING_PREVIEW;
+}
+
+export type AgentItem = {
   id: string;
   kind: "agent";
   body: ReactNode;
@@ -26,13 +45,13 @@ type AgentItem = {
   meta: { name: string; time: string };
 };
 
-type UserItem = {
+export type UserItem = {
   id: string;
   kind: "user";
   text: string;
 };
 
-type TranscriptItem = AgentItem | UserItem;
+export type TranscriptItem = AgentItem | UserItem;
 
 const INTRO_CHIPS = [
   "상품 문의",
@@ -56,35 +75,142 @@ const SHIPPING_BODY: ReactNode = (
   </>
 );
 
-export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
+// Bot reply lookup keyed by user-visible label (chip / card CTA / coupon).
+// Unrecognized labels fall through to a generic ack response.
+const RESPONSES: Record<string, { body: ReactNode; chips?: string[] }> = {
+  // ── INTRO chips (5) ──
+  "상품 문의": {
+    body: "어떤 점이 궁금하신가요? 자주 찾는 항목을 모아두었어요.",
+    chips: ["사이즈 가이드", "이번 주 신상", "재입고 알림"],
+  },
+  "주문 취소/변경 문의": {
+    body: "주문 후 1시간 이내에는 마이페이지에서 직접 취소가 가능해요. 그 이후 변경·취소는 상담사가 도와드려요.",
+    chips: ["주문 내역 보기", "상담사 연결"],
+  },
+  "포인트 적립": {
+    body: "구매 금액의 1%가 자동 적립되며, 멤버 등급에 따라 추가 적립이 진행돼요. 이벤트 응모 시 보너스 포인트도 받으실 수 있어요.",
+    chips: ["내 포인트 확인", "등급 혜택 보기"],
+  },
+  "배송 문의": {
+    body: SHIPPING_BODY,
+    chips: SHIPPING_CHIPS,
+  },
+  "기타 문의": {
+    body: "어떤 도움이 필요하신지 자유롭게 적어주세요. 운영 시간 내 상담사가 빠르게 답변드려요.",
+    chips: ["상담사 연결", "공지사항 보기"],
+  },
+
+  // ── Sub-chips ──
+  "사이즈 가이드": {
+    body: "킨더살몬은 자체 핏 차트로 운영돼요. 상의 S~XL, 하의 24~30 사이즈가 있어요. 자세한 측정 가이드를 보내드릴까요?",
+  },
+  "이번 주 신상": {
+    body: "이번 주 신상은 살몬 컬러 프린지 블라우스와 린넨 와이드 팬츠예요. 카탈로그 링크를 보내드릴게요.",
+  },
+  "재입고 알림": {
+    body: "관심 상품을 마이페이지에서 등록해 두시면 재입고 즉시 알려드려요. 알림 페이지로 이동해 드릴까요?",
+  },
+  "주문 내역 보기": {
+    body: "마이페이지 > 주문 내역에서 확인하실 수 있어요. 최근 1년 내 주문이 표시돼요.",
+  },
+  "상담사 연결": {
+    body: "상담사 연결 요청이 접수되었어요. 평일 운영 시간 내 빠르게 회신드릴게요 🌸",
+  },
+  "내 포인트 확인": {
+    body: "마이페이지 > 멤버십에서 적립 내역과 사용 가능한 포인트를 확인하실 수 있어요.",
+  },
+  "등급 혜택 보기": {
+    body: "킨더 멤버십은 살몬 / 로즈 / 블룸 3단계로 운영돼요. 등급에 따라 적립률과 무료배송 기준이 달라져요.",
+  },
+  "배송 정책 자세히 보기": {
+    body: "평일 오전 11시 이전 결제 건은 당일 출고돼요. 자세한 정책 페이지를 안내해 드릴까요?",
+  },
+  "예상 도착일": {
+    body: "지역에 따라 결제 후 1~3일 이내 도착해요. 도서산간 지역은 +1일이 추가될 수 있어요.",
+  },
+  "공지사항 보기": {
+    body: "킨더살몬 공식 공지 페이지를 안내해 드릴게요. 시즌 이벤트와 입고 일정을 확인하실 수 있어요.",
+  },
+
+  // ── Card CTA labels ──
+  "26 S/S 신상 보러가기": {
+    body: "이번 시즌은 살몬 톤을 메인으로 한 린넨·면 혼방 라인이 중심이에요. 카탈로그 링크를 보내드릴까요?",
+    chips: ["카탈로그 받기", "베스트 보기"],
+  },
+  "킨더 뉴스레터 구독": {
+    body: "뉴스레터 구독이 완료됐어요! 매주 화요일 살몬 픽이 도착할 거예요 🌸",
+  },
+  "15% 할인쿠폰 받기": {
+    body: "15% 쿠폰이 적립되었어요. 마이페이지 > 쿠폰함에서 확인하실 수 있어요.",
+  },
+  "사이즈 가이드 보기": {
+    body: "킨더살몬 핏 가이드 페이지를 안내해 드릴게요. 모델 착용 사이즈와 측정 팁이 정리되어 있어요.",
+  },
+  "배송 정책 보기": {
+    body: "배송 정책을 안내드려요. 50,000원 이상 무료배송, 미만은 3,000원이에요.",
+  },
+  "도착 예정 안내": {
+    body: "결제 후 1~3일 이내 도착이에요. 송장은 출고 즉시 문자로 안내드려요.",
+  },
+  "주문 내역 확인": {
+    body: "마이페이지 > 주문 내역에서 확인하실 수 있어요. 최근 1년 내 주문이 표시돼요.",
+  },
+  "교환/반품 안내": {
+    body: "수령 후 7일 이내 교환·반품 가능해요. 단순 변심의 경우 왕복 배송비가 발생할 수 있어요.",
+  },
+  "카탈로그 받기": {
+    body: "이메일로 카탈로그 PDF를 보내드릴게요. 주문하신 이메일로 5분 내 도착 예정이에요.",
+  },
+  "베스트 보기": {
+    body: "이번 주 베스트는 살몬 프린지 블라우스, 린넨 와이드 팬츠, 부클레 카디건이에요.",
+  },
+};
+
+function getResponse(label: string): { body: ReactNode; chips?: string[] } {
+  return (
+    RESPONSES[label] ?? {
+      body: "확인해 드릴게요. 잠시만 기다려 주세요.",
+    }
+  );
+}
+
+export function ChatScreen({
+  onBack,
+  topic = "brand",
+  isNew = false,
+  initialTranscript,
+  onUserActivity,
+  onTranscriptUpdate,
+}: Props) {
   const cards = CARDS_BY_TOPIC[topic];
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const initial = useMemo<TranscriptItem[]>(() => {
-    const intro: AgentItem = {
-      id: "intro",
-      kind: "agent",
-      body: "안녕하세요. 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
-      chips: INTRO_CHIPS,
-      meta: { name: "킨더살몬", time: isNew ? "방금 전" : "1시간 전" },
-    };
-    if (isNew) return [intro];
+    if (initialTranscript && initialTranscript.length > 0) return initialTranscript;
     return [
-      { ...intro, chips: undefined },
-      { id: "user-prefill", kind: "user", text: "배송 문의" },
       {
-        id: "shipping",
+        id: "intro",
         kind: "agent",
-        body: SHIPPING_BODY,
-        chips: SHIPPING_CHIPS,
-        meta: { name: "킨더살몬", time: "55분 전" },
+        body: INTRO_BODY,
+        chips: INTRO_CHIPS,
+        meta: { name: "킨더살몬", time: isNew ? "방금 전" : "1시간 전" },
       },
     ];
-  }, [isNew]);
+  }, [initialTranscript, isNew]);
 
   const [transcript, setTranscript] = useState<TranscriptItem[]>(initial);
   const [fadingChips, setFadingChips] = useState<Set<string>>(new Set());
   const hasAnchoredRef = useRef(false);
+
+  // Notify parent of every transcript change so it can persist across opens.
+  // Use a ref to capture the latest callback without retriggering on rerender.
+  const transcriptUpdateRef = useRef(onTranscriptUpdate);
+  useEffect(() => {
+    transcriptUpdateRef.current = onTranscriptUpdate;
+  });
+  useEffect(() => {
+    transcriptUpdateRef.current?.(transcript);
+  }, [transcript]);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -110,26 +236,27 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
 
   const handleChipClick = (turnId: string, label: string) => {
     if (fadingChips.has(turnId)) return;
+    const response = getResponse(label);
+    onUserActivity?.(previewOfBody(response.body));
     setFadingChips((prev) => new Set(prev).add(turnId));
 
     window.setTimeout(() => {
       setTranscript((prev) => {
+        const stamp = Date.now();
+        const response = getResponse(label);
         const next: TranscriptItem[] = prev.map((item) =>
           item.id === turnId && item.kind === "agent"
             ? { ...item, chips: undefined }
             : item,
         );
-        const stamp = Date.now();
         next.push({ id: `user-${stamp}`, kind: "user", text: label });
-        if (label === "배송 문의") {
-          next.push({
-            id: `shipping-${stamp}`,
-            kind: "agent",
-            body: SHIPPING_BODY,
-            chips: SHIPPING_CHIPS,
-            meta: { name: "킨더살몬", time: "방금 전" },
-          });
-        }
+        next.push({
+          id: `agent-${stamp}`,
+          kind: "agent",
+          body: response.body,
+          chips: response.chips,
+          meta: { name: "킨더살몬", time: "방금 전" },
+        });
         return next;
       });
       setFadingChips((prev) => {
@@ -138,6 +265,28 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
         return next;
       });
     }, FADE_MS);
+  };
+
+  // Card CTA / coupon click — append user message + agent response without
+  // fading anything (cards stay visible; no chip group to dismiss).
+  const handleCardAction = (label: string) => {
+    const response = getResponse(label);
+    onUserActivity?.(previewOfBody(response.body));
+    setTranscript((prev) => {
+      const stamp = Date.now();
+      const response = getResponse(label);
+      return [
+        ...prev,
+        { id: `user-${stamp}`, kind: "user", text: label },
+        {
+          id: `agent-${stamp}`,
+          kind: "agent",
+          body: response.body,
+          chips: response.chips,
+          meta: { name: "킨더살몬", time: "방금 전" },
+        },
+      ];
+    });
   };
 
   return (
@@ -149,7 +298,7 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
         <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (
-          <ChatCard key={`card-${i}`} data={card} />
+          <ChatCard key={`card-${i}`} data={card} onAction={handleCardAction} />
         ))}
 
         {transcript.map((item) =>
@@ -188,12 +337,15 @@ export function ChatScreen({ onBack, topic = "brand", isNew = false }: Props) {
       <TopBlurMask />
       <BackButton onClick={onBack} />
       <InputBar
-        onSend={(text) =>
+        onSend={(text) => {
+          // Free-form send has no bot reply, so the latest message is the
+          // user text itself.
+          onUserActivity?.(text);
           setTranscript((prev) => [
             ...prev,
             { id: `user-${Date.now()}`, kind: "user", text },
-          ])
-        }
+          ]);
+        }}
       />
     </div>
   );
@@ -291,7 +443,7 @@ function UserBubble({ body }: { body: string }) {
   return (
     <div className="ht-reveal ht-user-row flex justify-end w-full">
       <div
-        className="max-w-[300px] px-[14px] py-[6px] rounded-[10px] border text-[14px] leading-[1.6] text-white"
+        className="max-w-[300px] px-[14px] py-[6px] rounded-[12px] border text-[14px] leading-[1.6] text-white"
         style={{
           background: "var(--ht-bg-inverted)",
           borderColor: "var(--ht-border-default)",

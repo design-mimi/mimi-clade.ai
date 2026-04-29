@@ -83,11 +83,11 @@ Figma file: `fsAYYE5LmDVbSLnx53loNg` (해피톡)
 | `default` | 1 | — (거의 안 씀) |
 | `md` | 8 | 작은 요소 |
 | `lg` | 12 | 인풋, 메시지 버블 |
-| `xl` / `Card/lg` | 16 | 카드, 입력 컨테이너 |
+| `xl` / `Card/lg` | 16 | 카드, 입력 컨테이너, **Primary CTA 버튼** |
 | `rounded-3xl` | 24 | 칩 버튼, 메인 컨테이너 |
 | (커스텀) | 32 | 플로팅 헤더 |
 | (커스텀) | 100 | 네비 탭 아이템 |
-| `full` | 9999 | 스위치, 아바타, CTA 버튼 |
+| `full` | 9999 | 스위치, 아바타, 추천 칩, "다른 문의하기" pill 버튼 |
 
 ---
 
@@ -162,8 +162,10 @@ Figma file: `fsAYYE5LmDVbSLnx53loNg` (해피톡)
 
 ### Primary CTA (문의하기)
 - 배경 `bg/inverted` `#18181b`, 텍스트 white
-- 풀 width, height ~48px, 라운드 **full(pill)**
-- 텍스트 + 아이콘 (8px 갭)
+- 풀 width, height **48px**, 라운드 **16px** (xl)
+- border `1px rgba(255,255,255,0.2)` (border/inverted)
+- shadow `0 1px 2px 0 rgba(0,0,0,0.08), inset 0 -1px 0 0 rgba(0,0,0,0.08)`
+- 라벨 `md/SemiBold` + lead-icon (16px send arrow), 갭 4–8px
 
 ### Input-like button (다른 문의하기)
 - 배경 `#ffffff`, border `border/default`

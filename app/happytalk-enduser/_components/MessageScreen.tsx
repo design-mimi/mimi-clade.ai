@@ -1,63 +1,67 @@
 "use client";
 
-type MessageItem = {
-  status: string;
-  time: string;
-  body: string;
-};
-
-const MESSAGES: MessageItem[] = [
-  {
-    status: "2026년 4월 28일",
-    time: "1시간 전",
-    body: "안녕하세요. ⚽🏀 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
-  },
-  {
-    status: "2026년 4월 28일",
-    time: "5시간 전",
-    body: "안녕하세요. ⚽🏀 고객센터 운영 시간은 평일 오전 09시~ 6시(점심시간 12시~1시, 공휴일 휴무)입니다.",
-  },
-  {
-    status: "2026년 4월 27일",
-    time: "하루 전",
-    body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
-  },
-  {
-    status: "2026년 4월 21일",
-    time: "일주일 전",
-    body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
-  },
-  {
-    status: "2025년 3월 21일",
-    time: "2025.03.21",
-    body: "안녕하세요. 미야옹 고객님. 상품문의 답변드립니다. 해당 상품은 현재 품절로 확인되었습니다. 비슷한 상품을 안내드릴까요?",
-  },
-];
+import Image from "next/image";
+import type { SVGProps } from "react";
+import type { ConversationSummary } from "./types";
 
 type Props = {
-  onOpenChat?: () => void;
+  // Conversation history rows. Empty list → empty state (Figma 27158:30643).
+  // Populated rows follow Figma 26991:17957 layout.
+  conversations: ConversationSummary[];
+  // Empty-state "문의하기" — fresh brand inquiry, mirrors HomeScreen CTA.
+  onStartNewChat?: () => void;
+  // Row click — resume an existing conversation. Argument is the row id so
+  // the parent can target updates back to the same row instead of creating a
+  // duplicate when the user adds new activity.
+  onOpenHistory?: (conversationId: string) => void;
+  // Header "전체 삭제" — opens confirm modal owned by EnduserFrame.
+  onRequestDeleteAll?: () => void;
 };
 
-export function MessageScreen({ onOpenChat }: Props) {
+export function MessageScreen({
+  conversations,
+  onStartNewChat,
+  onOpenHistory,
+  onRequestDeleteAll,
+}: Props) {
+  const isEmpty = conversations.length === 0;
   return (
     <div className="relative flex flex-col w-full h-full bg-white">
-      <Header />
-      <div className="flex-1 flex flex-col px-[8px] pt-[16px] pb-[16px] gap-[8px] overflow-y-auto">
-        {MESSAGES.map((msg, i) => (
-          <div
-            key={i}
-            className="ht-reveal w-full"
-            style={{ animationDelay: `${Math.min(i, 4) * 60}ms` }}
-          >
-            <MessageRow {...msg} onClick={onOpenChat} />
-          </div>
-        ))}
+      <Header showDelete={!isEmpty} onDelete={onRequestDeleteAll} />
+      {isEmpty ? (
+        <EmptyContent />
+      ) : (
+        <div className="flex-1 flex flex-col px-[20px] pt-[16px] pb-[16px] gap-[20px] overflow-y-auto">
+          {conversations.map((c, i) => (
+            <div
+              key={c.id}
+              className="ht-reveal w-full"
+              style={{ animationDelay: `${Math.min(i, 4) * 60}ms` }}
+            >
+              <MessageRow
+                status={c.status}
+                createdAt={c.createdAt}
+                body={c.body}
+                onClick={() => onOpenHistory?.(c.id)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex justify-center shrink-0 pb-[100px]">
+        <InquireButton onClick={onStartNewChat} />
       </div>
     </div>
   );
 }
 
-function Header() {
+function Header({
+  showDelete,
+  onDelete,
+}: {
+  showDelete: boolean;
+  onDelete?: () => void;
+}) {
   return (
     <div
       className="flex items-center justify-between w-full h-[56px] pl-[20px] pr-[56px] sm:pr-[20px] py-[12px] bg-white border-b overflow-hidden"
@@ -73,46 +77,113 @@ function Header() {
       >
         메시지
       </h1>
-      <button
-        type="button"
-        className="ht-pressable px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
-        style={{ color: "var(--ht-text-subtle)" }}
-      >
-        내역 삭제
-      </button>
+      {showDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="ht-pressable px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
+          style={{ color: "var(--ht-text-muted)" }}
+        >
+          전체 삭제
+        </button>
+      )}
     </div>
   );
 }
 
-function MessageRow({
-  status,
-  time,
-  body,
-  onClick,
-}: MessageItem & { onClick?: () => void }) {
+function EmptyContent() {
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center w-full px-[20px] gap-[20px]">
+      <Image
+        src="/blum-empty.svg"
+        alt=""
+        width={39}
+        height={61}
+        priority
+        className="block"
+      />
+      <p
+        className="text-[14px] leading-[23px] text-center tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-subtle)" }}
+      >
+        첫 대화를 시작해 보세요.
+      </p>
+    </div>
+  );
+}
+
+function InquireButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[4px] w-full text-left rounded-[12px] px-[12px] py-[6px]"
+      className="ht-pressable inline-flex items-center justify-center gap-[4px] rounded-[16px] px-[24px] py-[12px] border text-white"
+      style={{
+        background: "var(--ht-bg-inverted)",
+        borderColor: "rgba(255, 255, 255, 0.2)",
+        boxShadow: "var(--ht-shadow-modal-lg)",
+      }}
+    >
+      <span
+        className="font-semibold tracking-[-0.25px]"
+        style={{ fontSize: 16, lineHeight: "24px" }}
+      >
+        문의하기
+      </span>
+      <SendIcon width={16} height={16} />
+    </button>
+  );
+}
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+function formatRelativeTime(createdAt: number): string {
+  const diff = Date.now() - createdAt;
+  if (diff >= ONE_DAY_MS) return ""; // hidden after 24h per design rule
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return "방금 전";
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  return `${hr}시간 전`;
+}
+
+function MessageRow({
+  status,
+  createdAt,
+  body,
+  onClick,
+}: {
+  status: string;
+  createdAt: number;
+  body: string;
+  onClick?: () => void;
+}) {
+  const timeLabel = formatRelativeTime(createdAt);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="ht-card-press flex flex-col gap-[4px] w-full text-left"
     >
       <div className="flex items-center justify-between gap-[8px] w-full">
         <span
-          className="text-[14px] leading-5 font-semibold"
+          className="text-[14px] leading-5 font-semibold tracking-[-0.25px]"
           style={{ color: "var(--ht-text-default)" }}
         >
           {status}
         </span>
-        <span
-          className="text-[12px] leading-4 shrink-0"
-          style={{ color: "var(--ht-text-subtle)" }}
-        >
-          {time}
-        </span>
+        {timeLabel && (
+          <span
+            className="text-[12px] leading-4 shrink-0 tracking-[-0.25px]"
+            style={{ color: "var(--ht-text-subtle)" }}
+          >
+            {timeLabel}
+          </span>
+        )}
       </div>
       <p
-        className="text-[14px] leading-[1.6] w-full line-clamp-2"
-        style={{ color: "var(--ht-text-default)" }}
+        className="text-[14px] w-full line-clamp-2 tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-default)", lineHeight: "23px" }}
       >
         {body}
       </p>
@@ -120,3 +191,16 @@ function MessageRow({
   );
 }
 
+function SendIcon(props: SVGProps<SVGSVGElement>) {
+  // Path source: Figma 27158:30705 (문의하기 button lead-icon).
+  // Original coords are anchored to the parent button viewBox; viewBox here
+  // crops to the icon area so it renders cleanly at any width/height.
+  return (
+    <svg viewBox="102 17 16 16" fill="none" {...props}>
+      <path
+        d="M103.298 23.21C102.949 23.0939 102.946 22.9066 103.305 22.7871L116.029 18.5458C116.381 18.4283 116.583 18.6255 116.484 18.9711L112.849 31.6952C112.748 32.0475 112.545 32.0598 112.396 31.7248L110 26.3331L114 20.9998L108.667 24.9998L103.298 23.21Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}

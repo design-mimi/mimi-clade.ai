@@ -16,3 +16,20 @@ export const HOME_VARIANTS: { id: HomeVariant; label: string }[] = [
 ];
 
 export type NavTab = "home" | "message" | "setting";
+
+export type ConversationSummary = {
+  id: string;
+  status: string;
+  // ms epoch — list row computes the relative time label from this and hides
+  // it once 24h have passed (sub-day rows show "방금 전" / "N시간 전").
+  createdAt: number;
+  body: string;
+};
+
+export type LauncherVariant = "pencil" | "infinity" | "heart";
+
+export const LAUNCHER_VARIANTS: { id: LauncherVariant; label: string }[] = [
+  { id: "pencil", label: "펜슬 드로잉" },
+  { id: "infinity", label: "인피니티" },
+  { id: "heart", label: "하트 + 커브" },
+];

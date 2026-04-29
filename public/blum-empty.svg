@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 39 61" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon blumn 01" clip-path="url(#clip0_0_112)">
+<path id="nose" d="M31.7085 1.26493C31.7085 1.26493 -2.64407 29.3363 6.99661 15.6345C16.6373 1.93281 28.739 10.1599 19.9525 26.6445C14.2271 37.3913 1.27119 44.7583 1.27119 44.7583C1.27119 44.7583 15.1322 44.5154 17.2373 50.1418" stroke="var(--stroke-0, #27272A)" stroke-opacity="0.25" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="lip" d="M11.8169 57.6302C11.8169 57.6302 24.4678 66.0294 35.9186 49.2311" stroke="var(--stroke-0, #27272A)" stroke-opacity="0.25" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="eye" d="M26.5831 24.823C26.5831 24.823 32.4407 28.7089 37.7288 20.9371" stroke="var(--stroke-0, #27272A)" stroke-opacity="0.25" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_0_112">
+<rect width="39" height="61" fill="white"/>
+</clipPath>
+</defs>
+</svg>

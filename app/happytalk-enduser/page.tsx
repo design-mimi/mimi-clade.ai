@@ -1,16 +1,35 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EnduserFrame, type ActiveScreen } from "./_components/EnduserFrame";
 import { VariantSelector } from "./_components/VariantSelector";
+import { LauncherVariantSelector } from "./_components/LauncherVariantSelector";
 import { Launcher } from "./_components/Launcher";
-import type { HomeVariant } from "./_components/types";
+import type { HomeVariant, LauncherVariant } from "./_components/types";
+
+const LAUNCHER_VARIANT_KEY = "ht-launcher-variant";
+
+function isLauncherVariant(value: string | null): value is LauncherVariant {
+  return value === "pencil" || value === "infinity" || value === "heart";
+}
 
 export default function HappytalkEnduserPage() {
   const [variant, setVariant] = useState<HomeVariant>("default");
+  const [launcherVariant, setLauncherVariant] = useState<LauncherVariant>("pencil");
   const [panelOpen, setPanelOpen] = useState(true);
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
+
+  // Restore launcher variant from localStorage on mount.
+  useEffect(() => {
+    const saved = window.localStorage.getItem(LAUNCHER_VARIANT_KEY);
+    if (isLauncherVariant(saved)) setLauncherVariant(saved);
+  }, []);
+
+  // Persist launcher variant.
+  useEffect(() => {
+    window.localStorage.setItem(LAUNCHER_VARIANT_KEY, launcherVariant);
+  }, [launcherVariant]);
 
   // VariantSelector is a dev affordance — only useful while the user is
   // actually looking at the home screen (widget open + home tab + no chat
@@ -42,8 +61,33 @@ export default function HappytalkEnduserPage() {
         />
       </div>
 
+      {/* Desktop (sm+): bottom-left stack — LauncherVariantSelector on top, VariantSelector below */}
+      <div className="hidden sm:flex fixed bottom-6 left-6 z-50 flex-col gap-4">
+        <LauncherVariantSelector
+          value={launcherVariant}
+          onChange={setLauncherVariant}
+          embedded
+        />
+        {showVariantSelector && (
+          <VariantSelector value={variant} onChange={setVariant} embedded />
+        )}
+      </div>
+
+      {/* Mobile: LauncherVariantSelector at bottom-LEFT — only when launcher is visible (= panel closed). */}
+      {!panelOpen && (
+        <div className="sm:hidden">
+          <LauncherVariantSelector
+            value={launcherVariant}
+            onChange={setLauncherVariant}
+          />
+        </div>
+      )}
+
+      {/* Mobile: existing VariantSelector at bottom-RIGHT — only when panel open + home. */}
       {showVariantSelector && (
-        <VariantSelector value={variant} onChange={setVariant} />
+        <div className="sm:hidden">
+          <VariantSelector value={variant} onChange={setVariant} />
+        </div>
       )}
 
       {panelOpen && (
@@ -60,7 +104,11 @@ export default function HappytalkEnduserPage() {
           panelOpen ? "hidden sm:block" : ""
         }`}
       >
-        <Launcher onClick={() => setPanelOpen((v) => !v)} />
+        <Launcher
+          variant={launcherVariant}
+          closeMode={panelOpen}
+          onClick={() => setPanelOpen((v) => !v)}
+        />
       </div>
     </div>
   );

@@ -6,9 +6,10 @@ import { HOME_VARIANTS, type HomeVariant } from "./types";
 type Props = {
   value: HomeVariant;
   onChange: (v: HomeVariant) => void;
+  embedded?: boolean;
 };
 
-export function VariantSelector({ value, onChange }: Props) {
+export function VariantSelector({ value, onChange, embedded = false }: Props) {
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
@@ -23,24 +24,33 @@ export function VariantSelector({ value, onChange }: Props) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  const desktopPanel = (
+    <div
+      className="flex flex-col gap-2 p-3 rounded-2xl bg-white/90 backdrop-blur-md border border-black/10"
+      style={{ boxShadow: "var(--ht-shadow-lg)" }}
+    >
+      <div className="px-1 pb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
+        홈 배리언트
+      </div>
+      {HOME_VARIANTS.map(({ id, label }) => (
+        <VariantButton
+          key={id}
+          active={id === value}
+          onClick={() => onChange(id)}
+          label={label}
+        />
+      ))}
+    </div>
+  );
+
+  // Embedded: caller controls positioning. Always render the desktop panel.
+  if (embedded) return desktopPanel;
+
   // Desktop: original sticky panel at bottom-left, always expanded.
   if (!isMobile) {
     return (
-      <div
-        className="fixed bottom-6 left-6 z-50 flex flex-col gap-2 p-3 rounded-2xl bg-white/90 backdrop-blur-md border border-black/10"
-        style={{ boxShadow: "var(--ht-shadow-lg)" }}
-      >
-        <div className="px-1 pb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
-          홈 배리언트
-        </div>
-        {HOME_VARIANTS.map(({ id, label }) => (
-          <VariantButton
-            key={id}
-            active={id === value}
-            onClick={() => onChange(id)}
-            label={label}
-          />
-        ))}
+      <div className="fixed bottom-6 left-6 z-50">
+        {desktopPanel}
       </div>
     );
   }
