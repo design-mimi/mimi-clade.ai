@@ -72,7 +72,7 @@ function ProfileEntry({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-pressable flex h-[36px] items-center gap-[6px]"
+      className="flex h-[36px] items-center gap-[6px] cursor-pointer"
     >
       <span
         className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
