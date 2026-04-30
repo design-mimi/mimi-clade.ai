@@ -34,26 +34,26 @@
   stroke-width: 2.5;
 }
 
-/* ───────── Pencil keyframes — 6s cycle ─────────
-   body  : 0–13.67%       (0.82s draw)
-   brow  : 13.67–25.67%   (0.72s draw)
-   pause : 25.67–31.67%   (0.36s breathing — brow→mouth)
-   mouth : 31.67–43.67%   (0.72s draw)
-   hold  : 43.67–100%     (3.38s)
+/* ───────── Pencil keyframes — 6.30s cycle ─────────
+   body  : 0–14.60%       (0.92s draw)
+   brow  : 14.60–29.21%   (0.92s draw)
+   pause : 29.21–34.92%   (0.36s breathing — brow→mouth)
+   mouth : 34.92–46.35%   (0.72s draw)
+   hold  : 46.35–100%     (3.38s)
 */
 @keyframes ht-pencil-body {
   0%      { stroke-dashoffset: 100; }
-  13.67%  { stroke-dashoffset: 0; }
+  14.60%  { stroke-dashoffset: 0; }
   100%    { stroke-dashoffset: 0; }
 }
 @keyframes ht-pencil-brow {
-  0%, 13.67% { stroke-dashoffset: 100; }
-  25.67%     { stroke-dashoffset: 0; }
+  0%, 14.60% { stroke-dashoffset: 100; }
+  29.21%     { stroke-dashoffset: 0; }
   100%       { stroke-dashoffset: 0; }
 }
 @keyframes ht-pencil-mouth {
-  0%, 31.67% { stroke-dashoffset: 100; }
-  43.67%     { stroke-dashoffset: 0; }
+  0%, 34.92% { stroke-dashoffset: 100; }
+  46.35%     { stroke-dashoffset: 0; }
   100%       { stroke-dashoffset: 0; }
 }
 
@@ -63,13 +63,13 @@
   100%    { stroke-width: 2.5; }
 }
 @keyframes ht-pencil-brow-w {
-  0%, 13.67% { stroke-width: 0; }
-  16.67%     { stroke-width: 2.5; }
+  0%, 14.60% { stroke-width: 0; }
+  17.60%     { stroke-width: 2.5; }
   100%       { stroke-width: 2.5; }
 }
 @keyframes ht-pencil-mouth-w {
-  0%, 31.67% { stroke-width: 0; }
-  34.67%     { stroke-width: 2.5; }
+  0%, 34.92% { stroke-width: 0; }
+  37.92%     { stroke-width: 2.5; }
   100%       { stroke-width: 2.5; }
 }
 
@@ -95,18 +95,18 @@
 @media (max-width: 639.98px) {
   .ht-launcher-pencil .body {
     animation:
-      ht-pencil-body 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-      ht-pencil-body-w 6s linear infinite both;
+      ht-pencil-body 6.30s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-body-w 6.30s linear infinite both;
   }
   .ht-launcher-pencil .brow {
     animation:
-      ht-pencil-brow 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-      ht-pencil-brow-w 6s linear infinite both;
+      ht-pencil-brow 6.30s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-brow-w 6.30s linear infinite both;
   }
   .ht-launcher-pencil .mouth {
     animation:
-      ht-pencil-mouth 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-      ht-pencil-mouth-w 6s linear infinite both;
+      ht-pencil-mouth 6.30s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-mouth-w 6.30s linear infinite both;
   }
   .ht-launcher-infinity .stroke-path {
     animation:
@@ -123,18 +123,18 @@
 @media (min-width: 640px) {
   .ht-launcher-pencil:hover .body {
     animation:
-      ht-pencil-body 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-      ht-pencil-body-w 6s linear infinite both;
+      ht-pencil-body 6.30s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-body-w 6.30s linear infinite both;
   }
   .ht-launcher-pencil:hover .brow {
     animation:
-      ht-pencil-brow 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-      ht-pencil-brow-w 6s linear infinite both;
+      ht-pencil-brow 6.30s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-brow-w 6.30s linear infinite both;
   }
   .ht-launcher-pencil:hover .mouth {
     animation:
-      ht-pencil-mouth 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-      ht-pencil-mouth-w 6s linear infinite both;
+      ht-pencil-mouth 6.30s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-mouth-w 6.30s linear infinite both;
   }
   .ht-launcher-infinity:hover .stroke-path {
     animation:
