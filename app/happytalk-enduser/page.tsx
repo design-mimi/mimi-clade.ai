@@ -1,35 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { EnduserFrame, type ActiveScreen } from "./_components/EnduserFrame";
 import { VariantSelector } from "./_components/VariantSelector";
 import { LauncherVariantSelector } from "./_components/LauncherVariantSelector";
 import { Launcher } from "./_components/Launcher";
 import type { HomeVariant, LauncherVariant } from "./_components/types";
 
-const LAUNCHER_VARIANT_KEY = "ht-launcher-variant";
-
-function isLauncherVariant(value: string | null): value is LauncherVariant {
-  return value === "pencil" || value === "infinity" || value === "heart";
-}
-
 export default function HappytalkEnduserPage() {
   const [variant, setVariant] = useState<HomeVariant>("default");
+  // Always start fresh on pencil — new visitors see the signature drawing
+  // motion first. Selector still toggles within the session, but page reload
+  // returns to pencil (no localStorage persistence).
   const [launcherVariant, setLauncherVariant] = useState<LauncherVariant>("pencil");
   const [panelOpen, setPanelOpen] = useState(true);
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
-
-  // Restore launcher variant from localStorage on mount.
-  useEffect(() => {
-    const saved = window.localStorage.getItem(LAUNCHER_VARIANT_KEY);
-    if (isLauncherVariant(saved)) setLauncherVariant(saved);
-  }, []);
-
-  // Persist launcher variant.
-  useEffect(() => {
-    window.localStorage.setItem(LAUNCHER_VARIANT_KEY, launcherVariant);
-  }, [launcherVariant]);
 
   // VariantSelector is a dev affordance — only useful while the user is
   // actually looking at the home screen (widget open + home tab + no chat
