@@ -11,6 +11,105 @@
        Snaps back to drawn on mouse out.
 */
 
+/* ═════════════ Style skins (Figma 27158:30782) ═════════════
+   Light / Glass / Brand Blue / Brand Yellow / Dark — applied as a class
+   on the .ht-launcher button. Stroke ink color follows skin contrast:
+   dark skins (brand-blue, dark) get white ink; light skins keep #231916. */
+
+.ht-launcher-style-light {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.04),
+    0 4px 12px 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Glass — three-layer structure mirroring Figma 27158:30870 exactly.
+   - Outer button: border + outer drop shadow only
+   - ::before (inner): backdrop-blur 10px + frosted gradient, clipped to
+     rounded corners by parent overflow:hidden
+   - ::after (inner top): 1px white inner highlight specular along the top
+     edge, layered above the icon */
+.ht-launcher-style-glass {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 2px 4px 0 rgba(0, 0, 0, 0.06),
+    0 8px 20px -2px rgba(0, 0, 0, 0.10) !important;
+}
+
+.ht-launcher-style-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.12) 100%);
+  pointer-events: none;
+}
+
+.ht-launcher-style-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  /* Sit above the icon SVG (z-index: 1) so the specular highlight lays on
+     top of all content, matching the Figma stacking. */
+  z-index: 2;
+}
+
+.ht-launcher-style-brand-blue {
+  background: #2563eb;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.15) !important;
+}
+.ht-launcher-style-brand-blue::after,
+.ht-launcher-style-brand-yellow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(64, 64, 64, 0.12) 100%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.ht-launcher-style-brand-yellow {
+  background: #fbe152;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.15) !important;
+}
+
+.ht-launcher-style-dark {
+  background-image:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.30) 100%),
+    linear-gradient(90deg, #000000 0%, #000000 100%);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Inverted ink for dark-toned skins. Light/glass/brand-yellow keep #231916. */
+.ht-launcher-style-brand-blue path,
+.ht-launcher-style-dark path {
+  stroke: #ffffff !important;
+}
+
+/* Close (X) icon ink also follows skin contrast. */
+.ht-launcher-style-brand-blue .ht-launcher-close path,
+.ht-launcher-style-dark .ht-launcher-close path {
+  stroke: #ffffff;
+}
+
+/* Lift the icon SVG above the brand gradient ::after overlay. */
+.ht-launcher > svg {
+  position: relative;
+  z-index: 1;
+}
+
 .ht-launcher-pencil path,
 .ht-launcher-infinity path,
 .ht-launcher-heart path {

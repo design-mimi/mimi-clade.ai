@@ -6,7 +6,11 @@ import { EnduserFrame, type ActiveScreen } from "./_components/EnduserFrame";
 import { VariantSelector } from "./_components/VariantSelector";
 import { LauncherVariantSelector } from "./_components/LauncherVariantSelector";
 import { Launcher } from "./_components/Launcher";
-import type { HomeVariant, LauncherVariant } from "./_components/types";
+import type {
+  HomeVariant,
+  LauncherStyle,
+  LauncherVariant,
+} from "./_components/types";
 
 export default function HappytalkEnduserPage() {
   const [variant, setVariant] = useState<HomeVariant>("default");
@@ -14,6 +18,9 @@ export default function HappytalkEnduserPage() {
   // motion first. Selector still toggles within the session, but page reload
   // returns to pencil (no localStorage persistence).
   const [launcherVariant, setLauncherVariant] = useState<LauncherVariant>("pencil");
+  // Launcher button skin (Figma 27158:30782). Light = current default white
+  // button. Same no-persistence policy as variant.
+  const [launcherStyle, setLauncherStyle] = useState<LauncherStyle>("light");
   const [panelOpen, setPanelOpen] = useState(true);
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
 
@@ -23,19 +30,22 @@ export default function HappytalkEnduserPage() {
   const showVariantSelector = panelOpen && activeScreen === "home";
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#eeeeee]">
-      {/* Mobile-only background */}
-      <div className="absolute inset-0 sm:hidden">
+    <div className="relative min-h-screen w-full sm:overflow-hidden bg-[#eeeeee]">
+      {/* Mobile-only background — flows in document so the page scrolls
+          through the full shop screenshot (750×2404). All overlays remain
+          fixed-positioned so they stay anchored while the bg scrolls. */}
+      <div className="sm:hidden">
         <Image
           src="/kindersalmonshop.com_Mobile.png"
           alt="킨더살몬 쇼핑몰"
-          fill
+          width={750}
+          height={2404}
           priority
-          className="object-cover object-top"
           sizes="100vw"
+          className="block w-full h-auto"
         />
       </div>
-      {/* Web (≥640px) background */}
+      {/* Web (≥640px) background — pinned to viewport (widget demo mode). */}
       <div className="absolute inset-0 hidden sm:block">
         <Image
           src="/kindersalmonshop.png"
@@ -57,6 +67,8 @@ export default function HappytalkEnduserPage() {
           <LauncherVariantSelector
             value={launcherVariant}
             onChange={setLauncherVariant}
+            styleValue={launcherStyle}
+            onStyleChange={setLauncherStyle}
             embedded
           />
         )}
@@ -71,6 +83,8 @@ export default function HappytalkEnduserPage() {
           <LauncherVariantSelector
             value={launcherVariant}
             onChange={setLauncherVariant}
+            styleValue={launcherStyle}
+            onStyleChange={setLauncherStyle}
           />
         </div>
       )}
@@ -98,6 +112,7 @@ export default function HappytalkEnduserPage() {
       >
         <Launcher
           variant={launcherVariant}
+          style={launcherStyle}
           closeMode={panelOpen}
           onClick={() => setPanelOpen((v) => !v)}
         />

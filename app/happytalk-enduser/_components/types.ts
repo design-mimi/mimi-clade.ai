@@ -33,3 +33,20 @@ export const LAUNCHER_VARIANTS: { id: LauncherVariant; label: string }[] = [
   { id: "infinity", label: "인피니티" },
   { id: "heart", label: "하트 + 커브" },
 ];
+
+// Visual style/skin of the home button — orthogonal to motion (LauncherVariant).
+// Sourced from Figma 27158:30782 (Web brand blue / yellow / Light / Glass / Dark).
+export type LauncherStyle =
+  | "brand-blue"
+  | "brand-yellow"
+  | "light"
+  | "glass"
+  | "dark";
+
+export const LAUNCHER_STYLES: { id: LauncherStyle; label: string }[] = [
+  { id: "brand-blue", label: "브랜드 (블루)" },
+  { id: "brand-yellow", label: "브랜드 (옐로우)" },
+  { id: "light", label: "라이트" },
+  { id: "glass", label: "글래스" },
+  { id: "dark", label: "다크" },
+];

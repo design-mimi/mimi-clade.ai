@@ -1,15 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LAUNCHER_VARIANTS, type LauncherVariant } from "./types";
+import {
+  LAUNCHER_STYLES,
+  LAUNCHER_VARIANTS,
+  type LauncherStyle,
+  type LauncherVariant,
+} from "./types";
 
 type Props = {
   value: LauncherVariant;
   onChange: (v: LauncherVariant) => void;
+  styleValue: LauncherStyle;
+  onStyleChange: (s: LauncherStyle) => void;
   embedded?: boolean;
 };
 
-export function LauncherVariantSelector({ value, onChange, embedded = false }: Props) {
+export function LauncherVariantSelector({
+  value,
+  onChange,
+  styleValue,
+  onStyleChange,
+  embedded = false,
+}: Props) {
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
@@ -58,6 +71,27 @@ export function LauncherVariantSelector({ value, onChange, embedded = false }: P
           onClick={() => onChange(id)}
           className={`text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
             id === value
+              ? "bg-zinc-900 text-white"
+              : "bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+
+      {/* Button type sheet — shown together with the variant picker since the
+          motion + skin combo is what's being previewed on the launcher icon. */}
+      <div className="mt-1 mb-1 border-t border-zinc-200/70" />
+      <div className="px-1 pb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
+        버튼 타입
+      </div>
+      {LAUNCHER_STYLES.map(({ id, label }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => onStyleChange(id)}
+          className={`text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+            id === styleValue
               ? "bg-zinc-900 text-white"
               : "bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
           }`}

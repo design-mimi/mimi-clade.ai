@@ -1,15 +1,29 @@
 "use client";
 
 import "./launcher.css";
-import type { LauncherVariant } from "./types";
+import type { LauncherStyle, LauncherVariant } from "./types";
 
 type Props = {
   variant: LauncherVariant;
+  style?: LauncherStyle;
   closeMode?: boolean;
   onClick?: () => void;
 };
 
-export function Launcher({ variant, closeMode = false, onClick }: Props) {
+const STYLE_CLASS: Record<LauncherStyle, string> = {
+  "brand-blue": "ht-launcher-style-brand-blue",
+  "brand-yellow": "ht-launcher-style-brand-yellow",
+  light: "ht-launcher-style-light",
+  glass: "ht-launcher-style-glass",
+  dark: "ht-launcher-style-dark",
+};
+
+export function Launcher({
+  variant,
+  style: launcherStyle = "light",
+  closeMode = false,
+  onClick,
+}: Props) {
   const variantClass = closeMode
     ? ""
     : variant === "pencil"
@@ -18,16 +32,17 @@ export function Launcher({ variant, closeMode = false, onClick }: Props) {
     ? "ht-launcher-infinity"
     : "ht-launcher-heart";
 
+  const styleClass = STYLE_CLASS[launcherStyle];
+
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={closeMode ? "상담 닫기" : "상담 열기"}
-      className={`ht-launcher ${variantClass} w-[60px] h-[60px] rounded-[20px] bg-white flex items-center justify-center border border-black/10`}
-      style={{ boxShadow: "var(--ht-shadow-lg)" }}
+      className={`ht-launcher ${styleClass} ${variantClass} w-[60px] h-[60px] rounded-[20px] flex items-center justify-center relative overflow-hidden`}
     >
       {closeMode && (
-        <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+        <svg className="ht-launcher-close" width={24} height={24} viewBox="0 0 24 24" fill="none">
           <path
             d="M5 5L19 19M19 5L5 19"
             stroke="#231916"
