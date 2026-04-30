@@ -61,13 +61,19 @@ export default function HappytalkEnduserPage() {
         />
       </div>
 
-      {/* Desktop (sm+): bottom-left stack — LauncherVariantSelector on top, VariantSelector below */}
+      {/* Desktop (sm+): bottom-left stack. LauncherVariantSelector only while
+          the launcher icon is showing (panel closed) — once the panel opens
+          the launcher becomes an X close button and the variant picker has
+          nothing to preview. VariantSelector takes its place when the home
+          screen is the active surface. */}
       <div className="hidden sm:flex fixed bottom-6 left-6 z-50 flex-col gap-4">
-        <LauncherVariantSelector
-          value={launcherVariant}
-          onChange={setLauncherVariant}
-          embedded
-        />
+        {!panelOpen && (
+          <LauncherVariantSelector
+            value={launcherVariant}
+            onChange={setLauncherVariant}
+            embedded
+          />
+        )}
         {showVariantSelector && (
           <VariantSelector value={variant} onChange={setVariant} embedded />
         )}
