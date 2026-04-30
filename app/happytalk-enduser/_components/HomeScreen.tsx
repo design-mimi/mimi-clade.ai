@@ -252,34 +252,38 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
         {isBrandImage && <div style={{ height: isTallHero ? 410 : 240 }} />}
 
         <div className={`pb-[100px] ${isBrandImage ? "rounded-t-[20px] bg-white" : ""}`}>
-          {/* Brand area */}
+          {/* Brand area — Figma 27215:1737. Status row now lives inside the
+             brand-name-area (title + desc + status as one unit), and the
+             button-area (CTA + 다른 문의하기) sits as a separate group below. */}
           <div
             className="flex flex-col gap-[16px] px-[20px] pb-[20px]"
             style={{ paddingTop: brandAreaPt }}
           >
-            <h1
-              className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap overflow-hidden"
-              style={{ color: "var(--ht-text-default)" }}
-            >
-              {brandName}
-            </h1>
-            {showDescription && (
-              <p
-                className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-full"
-                style={{ color: "#121212" }}
+            <div className="flex flex-col gap-[12px] w-full">
+              <h1
+                className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap overflow-hidden"
+                style={{ color: "var(--ht-text-default)" }}
               >
-                차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
-              </p>
-            )}
-            <div className="flex flex-col gap-[10px]">
-              <PrimaryCTA onClick={onOpenChat} />
+                {brandName}
+              </h1>
+              {showDescription && (
+                <p
+                  className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-full"
+                  style={{ color: "#121212" }}
+                >
+                  차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
+                </p>
+              )}
               <StatusRow />
+            </div>
+            <div className="flex flex-col gap-[8px] w-full">
+              <PrimaryCTA onClick={onOpenChat} />
+              <ChannelRow />
             </div>
           </div>
 
           {/* QnA area */}
           <div className="flex flex-col gap-[20px] px-[20px] pb-[12px]">
-            <ChannelRow />
             <SectionGroup title="공지">
               <NoticeCard text="2026 추석 명절 배송 일정 안내드립니다." />
             </SectionGroup>
@@ -315,42 +319,60 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
 
 function StatusRow() {
   const [open, setOpen] = useState(false);
+  // Mobile (<sm) hides the white "대기/예상" badge to keep the row from
+  // overflowing at boosted text sizes — the priority signal "상담 원활"
+  // stays visible. Web shows both. The combinatorial layout problem at
+  // 4 status values × all-on-one-row is intentionally deferred.
   return (
-    <div className="flex flex-col gap-[4px]">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-[4px] w-full">
+      <div className="flex items-center justify-between w-full">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
-          style={{ color: "#4E4E55" }}
+          style={{ color: "var(--ht-text-subtle)" }}
         >
           9-18시 운영 중
           <ChevronDownIcon
             width={16}
             height={16}
             style={{
-              color: "#6F6F77",
+              color: "var(--ht-icon-muted)",
               transform: open ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 200ms ease-out",
             }}
           />
         </button>
-        <span
-          className="inline-flex items-center justify-center rounded-full border min-h-[24px] py-[4px] px-[8px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
-          style={{
-            background: "rgba(102, 220, 126, 0.10)",
-            borderColor: "rgba(39, 39, 42, 0.10)",
-            color: "#4fc660",
-          }}
-        >
-          상담 원활
-        </span>
+        <div className="flex items-center gap-[8px]">
+          <span
+            className="hidden sm:inline-flex items-center justify-center rounded-full border py-[4px] px-[8px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
+            style={{
+              background: "var(--ht-bg-badge-default)",
+              borderColor: "var(--ht-border-default)",
+              color: "var(--ht-text-subtle)",
+              backdropFilter: "blur(2px)",
+              WebkitBackdropFilter: "blur(2px)",
+            }}
+          >
+            22명 대기 • 5분 예상
+          </span>
+          <span
+            className="inline-flex items-center justify-center rounded-full border py-[4px] px-[8px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
+            style={{
+              background: "var(--ht-bg-badge-green)",
+              borderColor: "var(--ht-border-default)",
+              color: "#33803F",
+            }}
+          >
+            상담 원활 • 2명
+          </span>
+        </div>
       </div>
       {open && (
         <div
           className="px-[8px] flex flex-col gap-[2px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
-          style={{ color: "#4E4E55" }}
+          style={{ color: "var(--ht-text-subtle)" }}
         >
           <span>평일 9-18시 운영</span>
           <span>토요일 10-17시 운영</span>
