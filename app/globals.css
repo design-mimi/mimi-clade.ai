@@ -284,8 +284,10 @@ body {
 .ht-card-press::after {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  /* Hover/active overlay extends 4px beyond the row on every side so the
+     highlight feels like a generous touch area, not a tight outline. */
+  inset: -4px;
+  border-radius: 16px;
   background: rgba(0, 0, 0, 0);
   transition: background 150ms ease-out;
   pointer-events: none;

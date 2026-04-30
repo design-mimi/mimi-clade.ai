@@ -166,7 +166,7 @@ function MessageRow({
     <button
       type="button"
       onClick={onClick}
-      className="ht-card-press flex flex-col gap-[4px] w-full text-left"
+      className="ht-card-press flex flex-col gap-[4px] w-full text-left rounded-[12px]"
     >
       <div className="flex items-center justify-between gap-[8px] w-full">
         <span
