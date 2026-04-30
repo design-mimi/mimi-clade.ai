@@ -1,6 +1,15 @@
 /* Launcher variant drawing animations.
-   Sourced verbatim from public/happytalk-enduser-homebutton/preview.html
-   (변형 02 펜슬 / 08 인피니티 / 09 하트+커브). */
+   Sourced from public/happytalk-enduser-homebutton/preview.html — keyframes
+   are mirrored here so the deployed launcher matches the SoT comparison
+   board (변형 02 펜슬 / 08 인피니티 / 09 하트+커브).
+
+   Trigger split:
+     - Mobile (<sm): infinite loop — no hover affordance, motion draws
+       attention to the chat entry point.
+     - Web (≥sm): hover-only — paths sit fully drawn at rest and animate
+       through one or more cycles while the cursor is over the launcher.
+       Snaps back to drawn on mouse out.
+*/
 
 .ht-launcher-pencil path,
 .ht-launcher-infinity path,
@@ -13,72 +22,58 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* Heart has no drawing animation — render at full stroke from the start. */
+/* ───────── Static (rest) state — paths fully drawn at full stroke ─────────
+   Both viewports use this baseline; mobile + web-hover rules below opt back
+   into the dash/width animation when their conditions match. */
+.ht-launcher-pencil .body,
+.ht-launcher-pencil .brow,
+.ht-launcher-pencil .mouth,
+.ht-launcher-infinity .stroke-path,
 .ht-launcher-heart path {
+  stroke-dasharray: 100;
   stroke-width: 2.5;
 }
 
-/* ───────── Pencil — body / brow / mouth sequential, 4s cycle ───────── */
-.ht-launcher-pencil .body,
-.ht-launcher-pencil .brow,
-.ht-launcher-pencil .mouth {
-  stroke-dasharray: 100;
-}
-.ht-launcher-pencil .body {
-  animation:
-    ht-pencil-body 4s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-    ht-pencil-body-w 4s linear infinite both;
-}
-.ht-launcher-pencil .brow {
-  animation:
-    ht-pencil-brow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-    ht-pencil-brow-w 4s linear infinite both;
-}
-.ht-launcher-pencil .mouth {
-  animation:
-    ht-pencil-mouth 4s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-    ht-pencil-mouth-w 4s linear infinite both;
-}
-
+/* ───────── Pencil keyframes — 6s cycle ─────────
+   body  : 0–13.67%       (0.82s draw)
+   brow  : 13.67–25.67%   (0.72s draw)
+   pause : 25.67–31.67%   (0.36s breathing — brow→mouth)
+   mouth : 31.67–43.67%   (0.72s draw)
+   hold  : 43.67–100%     (3.38s)
+*/
 @keyframes ht-pencil-body {
-  0%   { stroke-dashoffset: 100; }
-  12%  { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: 0; }
+  0%      { stroke-dashoffset: 100; }
+  13.67%  { stroke-dashoffset: 0; }
+  100%    { stroke-dashoffset: 0; }
 }
 @keyframes ht-pencil-brow {
-  0%, 12% { stroke-dashoffset: 100; }
-  24%     { stroke-dashoffset: 0; }
-  100%    { stroke-dashoffset: 0; }
+  0%, 13.67% { stroke-dashoffset: 100; }
+  25.67%     { stroke-dashoffset: 0; }
+  100%       { stroke-dashoffset: 0; }
 }
 @keyframes ht-pencil-mouth {
-  0%, 24% { stroke-dashoffset: 100; }
-  36%     { stroke-dashoffset: 0; }
-  100%    { stroke-dashoffset: 0; }
+  0%, 31.67% { stroke-dashoffset: 100; }
+  43.67%     { stroke-dashoffset: 0; }
+  100%       { stroke-dashoffset: 0; }
 }
 
 @keyframes ht-pencil-body-w {
-  0%   { stroke-width: 0; }
-  3%   { stroke-width: 2.5; }
-  100% { stroke-width: 2.5; }
+  0%      { stroke-width: 0; }
+  3%      { stroke-width: 2.5; }
+  100%    { stroke-width: 2.5; }
 }
 @keyframes ht-pencil-brow-w {
-  0%, 12% { stroke-width: 0; }
-  15%     { stroke-width: 2.5; }
-  100%    { stroke-width: 2.5; }
+  0%, 13.67% { stroke-width: 0; }
+  16.67%     { stroke-width: 2.5; }
+  100%       { stroke-width: 2.5; }
 }
 @keyframes ht-pencil-mouth-w {
-  0%, 24% { stroke-width: 0; }
-  27%     { stroke-width: 2.5; }
-  100%    { stroke-width: 2.5; }
+  0%, 31.67% { stroke-width: 0; }
+  34.67%     { stroke-width: 2.5; }
+  100%       { stroke-width: 2.5; }
 }
 
-/* ───────── Infinity — single path, 6s cycle (2s draw + 4s hold) ───────── */
-.ht-launcher-infinity .stroke-path {
-  stroke-dasharray: 100;
-  animation:
-    ht-infinity 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
-    ht-infinity-w 6s linear infinite both;
-}
+/* ───────── Infinity — single path, 6s cycle (~2s draw + ~4s hold) ───────── */
 @keyframes ht-infinity {
   0%   { stroke-dashoffset: 100; }
   33%  { stroke-dashoffset: 0; }
@@ -90,25 +85,74 @@
   100% { stroke-width: 2.5; }
 }
 
-/* ───────── Heart + curve — ding-dong pop (95% → 100% scale loop) ───────── */
-.ht-launcher-heart svg {
-  transform-origin: center;
-  animation: ht-heart-pop 2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
-}
+/* ───────── Heart + curve — ding-dong pop scale loop, 2s cycle ───────── */
 @keyframes ht-heart-pop {
   0%, 100% { transform: scale(0.95); }
   40%, 60% { transform: scale(1); }
 }
 
+/* ───────── Mobile (<sm) — infinite loop ───────── */
+@media (max-width: 639.98px) {
+  .ht-launcher-pencil .body {
+    animation:
+      ht-pencil-body 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-body-w 6s linear infinite both;
+  }
+  .ht-launcher-pencil .brow {
+    animation:
+      ht-pencil-brow 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-brow-w 6s linear infinite both;
+  }
+  .ht-launcher-pencil .mouth {
+    animation:
+      ht-pencil-mouth 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-mouth-w 6s linear infinite both;
+  }
+  .ht-launcher-infinity .stroke-path {
+    animation:
+      ht-infinity 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-infinity-w 6s linear infinite both;
+  }
+  .ht-launcher-heart svg {
+    transform-origin: center;
+    animation: ht-heart-pop 2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  }
+}
+
+/* ───────── Web (≥sm) — hover only ───────── */
+@media (min-width: 640px) {
+  .ht-launcher-pencil:hover .body {
+    animation:
+      ht-pencil-body 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-body-w 6s linear infinite both;
+  }
+  .ht-launcher-pencil:hover .brow {
+    animation:
+      ht-pencil-brow 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-brow-w 6s linear infinite both;
+  }
+  .ht-launcher-pencil:hover .mouth {
+    animation:
+      ht-pencil-mouth 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-pencil-mouth-w 6s linear infinite both;
+  }
+  .ht-launcher-infinity:hover .stroke-path {
+    animation:
+      ht-infinity 6s cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+      ht-infinity-w 6s linear infinite both;
+  }
+  .ht-launcher-heart:hover svg {
+    transform-origin: center;
+    animation: ht-heart-pop 2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  }
+}
+
+/* Reduced motion overrides every viewport. */
 @media (prefers-reduced-motion: reduce) {
   .ht-launcher-pencil .body,
   .ht-launcher-pencil .brow,
   .ht-launcher-pencil .mouth,
-  .ht-launcher-infinity .stroke-path {
-    animation: none !important;
-    stroke-dasharray: none !important;
-    stroke-width: 2.5;
-  }
+  .ht-launcher-infinity .stroke-path,
   .ht-launcher-heart svg {
     animation: none !important;
     transform: none !important;
