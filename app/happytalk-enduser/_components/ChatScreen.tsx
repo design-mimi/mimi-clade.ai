@@ -298,7 +298,9 @@ export function ChatScreen({
         <DateBadge label="2026년 4월 27일" />
 
         {cards.map((card, i) => (
-          <ChatCard key={`card-${i}`} data={card} onAction={handleCardAction} />
+          <div key={`card-${i}`} className="ht-agent-row">
+            <ChatCard data={card} onAction={handleCardAction} />
+          </div>
         ))}
 
         {transcript.map((item) =>
@@ -416,7 +418,7 @@ function AgentTurn({
   children: ReactNode;
 }) {
   return (
-    <div className="ht-reveal flex flex-col gap-[10px] w-full">
+    <div className="ht-reveal ht-agent-row flex flex-col gap-[10px] w-full">
       {children}
       <span
         className="text-[12px] leading-4 font-medium tracking-[-0.25px]"
@@ -519,6 +521,10 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Skip while an IME is mid-composition (Korean syllables, etc.). Otherwise
+    // the Enter that confirms the composition also sends, and the in-flight
+    // syllable gets re-committed into the now-empty textarea after send.
+    if (e.nativeEvent.isComposing) return;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();

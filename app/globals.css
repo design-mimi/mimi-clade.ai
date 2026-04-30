@@ -242,11 +242,12 @@ body {
 }
 
 
-/* Consecutive user bubbles tighten to 10px effective gap (matches agent
-   turn internal gap). Parent flex gap is 24px, so negative margin offsets
-   to 10. Different-speaker transitions keep the full 24px from parent. */
-.ht-user-row + .ht-user-row {
-  margin-top: -14px;
+/* Consecutive same-speaker bubbles tighten to 4px effective gap. Parent
+   flex gap is 24px, so negative margin offsets to 4. Different-speaker
+   transitions keep the full 24px from parent. */
+.ht-user-row + .ht-user-row,
+.ht-agent-row + .ht-agent-row {
+  margin-top: -20px;
 }
 
 /* ---- Pressable (button press + hover dim overlay) ---- */
