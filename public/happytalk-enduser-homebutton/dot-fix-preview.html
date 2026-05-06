@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pencil Drawing — Dot Fix 비교</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #231916;
+      --bg: #fafafa;
+      --muted: #999;
+      --grid: #ececec;
+      --ease-soft: cubic-bezier(.4, 0, .2, 1);
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 32px;
+      padding: 56px 24px 40px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "SF Pro Text",
+        "Helvetica Neue", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+    header p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      align-items: stretch;
+    }
+
+    @media (max-width: 880px) {
+      main { grid-template-columns: repeat(2, 1fr); max-width: 600px; }
+    }
+
+    .stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 56px 20px 24px;
+      background: #eef1f5;
+      border: 1px solid var(--grid);
+      border-radius: 16px;
+      min-height: 360px;
+      overflow: visible;
+    }
+
+    .stage-label {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stage-tag {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .stage .caption {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .stage .caption b { color: var(--ink); font-weight: 600; }
+
+    /* ─── 공통: 버튼 + 심볼 ───────────────────────── */
+    .home-btn {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid rgba(35, 25, 22, 0.04);
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 1px 2px rgba(35, 25, 22, 0.04),
+        0 8px 24px rgba(35, 25, 22, 0.10);
+    }
+
+    .home-btn svg { display: block; overflow: visible; width: 56px; height: 93px; }
+
+    .home-btn path {
+      stroke: var(--ink);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* ─── 공통: 5s 사이클 시퀀셜 드로잉 ───────────── */
+    /*
+     * body 0–20% / brow 20–40% / mouth 40–60% / hold 60–100%
+     * 사이클 끝에서 0% 로 wrap → 모두 invisible 동시 리셋.
+     */
+    .draw .body,
+    .draw .brow,
+    .draw .mouth {
+      stroke-dasharray: 100;
+      animation-duration: 5s;
+      animation-timing-function: var(--ease-soft);
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+    }
+    .draw .body  { animation-name: pdraw-body; }
+    .draw .brow  { animation-name: pdraw-brow; }
+    .draw .mouth { animation-name: pdraw-mouth; }
+
+    @keyframes pdraw-body {
+      0%   { stroke-dashoffset: 100; }
+      20%  { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes pdraw-brow {
+      0%, 20% { stroke-dashoffset: 100; }
+      40%     { stroke-dashoffset: 0; }
+      100%    { stroke-dashoffset: 0; }
+    }
+    @keyframes pdraw-mouth {
+      0%, 40% { stroke-dashoffset: 100; }
+      60%     { stroke-dashoffset: 0; }
+      100%    { stroke-dashoffset: 0; }
+    }
+
+    /* ─── A. linecap: butt ────────────────────────── */
+    /*
+     * 가장 단순. round cap 자체를 제거 → dot phase 가 사라짐.
+     * 단점: 라인 끝단이 각져서 brand round 끝단 소실.
+     */
+    .fix-a .body,
+    .fix-a .brow,
+    .fix-a .mouth {
+      stroke-linecap: butt;
+    }
+
+    /* ─── B. opacity 동기 페이드인 ────────────────── */
+    /*
+     * round cap 유지. 각 라인의 draw 시작 시점에 opacity 0 → 1
+     * 페이드인 (linear, 짧게) 으로 dot phase 자체가 invisible.
+     */
+    .fix-b .body  {
+      animation:
+        pdraw-body 5s var(--ease-soft) infinite both,
+        fade-body  5s linear            infinite both;
+    }
+    .fix-b .brow  {
+      animation:
+        pdraw-brow 5s var(--ease-soft) infinite both,
+        fade-brow  5s linear            infinite both;
+    }
+    .fix-b .mouth {
+      animation:
+        pdraw-mouth 5s var(--ease-soft) infinite both,
+        fade-mouth  5s linear            infinite both;
+    }
+    @keyframes fade-body {
+      0%   { opacity: 0; }
+      3%   { opacity: 1; }
+      100% { opacity: 1; }
+    }
+    @keyframes fade-brow {
+      0%, 20% { opacity: 0; }
+      23%     { opacity: 1; }
+      100%    { opacity: 1; }
+    }
+    @keyframes fade-mouth {
+      0%, 40% { opacity: 0; }
+      43%     { opacity: 1; }
+      100%    { opacity: 1; }
+    }
+
+    /* ─── C. 가속 easing (front-loaded) ───────────── */
+    /*
+     * round cap 유지. 시작이 매우 빠른 cubic-bezier 로 dot phase 를
+     * 1~2 프레임 안에 통과 → 점이 보일 시간 자체가 없음.
+     */
+    .fix-c .body,
+    .fix-c .brow,
+    .fix-c .mouth {
+      animation-timing-function: cubic-bezier(0, 0.95, 0.15, 1);
+    }
+
+    /* ─── D. stroke-width 0 → 2.5 grow ────────────── */
+    /*
+     * round cap 유지. 시작 ~3% 동안 stroke-width 가 0 → 2.5 로
+     * 같이 커지므로, dot phase 에서는 두께 자체가 거의 0 → 점 안 보임.
+     */
+    .fix-d .body  {
+      animation:
+        pdraw-body 5s var(--ease-soft) infinite both,
+        width-body 5s linear            infinite both;
+    }
+    .fix-d .brow  {
+      animation:
+        pdraw-brow 5s var(--ease-soft) infinite both,
+        width-brow 5s linear            infinite both;
+    }
+    .fix-d .mouth {
+      animation:
+        pdraw-mouth 5s var(--ease-soft) infinite both,
+        width-mouth 5s linear            infinite both;
+    }
+    @keyframes width-body {
+      0%   { stroke-width: 0; }
+      4%   { stroke-width: 2.5; }
+      100% { stroke-width: 2.5; }
+    }
+    @keyframes width-brow {
+      0%, 20% { stroke-width: 0; }
+      24%     { stroke-width: 2.5; }
+      100%    { stroke-width: 2.5; }
+    }
+    @keyframes width-mouth {
+      0%, 40% { stroke-width: 0; }
+      44%     { stroke-width: 2.5; }
+      100%    { stroke-width: 2.5; }
+    }
+
+    /* ─── 모션 줄이기 ──────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .draw .body, .draw .brow, .draw .mouth {
+        animation: none !important;
+        stroke-dasharray: none !important;
+      }
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .legend {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .legend a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Pencil Drawing — 점 찍힘 fix 비교</h1>
+    <p>
+      모두 5s 사이클 / body → brow → mouth 순차 / 단일 변수만 다르게.<br/>
+      각 라인이 그려지기 시작하는 순간(dot phase) 동그란 점이 찍히는 문제 해결 4가지 비교.
+    </p>
+    <span class="legend"><a href="./preview.html">← 메인 프리뷰로</a></span>
+  </header>
+
+  <main>
+
+    <!-- ───────── A · butt cap ───────── -->
+    <section class="stage">
+      <span class="stage-label">A</span>
+      <span class="stage-tag">butt cap</span>
+      <button class="home-btn draw fix-a" aria-label="A">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="body"  pathLength="100" d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55" />
+          <path class="mouth" pathLength="100" d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65" />
+          <path class="brow"  pathLength="100" d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69" />
+        </svg>
+      </button>
+      <span class="caption">
+        <b>linecap: butt</b><br/>
+        끝단 평평 / 점 완전 제거<br/>
+        (brand round 끝단 소실)
+      </span>
+    </section>
+
+    <!-- ───────── B · opacity 페이드 ───────── -->
+    <section class="stage">
+      <span class="stage-label">B</span>
+      <span class="stage-tag">opacity</span>
+      <button class="home-btn draw fix-b" aria-label="B">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="body"  pathLength="100" d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55" />
+          <path class="mouth" pathLength="100" d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65" />
+          <path class="brow"  pathLength="100" d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69" />
+        </svg>
+      </button>
+      <span class="caption">
+        <b>opacity 0 → 1 sync</b><br/>
+        round cap 유지<br/>
+        dot phase 만 투명
+      </span>
+    </section>
+
+    <!-- ───────── C · 가속 easing ───────── -->
+    <section class="stage">
+      <span class="stage-label">C</span>
+      <span class="stage-tag">fast ease</span>
+      <button class="home-btn draw fix-c" aria-label="C">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="body"  pathLength="100" d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55" />
+          <path class="mouth" pathLength="100" d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65" />
+          <path class="brow"  pathLength="100" d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69" />
+        </svg>
+      </button>
+      <span class="caption">
+        <b>front-loaded ease</b><br/>
+        round cap 유지<br/>
+        dot phase 1프레임에 통과
+      </span>
+    </section>
+
+    <!-- ───────── D · stroke-width grow ───────── -->
+    <section class="stage">
+      <span class="stage-label">D</span>
+      <span class="stage-tag">width grow</span>
+      <button class="home-btn draw fix-d" aria-label="D">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="body"  pathLength="100" d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55" />
+          <path class="mouth" pathLength="100" d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65" />
+          <path class="brow"  pathLength="100" d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69" />
+        </svg>
+      </button>
+      <span class="caption">
+        <b>stroke-width 0 → 2.5</b><br/>
+        round cap 유지<br/>
+        시작 시 라인 두께 0 → 점 사라짐
+      </span>
+    </section>
+
+  </main>
+
+  <footer>
+    happytalk-enduser-homebutton · dot-fix-preview.html
+  </footer>
+</body>
+</html>

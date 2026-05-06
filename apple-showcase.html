@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apple — Design Showcase</title>
+<style>
+  :root {
+    --sk-focus-color: #0071e3;
+    --sk-body-link-color: #0066cc;
+    --link-dark: #2997ff;
+    --text-near-black: #1d1d1f;
+    --bg-light: #f5f5f7;
+    --bg-dark: #000000;
+    --black-80: rgba(0, 0, 0, 0.8);
+    --black-48: rgba(0, 0, 0, 0.48);
+    --card-shadow: 0 5px 30px 3px rgba(0, 0, 0, 0.22);
+    --dark-surface-1: #272729;
+    --dark-surface-3: #28282a;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+    color: var(--text-near-black);
+    background: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--sk-focus-color);
+    outline-offset: 2px;
+  }
+
+  /* ==================== Navigation ==================== */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  .nav-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    height: 100%;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-list {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+    align-items: center;
+    height: 100%;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav a {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    letter-spacing: -0.01em;
+  }
+
+  .nav a:hover {
+    opacity: 1;
+  }
+
+  .apple-logo {
+    width: 14px;
+    height: 44px;
+    fill: #fff;
+  }
+
+  .nav-icon {
+    width: 14px;
+    height: 44px;
+    fill: #fff;
+    opacity: 0.8;
+  }
+
+  /* ==================== Shared Typography ==================== */
+  .display {
+    font-family: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .h-hero {
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.28px;
+  }
+
+  .h-section {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.10;
+  }
+
+  .h-tile {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.14;
+    letter-spacing: 0.196px;
+  }
+
+  .sub-21 {
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.19;
+    letter-spacing: 0.231px;
+  }
+
+  .caption {
+    font-size: 14px;
+    line-height: 1.29;
+    letter-spacing: -0.224px;
+  }
+
+  /* ==================== Sections ==================== */
+  .section {
+    width: 100%;
+    padding: 80px 22px 0;
+    text-align: center;
+  }
+
+  .section-dark {
+    background: var(--bg-dark);
+    color: #fff;
+  }
+
+  .section-light {
+    background: var(--bg-light);
+    color: var(--text-near-black);
+  }
+
+  .section-content {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-size: 21px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.19;
+  }
+
+  /* ==================== CTA Buttons ==================== */
+  .cta-row {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Primary Blue filled CTA */
+  .btn-blue {
+    background: #0071e3;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 980px;
+    border: 1px solid transparent;
+    font: 400 17px/1 "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-blue:hover {
+    background: #0077ed;
+  }
+
+  /* Outline pill */
+  .btn-outline {
+    background: transparent;
+    color: var(--sk-body-link-color);
+    border: 1px solid var(--sk-body-link-color);
+    padding: 8px 15px;
+    border-radius: 980px;
+    font: 400 17px/1 "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .section-dark .btn-outline {
+    color: var(--link-dark);
+    border-color: var(--link-dark);
+  }
+
+  .btn-outline:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Inline "Learn more" */
+  .learn-more {
+    color: var(--sk-body-link-color);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 400;
+  }
+
+  .section-dark .learn-more {
+    color: var(--link-dark);
+  }
+
+  .learn-more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .learn-more::after {
+    content: " ›";
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+
+  .learn-more:hover::after {
+    transform: translateX(2px);
+  }
+
+  /* ==================== Hero Product Visual ==================== */
+  .hero-product {
+    margin: 48px auto 0;
+    width: 100%;
+    max-width: 780px;
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+  }
+
+  /* Abstract "product" visual using pure CSS — stylized iPhone silhouette */
+  .iphone-frame {
+    width: 180px;
+    height: 360px;
+    background: linear-gradient(180deg, #3a3a3c 0%, #1c1c1e 100%);
+    border-radius: 36px;
+    padding: 6px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+  }
+
+  .iphone-screen {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 20%, #1e3a8a 0%, #000 70%);
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .iphone-notch {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 14px;
+    background: #000;
+    border-radius: 10px;
+  }
+
+  /* Laptop visual */
+  .macbook {
+    width: 480px;
+    max-width: 100%;
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(180deg, #3a3a3c 0%, #2c2c2e 100%);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+  }
+
+  .macbook-screen {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 30%, #1e3a8a 0%, #000 70%);
+    border-radius: 4px;
+  }
+
+  .macbook::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: -10%;
+    right: -10%;
+    height: 8px;
+    background: linear-gradient(180deg, #48484a 0%, #1c1c1e 100%);
+    border-radius: 0 0 6px 6px;
+  }
+
+  /* Watch visual */
+  .watch {
+    width: 180px;
+    height: 220px;
+    background: linear-gradient(180deg, #3a3a3c 0%, #1c1c1e 100%);
+    border-radius: 36px;
+    padding: 10px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+  }
+
+  .watch-screen {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 30%, #dc2626 0%, #000 70%);
+    border-radius: 28px;
+  }
+
+  .watch::before,
+  .watch::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 40px;
+    background: linear-gradient(180deg, #2c2c2e, #48484a);
+    z-index: -1;
+  }
+
+  .watch::before {
+    top: -32px;
+    border-radius: 24px 24px 8px 8px;
+  }
+
+  .watch::after {
+    bottom: -32px;
+    border-radius: 8px 8px 24px 24px;
+  }
+
+  /* ==================== Product Grid Tiles ==================== */
+  .tile-grid {
+    margin-top: 80px;
+    padding-bottom: 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tile {
+    background: var(--bg-light);
+    border-radius: 18px;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 580px;
+  }
+
+  .tile.tile-dark {
+    background: #000;
+    color: #fff;
+  }
+
+  .tile-eyebrow {
+    font-family: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #0071e3;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .tile h3 {
+    font-family: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.10;
+    margin-bottom: 4px;
+  }
+
+  .tile p {
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.19;
+    letter-spacing: 0.011em;
+    margin-top: 4px;
+  }
+
+  .tile .cta-row {
+    margin-top: 16px;
+  }
+
+  .tile-visual {
+    margin-top: auto;
+    padding-top: 48px;
+  }
+
+  /* ==================== Feature Strip ==================== */
+  .strip {
+    background: var(--bg-light);
+    padding: 120px 22px;
+    text-align: center;
+  }
+
+  .strip-content {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .strip-row {
+    margin-top: 60px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .strip-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 40px 28px;
+    text-align: left;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .strip-card h4 {
+    font-family: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.19;
+    letter-spacing: 0.231px;
+    margin-bottom: 10px;
+  }
+
+  .strip-card .desc {
+    color: var(--black-80);
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+    flex: 1;
+  }
+
+  .strip-card .learn-more {
+    margin-top: 24px;
+    align-self: flex-start;
+  }
+
+  /* ==================== Footer ==================== */
+  .footer {
+    background: var(--bg-light);
+    color: var(--black-80);
+    padding: 40px 22px 20px;
+    font-size: 12px;
+    line-height: 1.33;
+    letter-spacing: -0.12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .footer-inner {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .footer-cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .footer-col h5 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-near-black);
+    margin-bottom: 12px;
+  }
+
+  .footer-col ul {
+    list-style: none;
+  }
+
+  .footer-col li {
+    margin-bottom: 8px;
+  }
+
+  .footer-col a {
+    color: var(--black-80);
+    text-decoration: none;
+  }
+
+  .footer-col a:hover {
+    text-decoration: underline;
+  }
+
+  .copy {
+    padding-top: 24px;
+    font-size: 12px;
+    color: var(--black-48);
+  }
+
+  /* ==================== Responsive ==================== */
+  @media (max-width: 834px) {
+    .h-hero { font-size: 40px; }
+    .h-section { font-size: 32px; }
+    .tile-grid { grid-template-columns: 1fr; }
+    .strip-row { grid-template-columns: 1fr; }
+    .footer-cols { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .h-hero { font-size: 32px; }
+    .h-section { font-size: 28px; }
+    .nav-list { gap: 20px; }
+    .nav a { font-size: 11px; }
+    .section { padding: 48px 16px 0; }
+    .tile { padding: 40px 24px; min-height: 420px; }
+    .strip { padding: 60px 16px; }
+    .footer-cols { grid-template-columns: 1fr; }
+    .iphone-frame { width: 140px; height: 280px; }
+    .macbook { width: 280px; }
+    .watch { width: 140px; height: 170px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== Navigation ========== -->
+<nav class="nav" aria-label="Global">
+  <div class="nav-inner">
+    <a href="#" aria-label="Apple">
+      <svg class="apple-logo" viewBox="0 0 14 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.0729 17.6825 A3.61 3.61 0 0 0 11.335 14.5875 a3.69 3.69 0 0 0 -2.9075 -1.57 c-1.2225 -.1275 -2.4075 .725 -3.0425 .725 -.6575 0 -1.6025 -.7075 -2.6425 -.685 a3.875 3.875 0 0 0 -3.26 1.9875 c-1.4025 2.43 -.3575 6.025 1.0125 7.9975 .675 .97 1.4775 2.0475 2.53 2.01 1.015 -.04 1.4025 -.6475 2.6275 -.6475 1.2375 0 1.585 .6475 2.6575 .6225 1.1 -.0175 1.7925 -.975 2.46 -1.9525 a10.635 10.635 0 0 0 1.1125 -2.2975 3.41 3.41 0 0 1 -2.0775 -3.12Z M9.3775 11.71 a3.33 3.33 0 0 0 .77 -2.3675 3.35 3.35 0 0 0 -2.13 1.1225 3.13 3.13 0 0 0 -.8 2.2875 2.83 2.83 0 0 0 2.16 -1.0425Z" />
+      </svg>
+    </a>
+    <ul class="nav-list">
+      <li><a href="#store">Store</a></li>
+      <li><a href="#mac">Mac</a></li>
+      <li><a href="#ipad">iPad</a></li>
+      <li><a href="#iphone">iPhone</a></li>
+      <li><a href="#watch">Watch</a></li>
+      <li><a href="#vision">Vision</a></li>
+      <li><a href="#music">Music</a></li>
+      <li><a href="#tv">TV</a></li>
+      <li><a href="#support">Support</a></li>
+    </ul>
+    <svg class="nav-icon" viewBox="0 0 14 44" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.298,27.202l-3.87-3.87c0.701-0.929,1.122-2.081,1.122-3.332c0-3.06-2.489-5.55-5.55-5.55c-3.06,0-5.55,2.49-5.55,5.55 c0,3.061,2.49,5.55,5.55,5.55c1.251,0,2.403-0.421,3.332-1.122l3.87,3.87c0.151,0.151,0.35,0.228,0.548,0.228 s0.396-0.076,0.548-0.228C14.601,27.995,14.601,27.505,14.298,27.202z M1.55,20c0-2.454,1.997-4.45,4.45-4.45 c2.454,0,4.45,1.997,4.45,4.45S8.454,24.45,6,24.45C3.546,24.45,1.55,22.454,1.55,20z" />
+    </svg>
+  </div>
+</nav>
+
+<!-- ========== Hero: iPhone (Dark) ========== -->
+<section class="section section-dark" id="iphone">
+  <div class="section-content">
+    <p class="eyebrow display">iPhone</p>
+    <h1 class="display h-hero">Titanium. So strong. So light. So Pro.</h1>
+    <p class="subtitle display">From $999 or $41.62/mo. for 24 mo.*</p>
+    <div class="cta-row">
+      <a href="#" class="btn-blue">Buy</a>
+      <a href="#" class="btn-outline">Learn more</a>
+    </div>
+    <div class="hero-product">
+      <div class="iphone-frame">
+        <div class="iphone-screen">
+          <div class="iphone-notch"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MacBook (Light) ========== -->
+<section class="section section-light" id="mac">
+  <div class="section-content">
+    <p class="eyebrow display">MacBook Pro</p>
+    <h2 class="display h-hero">Mind-blowing. Head-turning.</h2>
+    <p class="subtitle display">Supercharged by M4, M4 Pro, or M4 Max.</p>
+    <div class="cta-row">
+      <a href="#" class="btn-blue">Buy</a>
+      <a href="#" class="btn-outline">Learn more</a>
+    </div>
+    <div class="hero-product">
+      <div class="macbook">
+        <div class="macbook-screen"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Apple Watch (Dark) ========== -->
+<section class="section section-dark" id="watch">
+  <div class="section-content">
+    <p class="eyebrow display">Apple Watch Series 10</p>
+    <h2 class="display h-hero">Thinstant classic.</h2>
+    <p class="subtitle display">Big, advanced display. Thinner design. Brighter possibilities.</p>
+    <div class="cta-row">
+      <a href="#" class="btn-blue">Buy</a>
+      <a href="#" class="btn-outline">Learn more</a>
+    </div>
+    <div class="hero-product">
+      <div class="watch">
+        <div class="watch-screen"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Product Grid (Two Tiles) ========== -->
+<section style="background: #fafafa; padding: 12px 22px;">
+  <div class="tile-grid" style="margin-top: 0;">
+    <article class="tile">
+      <p class="tile-eyebrow">iPad Air</p>
+      <h3>Two powerful sizes.</h3>
+      <p>Now supercharged by the M3 chip.</p>
+      <div class="cta-row">
+        <a href="#" class="learn-more">Learn more</a>
+        <a href="#" class="learn-more">Buy</a>
+      </div>
+      <div class="tile-visual">
+        <div class="macbook" style="width: 260px; aspect-ratio: 4/3;">
+          <div class="macbook-screen"></div>
+        </div>
+      </div>
+    </article>
+    <article class="tile tile-dark">
+      <p class="tile-eyebrow" style="color: #2997ff;">AirPods 4</p>
+      <h3>Iconic. Now supersonic.</h3>
+      <p>With Active Noise Cancellation.</p>
+      <div class="cta-row">
+        <a href="#" class="learn-more" style="color: #2997ff;">Learn more</a>
+        <a href="#" class="learn-more" style="color: #2997ff;">Buy</a>
+      </div>
+      <div class="tile-visual">
+        <div class="watch" style="width: 140px; height: 170px;">
+          <div class="watch-screen" style="background: radial-gradient(circle at 50% 30%, #fff 0%, #ccc 70%);"></div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ========== Feature Strip ========== -->
+<section class="strip" id="services">
+  <div class="strip-content">
+    <h2 class="display h-section">The Apple Ecosystem.</h2>
+    <p class="subtitle" style="margin-top: 12px;">Everything you love, all working together.</p>
+
+    <div class="strip-row">
+      <div class="strip-card">
+        <p class="tile-eyebrow">Apple Music</p>
+        <h4 class="display">Over 100 million songs.</h4>
+        <p class="desc">Listen to lossless audio and Spatial Audio with Dolby Atmos — on any device.</p>
+        <a href="#" class="learn-more">Learn more</a>
+      </div>
+      <div class="strip-card">
+        <p class="tile-eyebrow">Apple TV+</p>
+        <h4 class="display">The best of television.</h4>
+        <p class="desc">Award-winning Apple Originals and the latest releases, all ad-free.</p>
+        <a href="#" class="learn-more">Learn more</a>
+      </div>
+      <div class="strip-card">
+        <p class="tile-eyebrow">Apple Arcade</p>
+        <h4 class="display">Endless games. No ads.</h4>
+        <p class="desc">Over 200 games. New ones added every month. Play on every Apple device.</p>
+        <a href="#" class="learn-more">Learn more</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <p style="margin-bottom: 24px; color: var(--black-48);">*Monthly financing available with eligible credit. Learn more about iPhone financing.</p>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h5>Shop and Learn</h5>
+        <ul>
+          <li><a href="#">Store</a></li>
+          <li><a href="#">Mac</a></li>
+          <li><a href="#">iPad</a></li>
+          <li><a href="#">iPhone</a></li>
+          <li><a href="#">Watch</a></li>
+          <li><a href="#">Vision</a></li>
+          <li><a href="#">AirPods</a></li>
+          <li><a href="#">TV & Home</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="#">Apple Music</a></li>
+          <li><a href="#">Apple TV+</a></li>
+          <li><a href="#">Apple Fitness+</a></li>
+          <li><a href="#">Apple News+</a></li>
+          <li><a href="#">Apple Arcade</a></li>
+          <li><a href="#">iCloud</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Apple Store</h5>
+        <ul>
+          <li><a href="#">Find a Store</a></li>
+          <li><a href="#">Genius Bar</a></li>
+          <li><a href="#">Today at Apple</a></li>
+          <li><a href="#">Group Reservations</a></li>
+          <li><a href="#">Apple Camp</a></li>
+          <li><a href="#">Trade In</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About Apple</h5>
+        <ul>
+          <li><a href="#">Newsroom</a></li>
+          <li><a href="#">Apple Leadership</a></li>
+          <li><a href="#">Career Opportunities</a></li>
+          <li><a href="#">Investors</a></li>
+          <li><a href="#">Ethics & Compliance</a></li>
+          <li><a href="#">Contact Apple</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copy">Copyright © 2026 Apple Inc. All rights reserved. &nbsp;·&nbsp; Privacy Policy &nbsp;·&nbsp; Terms of Use &nbsp;·&nbsp; Sales and Refunds &nbsp;·&nbsp; Legal &nbsp;·&nbsp; Site Map</p>
+  </div>
+</footer>
+
+</body>
+</html>

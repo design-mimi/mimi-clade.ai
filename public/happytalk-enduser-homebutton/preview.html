@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home Button — 모션 변형 비교</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #231916;
+      --bg: #fafafa;
+      --muted: #999;
+      --grid: #ececec;
+      --ease-out-back: cubic-bezier(.34, 1.4, .64, 1);
+      --ease-soft: cubic-bezier(.4, 0, .2, 1);
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 32px;
+      padding: 56px 24px 40px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "SF Pro Text",
+        "Helvetica Neue", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      align-items: stretch;
+    }
+
+    @media (max-width: 760px) {
+      main { grid-template-columns: repeat(2, 1fr); max-width: 640px; }
+    }
+
+    .stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      padding: 56px 24px 32px;
+      background: #eef1f5;
+      border: 1px solid var(--grid);
+      border-radius: 16px;
+      min-height: 340px;
+      overflow: visible;
+    }
+
+    .stage-number {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stage .caption {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .stage .caption b { color: var(--ink); font-weight: 600; }
+
+    /* ─── Home button (공통) ─────────────────────────── */
+
+    .home-btn {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid rgba(35, 25, 22, 0.04);
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 1px 2px rgba(35, 25, 22, 0.04),
+        0 8px 24px rgba(35, 25, 22, 0.10);
+      transition:
+        transform 360ms var(--ease-out-back),
+        box-shadow 360ms var(--ease-out-back);
+    }
+
+    .home-btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 2px 4px rgba(35, 25, 22, 0.06),
+        0 14px 32px rgba(35, 25, 22, 0.14);
+    }
+
+    .home-btn:active {
+      transform: translateY(0) scale(0.97);
+      box-shadow:
+        0 1px 2px rgba(35, 25, 22, 0.04),
+        0 4px 12px rgba(35, 25, 22, 0.08);
+    }
+
+    .home-btn:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 4px;
+    }
+
+    /* viewBox 위/아래로 약간의 여유 */
+    .home-btn svg { display: block; overflow: visible; width: 56px; height: 93px; }
+
+    /* path 기본값 — 전 변형 공통 */
+    .home-btn path {
+      stroke: var(--ink);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* ─── 1. 입꼬리 morph ─────────────────────────────── */
+    /*
+     * CSS 의 d: path() 속성으로 path 데이터 자체를 morph 합니다.
+     * stroke 두께(2.5)는 그대로 유지 → 호버 시 얇아짐 없음.
+     */
+    .variant-morph .mouth {
+      d: path("M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65");
+      transition: d 480ms var(--ease-soft);
+    }
+
+    .variant-morph:hover .mouth {
+      d: path("M10.5 55.6 C 10.5 55.6 24.06 63 36.3 47.2");
+    }
+
+    /* ─── 2. 펜슬 드로잉 (순차 자동 루프) ─────────────── */
+    /*
+     * body → brow → mouth 순서로 그려지고, 사이클 끝에 동시에 invisible 로 리셋.
+     *
+     * Dot fix (D — stroke-width grow):
+     *  각 라인의 draw 시작 시 stroke-width 가 0 → 2.5 로 같이 자라남.
+     *  round cap dot phase 에서 두께가 거의 0 이라 점이 안 보이고,
+     *  펜촉이 종이에 안착되며 압력이 가해지는 듯한 물리 인상 → linecap: round 유지.
+     *
+     * 한 사이클 = 6.30s
+     *  ├ body  : 0–14.60%      (0–0.92s)    그려짐 + width 0→2.5 (0–3%)
+     *  ├ brow  : 14.60–29.21%  (0.92–1.84s) 그려짐 + width 0→2.5 (14.60–17.60%)
+     *  ├ pause : 29.21–34.92%  (1.84–2.20s) 호흡 — brow→mouth 사이 0.36s 여유
+     *  ├ mouth : 34.92–46.35%  (2.20–2.92s) 그려짐 + width 0→2.5 (34.92–37.92%)
+     *  ├ hold  : 46.35–100%    (2.92–6.30s) 모두 visible 유지
+     *  └ 사이클 종료 → 0% 로 점프 → 모두 invisible 동시 리셋
+     */
+    .variant-pencil .body {
+      stroke-dasharray: 100;
+      animation:
+        pencil-body       6.30s var(--ease-soft) infinite both,
+        width-pencil-body 6.30s linear           infinite both;
+    }
+    .variant-pencil .brow {
+      stroke-dasharray: 100;
+      animation:
+        pencil-brow       6.30s var(--ease-soft) infinite both,
+        width-pencil-brow 6.30s linear           infinite both;
+    }
+    .variant-pencil .mouth {
+      stroke-dasharray: 100;
+      animation:
+        pencil-mouth       6.30s var(--ease-soft) infinite both,
+        width-pencil-mouth 6.30s linear           infinite both;
+    }
+
+    @keyframes pencil-body {
+      0%     { stroke-dashoffset: 100; }
+      14.60% { stroke-dashoffset: 0; }
+      100%   { stroke-dashoffset: 0; }
+    }
+    @keyframes pencil-brow {
+      0%, 14.60% { stroke-dashoffset: 100; }
+      29.21%     { stroke-dashoffset: 0; }
+      100%       { stroke-dashoffset: 0; }
+    }
+    @keyframes pencil-mouth {
+      /* 5.71% (0.36s @ 6.30s cycle) breathing pause after brow finishes at
+         29.21% so the brow→mouth transition doesn't feel rushed. */
+      0%, 34.92% { stroke-dashoffset: 100; }
+      46.35%     { stroke-dashoffset: 0; }
+      100%       { stroke-dashoffset: 0; }
+    }
+
+    /* width grow — 각 라인 draw 시작 시점에 0 → 2.5 ramp (dot phase 무력화) */
+    @keyframes width-pencil-body {
+      0%   { stroke-width: 0; }
+      3%   { stroke-width: 2.5; }
+      100% { stroke-width: 2.5; }
+    }
+    @keyframes width-pencil-brow {
+      0%, 14.60% { stroke-width: 0; }
+      17.60%     { stroke-width: 2.5; }
+      100%       { stroke-width: 2.5; }
+    }
+    @keyframes width-pencil-mouth {
+      0%, 34.92% { stroke-width: 0; }
+      37.92%     { stroke-width: 2.5; }
+      100%       { stroke-width: 2.5; }
+    }
+
+    /* 단일 path 아이콘용 드로잉 루프 — 08 인피니티 */
+    /* 같은 D 방식: dashoffset 과 stroke-width 동기 grow */
+    .variant-draw-single .stroke-path {
+      stroke-dasharray: 100;
+      animation:
+        pencil-single 5s var(--ease-soft) infinite both,
+        width-single  5s linear           infinite both;
+    }
+    @keyframes pencil-single {
+      0%   { stroke-dashoffset: 100; }
+      32%  { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes width-single {
+      0%   { stroke-width: 0; }
+      5%   { stroke-width: 2.5; }
+      100% { stroke-width: 2.5; }
+    }
+
+    /* 09 하트+커브 — spring pop-in 등장 + 5초 유지 */
+    /* 한 사이클 = 7s
+     *  ├ enter : 0–14%   (0–1s)    scale 0.3→1.15→0.95→1, opacity 0→1
+     *  ├ hold  : 14–86%  (1–6s)    scale 1, opacity 1 (5초 유지)
+     *  └ exit  : 86–100% (6–7s)    opacity 1→0
+     */
+    .variant-heart .p1,
+    .variant-heart .p2,
+    .variant-heart .p3,
+    .variant-heart .p4,
+    .variant-heart .p5,
+    .variant-heart .p6 { stroke-width: 2.5; }
+
+    .variant-heart svg {
+      transform-origin: 50% 50%;
+      animation: heart-pop 7s ease-out infinite both;
+    }
+
+    @keyframes heart-pop {
+      0%   { transform: scale(0.3);  opacity: 0; }
+      6%   { transform: scale(1.15); opacity: 1; }
+      10%  { transform: scale(0.95); opacity: 1; }
+      14%  { transform: scale(1);    opacity: 1; }
+      86%  { transform: scale(1);    opacity: 1; }
+      100% { transform: scale(1);    opacity: 0; }
+    }
+
+    /* viewBox 가 다른 라인 아이콘은 svg 크기 override */
+    .variant-infinity svg { width: 76px; height: 64px; }
+    .variant-heart    svg { width: 76px; height: 68px; }
+
+    /* ─── 3. 눈썹 + 입꼬리 ────────────────────────────── */
+
+    .variant-brow .brow {
+      transition: transform 540ms var(--ease-out-back);
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+    }
+
+    .variant-brow:hover .brow {
+      transform: translateY(-1px);
+    }
+
+    .variant-brow .mouth {
+      d: path("M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65");
+      transition: d 480ms var(--ease-soft);
+    }
+
+    .variant-brow:hover .mouth {
+      d: path("M10.5 55.6 C 10.5 55.6 24.06 63 36.3 47.2");
+    }
+
+    /* ─── 4. 시선 추적 (look / eye-follow) ────────── */
+    /*
+     * JS 가 mousemove 마다 .variant-look 버튼에
+     * --look-x / --look-y (SVG user units, 최대 ±5) 를 세팅.
+     * brow / mouth 가 시선 방향으로 이동해 따라오는 듯한 느낌.
+     */
+    .variant-look .brow,
+    .variant-look .mouth {
+      transition: transform 240ms var(--ease-soft);
+      transform: translate(
+        calc(var(--look-x, 0) * 1px),
+        calc(var(--look-y, 0) * 1px)
+      );
+    }
+
+    /* ─── 5. 틸트 + 플로팅 (idle motion) ──────────── */
+    /*
+     * translate / rotate 개별 속성은 transform 과 합성되므로
+     * 기존 :hover · :active 의 transform 효과는 그대로 유지됨.
+     */
+    .variant-tilt {
+      animation:
+        tilt-bob 3.6s var(--ease-soft) infinite alternate,
+        tilt-rotate 5.2s var(--ease-soft) infinite alternate;
+    }
+    @keyframes tilt-bob {
+      from { translate: 0 0; }
+      to   { translate: 0 -16px; }
+    }
+    @keyframes tilt-rotate {
+      from { rotate: -8deg; }
+      to   { rotate: 8deg; }
+    }
+
+    /* ─── 6. 윙크 (자동 루프) ─────────────────────── */
+    /*
+     * brow 만 짧게 scaleY 압축 → 한쪽 눈을 감았다 뜨는 느낌.
+     * mouth 도 동시에 살짝 더 웃으며 표정에 입체감.
+     * 한 사이클 = 7s, 활성 구간은 마지막 ~0.5s.
+     */
+    .variant-wink .brow {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+      animation: wink-blink 7s var(--ease-soft) infinite;
+    }
+    @keyframes wink-blink {
+      0%, 88%, 100% { transform: scaleY(1); }
+      92%, 96%      { transform: scaleY(0.12); }
+    }
+
+    .variant-wink .mouth {
+      d: path("M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65");
+      animation: wink-smile 7s var(--ease-soft) infinite;
+    }
+    @keyframes wink-smile {
+      0%, 86%, 100% {
+        d: path("M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65");
+      }
+      92%, 96% {
+        d: path("M10.5 55.6 C 10.5 55.6 24.06 63 36.3 47.2");
+      }
+    }
+
+    /* ─── 7. 지글거림 (squigglevision) ────────────── */
+    /*
+     * SVG <filter> + SMIL <animate seed> 로 잉크가 떨리는 듯한 잔진동.
+     * stroke 자체가 변형되므로 별도 CSS 키프레임 불필요.
+     * filter 정의는 section 07 의 SVG 내부 <defs> 에 인라인.
+     */
+    .variant-squiggle svg { overflow: visible; }
+
+    /* ─── 모션 줄이기 환경 대응 ──────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .home-btn,
+      .variant-morph .mouth,
+      .variant-brow .mouth,
+      .variant-brow .brow,
+      .variant-look .brow,
+      .variant-look .mouth {
+        transition: none !important;
+        transform: none !important;
+      }
+      .variant-pencil .body,
+      .variant-pencil .brow,
+      .variant-pencil .mouth,
+      .variant-tilt,
+      .variant-wink .brow,
+      .variant-wink .mouth,
+      .variant-draw-single .stroke-path,
+      .variant-heart .p1,
+      .variant-heart .p2,
+      .variant-heart .p3,
+      .variant-heart .p4,
+      .variant-heart .p5,
+      .variant-heart .p6 {
+        animation: none !important;
+        stroke-dasharray: none !important;
+      }
+      .variant-tilt { translate: 0 0 !important; rotate: 0 !important; }
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Home Button — 모션 변형 비교</h1>
+    <p>01 / 03 호버 · 04 마우스 추적 · 02 / 05 / 06 / 07 / 08 / 09 자동 루프 · 버튼 128×128 / stroke 2.5.</p>
+  </header>
+
+  <main>
+
+    <!-- ───────── 01 · 입꼬리 morph ───────── -->
+    <section class="stage">
+      <span class="stage-number">01</span>
+      <button class="home-btn variant-morph" aria-label="홈 (morph)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="body"
+            d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+          />
+          <path
+            class="mouth"
+            d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+          />
+          <path
+            class="brow"
+            d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>입꼬리 morph</b><br/>호버 시 입꼬리만 살짝</span>
+    </section>
+
+    <!-- ───────── 02 · 펜슬 드로잉 ───────── -->
+    <section class="stage">
+      <span class="stage-number">02</span>
+      <button class="home-btn variant-pencil" aria-label="홈 (pencil)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="body"
+            pathLength="100"
+            d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+          />
+          <path
+            class="mouth"
+            pathLength="100"
+            d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+          />
+          <path
+            class="brow"
+            pathLength="100"
+            d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>펜슬 드로잉</b><br/>자동 루프 · 6s 사이클</span>
+    </section>
+
+    <!-- ───────── 03 · 눈썹 + 입꼬리 ───────── -->
+    <section class="stage">
+      <span class="stage-number">03</span>
+      <button class="home-btn variant-brow" aria-label="홈 (brow + smile)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="body"
+            d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+          />
+          <path
+            class="mouth"
+            d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+          />
+          <path
+            class="brow"
+            d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>눈썹 + 입꼬리</b><br/>호버 시 미세 조합</span>
+    </section>
+
+    <!-- ───────── 04 · 시선 추적 ───────── -->
+    <section class="stage">
+      <span class="stage-number">04</span>
+      <button class="home-btn variant-look" aria-label="홈 (look)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="body"
+            d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+          />
+          <path
+            class="mouth"
+            d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+          />
+          <path
+            class="brow"
+            d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>시선 추적</b><br/>커서 따라 미세 이동</span>
+    </section>
+
+    <!-- ───────── 05 · 틸트 + 플로팅 ───────── -->
+    <section class="stage">
+      <span class="stage-number">05</span>
+      <button class="home-btn variant-tilt" aria-label="홈 (tilt + float)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="body"
+            d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+          />
+          <path
+            class="mouth"
+            d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+          />
+          <path
+            class="brow"
+            d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>틸트 + 플로팅</b><br/>둥둥 + 좌우 갸웃</span>
+    </section>
+
+    <!-- ───────── 06 · 윙크 ───────── -->
+    <section class="stage">
+      <span class="stage-number">06</span>
+      <button class="home-btn variant-wink" aria-label="홈 (wink)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="body"
+            d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+          />
+          <path
+            class="mouth"
+            d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+          />
+          <path
+            class="brow"
+            d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>윙크</b><br/>7s 자동 깜빡임</span>
+    </section>
+
+    <!-- ───────── 07 · 지글거림 (squigglevision) ───────── -->
+    <section class="stage">
+      <span class="stage-number">07</span>
+      <button class="home-btn variant-squiggle" aria-label="홈 (squiggle)">
+        <svg viewBox="0 -2 39 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="squiggle-filter" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="noise">
+                <animate
+                  attributeName="seed"
+                  values="1;4;7;2;5;8"
+                  dur="0.5s"
+                  calcMode="discrete"
+                  repeatCount="indefinite" />
+              </feTurbulence>
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" />
+            </filter>
+          </defs>
+          <g filter="url(#squiggle-filter)">
+            <path
+              class="body"
+              d="M31.18 1.25C31.18 1.25 -2.6 28.99 6.88 15.45C16.36 1.91 28.26 10.04 19.62 26.33C13.99 36.95 1.25 44.23 1.25 44.23C1.25 44.23 14.88 43.99 16.95 49.55"
+            />
+            <path
+              class="mouth"
+              d="M11.6201 56.95C11.6201 56.95 24.0601 65.25 35.3201 48.65"
+            />
+            <path
+              class="brow"
+              d="M26.1396 24.53C26.1396 24.53 31.8996 28.37 37.0996 20.69"
+            />
+          </g>
+        </svg>
+      </button>
+      <span class="caption"><b>지글거림</b><br/>손글씨 떨림 잉크</span>
+    </section>
+
+    <!-- ───────── 08 · 인피니티 드로잉 (Figma 27158:31167) ───────── -->
+    <section class="stage">
+      <span class="stage-number">08</span>
+      <button class="home-btn variant-draw-single variant-infinity" aria-label="홈 (infinity drawing)">
+        <svg viewBox="0 0 45 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="stroke-path"
+            pathLength="100"
+            d="M40.5263 34.4977C26.3535 36.8422 12.05 31.522 3.59816 20.39C-2.90328 11.3111 5.04317 2.93863 15.8497 9.25795C27.7981 16.245 23.4641 25.9211 18.9562 22.7832C12.2672 17.9123 28.1595 -6.47756 40.0787 3.71539C47.7795 11.0909 41.2198 29.9182 9.81085 36.529"
+          />
+        </svg>
+      </button>
+      <span class="caption"><b>인피니티</b><br/>한 획 자동 드로잉</span>
+    </section>
+
+    <!-- ───────── 09 · 하트+커브 드로잉 (Figma 27158:31169) ───────── -->
+    <section class="stage">
+      <span class="stage-number">09</span>
+      <button class="home-btn variant-heart" aria-label="홈 (heart drawing)">
+        <svg viewBox="0 0 45 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="p1" pathLength="100" d="M31.9678 12.0836C31.9678 12.0836 37.1995 14.3759 38.8408 15.3056C43.1729 17.7821 43.0625 12.9492 41.0582 11.8271" />
+          <path class="p2" pathLength="100" d="M38.3271 19.3451C42.32 21.6533 41.9728 16.8444 39.6607 15.7144" />
+          <path class="p3" pathLength="100" d="M38.4617 19.5853C38.4617 19.5853 32.1095 25.0834 19.6575 24.0495C-9.20762 21.6611 2.38421 1.67219 20.5887 1.26343C34.5557 0.950856 39.8978 6.18452 41.3419 7.45887C42.3204 8.32447 43.5592 9.72706 43.2357 11.0014C42.9595 12.0754 42.3519 12.9169 40.2214 11.2499C36.4495 8.30042 33.159 7.77145 33.159 7.77145" />
+          <path class="p4" pathLength="100" d="M12.5716 27.4077C12.5716 27.4077 7.33987 25.1155 5.69855 24.1857C1.36641 21.7092 1.47688 26.5421 3.48119 27.6642" />
+          <path class="p5" pathLength="100" d="M6.21174 20.1463C2.21892 17.8381 2.56612 22.6469 4.87817 23.777" />
+          <path class="p6" pathLength="100" d="M6.07749 19.9057C6.07749 19.9057 12.4297 14.4076 24.8816 15.4415C53.7547 17.8379 42.155 37.8268 23.9505 38.2356C9.98351 38.5481 4.64133 33.3145 3.19728 32.0401C2.21881 31.1745 0.979924 29.7719 1.30345 28.4976C1.57964 27.4236 2.18724 26.582 4.3178 28.2491C8.08968 31.1986 11.3802 31.7275 11.3802 31.7275" />
+        </svg>
+      </button>
+      <span class="caption"><b>하트 + 커브</b><br/>팝 등장 · 5초 유지</span>
+    </section>
+
+  </main>
+
+  <footer>
+    happytalk-enduser-homebutton · preview.html
+  </footer>
+
+  <script>
+    // 04 시선 추적 — 커서 위치에 따라 brow / mouth 를 SVG user units 로 ±2 이동
+    (function () {
+      const lookBtns = document.querySelectorAll('.variant-look');
+      if (!lookBtns.length) return;
+      let raf = 0, lastX = 0, lastY = 0;
+      function update() {
+        raf = 0;
+        lookBtns.forEach((btn) => {
+          const r = btn.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const dx = lastX - cx;
+          const dy = lastY - cy;
+          const dist = Math.hypot(dx, dy) || 1;
+          const reach = Math.min(5, dist / 45);
+          const tx = (dx / dist) * reach;
+          const ty = (dy / dist) * reach;
+          btn.style.setProperty('--look-x', tx.toFixed(2));
+          btn.style.setProperty('--look-y', ty.toFixed(2));
+        });
+      }
+      window.addEventListener('mousemove', (e) => {
+        lastX = e.clientX; lastY = e.clientY;
+        if (!raf) raf = requestAnimationFrame(update);
+      }, { passive: true });
+    })();
+  </script>
+</body>
+</html>
