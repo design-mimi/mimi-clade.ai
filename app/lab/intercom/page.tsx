@@ -78,6 +78,10 @@ export default function IntercomLab() {
 /* ─────────── Support widget (Intercom-skinned happytalk) ─────────── */
 
 function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void }) {
+  // V2 launcher "light" skin: white fill, 6% black border, soft 2-layer drop
+  // shadow, 20px radius. Icon ink swaps to dark; the Intercom mark inverts
+  // (off-black rect + Fin Orange disc) so it reads against the white
+  // surface. Hover/active scale follows Intercom's spec.
   return (
     <button
       type="button"
@@ -89,14 +93,17 @@ function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void
         bottom: 32,
         width: 60,
         height: 60,
-        borderRadius: 4,
-        background: OFF_BLACK,
-        color: "#fff",
-        border: "none",
+        borderRadius: 20,
+        background: "#ffffff",
+        color: OFF_BLACK,
+        border: "1px solid rgba(0,0,0,0.06)",
+        boxShadow:
+          "0 1px 3px 0 rgba(0,0,0,0.04), 0 4px 12px 0 rgba(0,0,0,0.08)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
         zIndex: 100,
         transition: "transform 200ms cubic-bezier(0.22,1,0.36,1)",
       }}
@@ -107,12 +114,12 @@ function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void
     >
       {open ? (
         <svg width={20} height={20} viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M5 5l14 14M19 5L5 19" stroke="#fff" strokeWidth={2} strokeLinecap="round" />
+          <path d="M5 5l14 14M19 5L5 19" stroke={OFF_BLACK} strokeWidth={2} strokeLinecap="round" />
         </svg>
       ) : (
         <svg width={26} height={26} viewBox="0 0 28 28" fill="none" aria-hidden>
-          <rect x="3" y="3" width="22" height="22" rx="3" fill={FIN} />
-          <circle cx="14" cy="14" r="4" fill="#fff" />
+          <rect x="3" y="3" width="22" height="22" rx="3" fill={OFF_BLACK} />
+          <circle cx="14" cy="14" r="4" fill={FIN} />
         </svg>
       )}
     </button>

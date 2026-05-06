@@ -48,6 +48,10 @@ export default function AppleLab() {
 /* ─────────── Support widget (Apple-skinned happytalk) ─────────── */
 
 function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void }) {
+  // V2 launcher "brand-blue" skin: #2563eb fill, 8% white border, 4px drop
+  // shadow, 20px radius, with mix-blend gradient ::after for depth
+  // (rendered here as an absolutely-positioned span since inline JSX has
+  // no pseudo elements). Icon ink stays white per V2 spec.
   return (
     <button
       type="button"
@@ -59,33 +63,48 @@ function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void
         bottom: 32,
         width: 60,
         height: 60,
-        borderRadius: 16,
-        background: APPLE_BLUE,
+        borderRadius: 20,
+        background: "#2563eb",
         color: "#fff",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "rgba(0, 0, 0, 0.22) 3px 5px 30px 0px",
+        border: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "0 4px 4px 0 rgba(0, 0, 0, 0.15)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
         zIndex: 100,
         transition: "transform 200ms cubic-bezier(0.22,1,0.36,1)",
       }}
     >
-      {open ? (
-        <svg width={22} height={22} viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M5 5l14 14M19 5L5 19" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" />
-        </svg>
-      ) : (
-        <svg width={24} height={24} viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M20 12c0 4.4-3.6 8-8 8a8 8 0 01-7-4l-1 4 4-1c1.2.8 2.5 1 4 1 4.4 0 8-3.6 8-8z"
-            stroke="#fff"
-            strokeWidth={2}
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "inherit",
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(64,64,64,0.12) 100%)",
+          mixBlendMode: "multiply",
+          pointerEvents: "none",
+        }}
+      />
+      <span style={{ position: "relative", display: "inline-flex", zIndex: 1 }}>
+        {open ? (
+          <svg width={22} height={22} viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M5 5l14 14M19 5L5 19" stroke="#fff" strokeWidth={2.2} strokeLinecap="round" />
+          </svg>
+        ) : (
+          <svg width={24} height={24} viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M20 12c0 4.4-3.6 8-8 8a8 8 0 01-7-4l-1 4 4-1c1.2.8 2.5 1 4 1 4.4 0 8-3.6 8-8z"
+              stroke="#fff"
+              strokeWidth={2}
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </span>
     </button>
   );
 }
