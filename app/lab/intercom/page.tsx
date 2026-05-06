@@ -175,7 +175,7 @@ function PanelBody() {
             margin: "0 0 16px",
           }}
         >
-          킨더살몬
+          브랜드명
         </h2>
         <p
           style={{
@@ -187,7 +187,7 @@ function PanelBody() {
             margin: "0 0 20px",
           }}
         >
-          차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
+          여기에 브랜드 한 줄 소개가 들어갑니다.
         </p>
         <PanelStatusRow />
       </div>
