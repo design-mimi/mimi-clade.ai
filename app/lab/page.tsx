@@ -87,7 +87,7 @@ export default function LabIndex() {
               margin: 0,
             }}
           >
-            세 가지 디자인 언어, 같은 캔버스.
+            다섯 가지 디자인 언어, 같은 캔버스.
           </h1>
           <p
             style={{
@@ -98,7 +98,7 @@ export default function LabIndex() {
               maxWidth: 600,
             }}
           >
-            각 카드는 해당 brand의 시각 시스템을 적용한 데모 화면으로 이동합니다. V1·V2와는 별도의 트랙입니다.
+            각 카드는 해당 brand의 시각 시스템을 적용한 데모 화면으로 이동합니다. 동일한 위젯(런처 + 홈 패널)을 5개 디자인 언어로 리스킨한 비교 트랙으로, V1·V2와는 별도로 관리됩니다.
           </p>
         </header>
 
