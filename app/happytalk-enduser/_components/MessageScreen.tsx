@@ -120,7 +120,7 @@ function InquireButton({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="ht-pressable pointer-events-auto inline-flex items-center justify-center gap-[4px] rounded-[16px] px-[24px] py-[12px] border text-white"
+      className="ht-cta-button pointer-events-auto inline-flex items-center justify-center gap-[4px] rounded-[16px] px-[24px] py-[12px] border text-white"
       style={{
         background: "var(--ht-bg-inverted)",
         borderColor: "rgba(255, 255, 255, 0.2)",
@@ -133,7 +133,7 @@ function InquireButton({ onClick }: { onClick?: () => void }) {
       >
         문의하기
       </span>
-      <SendIcon width={16} height={16} />
+      <SendIcon className="ht-cta-icon" width={16} height={16} />
     </button>
   );
 }
