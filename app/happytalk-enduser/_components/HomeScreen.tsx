@@ -285,7 +285,7 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           {/* QnA area */}
           <div className="flex flex-col gap-[20px] px-[20px] pb-[12px]">
             <SectionGroup title="공지">
-              <NoticeCard text="2026 추석 명절 배송 일정 안내드립니다." />
+              <NoticeCard text="2026 추석 명절 배송 일정을 안내해 드릴게요." />
             </SectionGroup>
             <FaqSection />
           </div>
@@ -312,7 +312,7 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
           "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
       }}
     >
-      문의하기
+      상담 시작하기
     </button>
   );
 }
@@ -333,7 +333,7 @@ function StatusRow() {
           className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
           style={{ color: "var(--ht-text-subtle)" }}
         >
-          9-18시 운영 중
+          9-18시 운영 중이에요
           <ChevronDownIcon
             width={16}
             height={16}
@@ -374,9 +374,9 @@ function StatusRow() {
           className="px-[8px] flex flex-col gap-[2px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
           style={{ color: "var(--ht-text-subtle)" }}
         >
-          <span>평일 9-18시 운영</span>
-          <span>토요일 10-17시 운영</span>
-          <span>일요일 10-17시 운영</span>
+          <span>평일 9-18시에 운영해요</span>
+          <span>토요일 10-17시에 운영해요</span>
+          <span>일요일 10-17시에 운영해요</span>
         </div>
       )}
     </div>
@@ -396,7 +396,7 @@ function ChannelRow() {
         className="text-[14px] leading-5 tracking-[-0.25px]"
         style={{ color: "#4E4E55" }}
       >
-        다른 문의하기
+        다른 채널로 문의하기
       </span>
       <div className="flex items-center gap-[6px]">
         <button
@@ -462,7 +462,7 @@ function SearchInput({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search"
+        placeholder="궁금한 내용을 검색해 보세요"
         aria-label="자주 묻는 질문 검색"
         className="flex-1 min-w-0 bg-transparent outline-none border-none px-[4px] text-[14px] leading-5 tracking-[-0.25px] placeholder:text-[rgba(39,39,42,0.3)]"
         style={{ color: "var(--ht-text-default)" }}
@@ -489,7 +489,7 @@ function FaqCard({
           style={{ color: "#6F6F77" }}
         >
           {hasQuery
-            ? "검색 결과가 없습니다."
+            ? "검색 결과가 없어요."
             : "질문이 아직 없어요."}
         </p>
       ) : (

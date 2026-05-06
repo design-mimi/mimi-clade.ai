@@ -345,7 +345,8 @@ export function EnduserFrame({
       {/* End-chat confirmation modal */}
       {endChatConfirm && (
         <ConfirmModal
-          title="상담을 종료하시겠습니까?"
+          title="상담을 종료할까요?"
+          confirmLabel="상담 종료하기"
           onCancel={() => setEndChatConfirm(false)}
           onConfirm={() => {
             setEndChatConfirm(false);
@@ -357,7 +358,8 @@ export function EnduserFrame({
       {/* Delete-all-conversations confirmation modal */}
       {deleteAllConfirm && (
         <ConfirmModal
-          title="전체 메시지를 삭제하시겠습니까?"
+          title="전체 메시지를 삭제할까요?"
+          confirmLabel="전체 삭제하기"
           onCancel={() => setDeleteAllConfirm(false)}
           onConfirm={() => {
             setConversations([]);

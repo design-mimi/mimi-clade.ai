@@ -31,7 +31,7 @@ type Props = {
 // Flat-text fallback for non-string agent bodies (e.g. shipping body uses JSX
 // with bullet list).
 const SHIPPING_PREVIEW =
-  "고객님. 배송비 정책을 안내드립니다. 50,000원 미만 주문 배송비 3,000원 / 50,000원 이상 무료배송";
+  "배송비 정책을 안내해 드릴게요. 50,000원 미만 주문은 배송비 3,000원, 50,000원 이상이면 무료배송이에요.";
 
 function previewOfBody(body: ReactNode): string {
   return typeof body === "string" ? body : SHIPPING_PREVIEW;
@@ -53,24 +53,26 @@ export type UserItem = {
 
 export type TranscriptItem = AgentItem | UserItem;
 
+// Intro chips follow UX_writing.md §11.1 — user-language phrasing
+// (사용자가 실제로 말하는 표현) instead of internal category nouns.
 const INTRO_CHIPS = [
-  "상품 문의",
-  "주문 취소/변경 문의",
-  "포인트 적립",
-  "배송 문의",
-  "기타 문의",
+  "상품이 궁금해요",
+  "주문을 취소하고 싶어요",
+  "포인트가 궁금해요",
+  "배송이 궁금해요",
+  "다른 문의가 있어요",
 ];
 
-const SHIPPING_CHIPS = ["배송 정책 자세히 보기", "예상 도착일"];
+const SHIPPING_CHIPS = ["배송 정책 자세히 보기", "도착 예정일 확인"];
 
 const FADE_MS = 200;
 
 const SHIPPING_BODY: ReactNode = (
   <>
-    고객님. 배송비 정책을 안내드립니다.
+    배송비 정책을 안내해 드릴게요.
     <ul className="list-disc ps-[21px] mt-[2px]">
-      <li>50,000원 미만 주문 배송비 : 3,000원</li>
-      <li>50,000원 이상 주문 배송비 : 무료배송</li>
+      <li>50,000원 미만 주문 배송비: 3,000원</li>
+      <li>50,000원 이상 주문 배송비: 무료배송</li>
     </ul>
   </>
 );
@@ -79,45 +81,45 @@ const SHIPPING_BODY: ReactNode = (
 // Unrecognized labels fall through to a generic ack response.
 const RESPONSES: Record<string, { body: ReactNode; chips?: string[] }> = {
   // ── INTRO chips (5) ──
-  "상품 문의": {
-    body: "어떤 점이 궁금하신가요? 자주 찾는 항목을 모아두었어요.",
+  "상품이 궁금해요": {
+    body: "어떤 점이 궁금하신가요? 자주 찾는 항목을 모아 두었어요.",
     chips: ["사이즈 가이드", "이번 주 신상", "재입고 알림"],
   },
-  "주문 취소/변경 문의": {
-    body: "주문 후 1시간 이내에는 마이페이지에서 직접 취소가 가능해요. 그 이후 변경·취소는 상담사가 도와드려요.",
-    chips: ["주문 내역 보기", "상담사 연결"],
+  "주문을 취소하고 싶어요": {
+    body: "주문 후 1시간 이내에는 마이페이지에서 바로 취소할 수 있어요. 그 이후에는 상담사가 도와드려요.",
+    chips: ["주문 내역 보기", "상담사에게 연결하기"],
   },
-  "포인트 적립": {
-    body: "구매 금액의 1%가 자동 적립되며, 멤버 등급에 따라 추가 적립이 진행돼요. 이벤트 응모 시 보너스 포인트도 받으실 수 있어요.",
+  "포인트가 궁금해요": {
+    body: "구매 금액의 1%가 자동 적립돼요. 멤버 등급에 따라 추가 적립이 가능하고, 이벤트 응모 시 보너스 포인트도 받을 수 있어요.",
     chips: ["내 포인트 확인", "등급 혜택 보기"],
   },
-  "배송 문의": {
+  "배송이 궁금해요": {
     body: SHIPPING_BODY,
     chips: SHIPPING_CHIPS,
   },
-  "기타 문의": {
-    body: "어떤 도움이 필요하신지 자유롭게 적어주세요. 운영 시간 내 상담사가 빠르게 답변드려요.",
-    chips: ["상담사 연결", "공지사항 보기"],
+  "다른 문의가 있어요": {
+    body: "어떤 도움이 필요한지 편하게 남겨 주세요. 운영 시간 내 상담사가 빠르게 답변드릴게요.",
+    chips: ["상담사에게 연결하기", "공지사항 보기"],
   },
 
   // ── Sub-chips ──
   "사이즈 가이드": {
-    body: "킨더살몬은 자체 핏 차트로 운영돼요. 상의 S~XL, 하의 24~30 사이즈가 있어요. 자세한 측정 가이드를 보내드릴까요?",
+    body: "킨더살몬은 자체 핏 차트로 운영돼요. 상의 S~XL, 하의 24~30 사이즈가 있어요. 자세한 측정 가이드를 보내 드릴까요?",
   },
   "이번 주 신상": {
-    body: "이번 주 신상은 살몬 컬러 프린지 블라우스와 린넨 와이드 팬츠예요. 카탈로그 링크를 보내드릴게요.",
+    body: "이번 주 신상은 살몬 컬러 프린지 블라우스와 린넨 와이드 팬츠예요. 카탈로그 링크를 보내 드릴게요.",
   },
   "재입고 알림": {
-    body: "관심 상품을 마이페이지에서 등록해 두시면 재입고 즉시 알려드려요. 알림 페이지로 이동해 드릴까요?",
+    body: "관심 상품을 마이페이지에서 등록해 두면 재입고 즉시 알려 드려요. 알림 페이지로 이동할까요?",
   },
   "주문 내역 보기": {
-    body: "마이페이지 > 주문 내역에서 확인하실 수 있어요. 최근 1년 내 주문이 표시돼요.",
+    body: "마이페이지 > 주문 내역에서 확인할 수 있어요. 최근 1년 내 주문이 표시돼요.",
   },
-  "상담사 연결": {
-    body: "상담사 연결 요청이 접수되었어요. 평일 운영 시간 내 빠르게 회신드릴게요 🌸",
+  "상담사에게 연결하기": {
+    body: "상담사 연결 요청이 접수됐어요. 평일 운영 시간 내 빠르게 답변드릴게요 🌸",
   },
   "내 포인트 확인": {
-    body: "마이페이지 > 멤버십에서 적립 내역과 사용 가능한 포인트를 확인하실 수 있어요.",
+    body: "마이페이지 > 멤버십에서 적립 내역과 사용 가능한 포인트를 확인할 수 있어요.",
   },
   "등급 혜택 보기": {
     body: "킨더 멤버십은 살몬 / 로즈 / 블룸 3단계로 운영돼요. 등급에 따라 적립률과 무료배송 기준이 달라져요.",
@@ -125,41 +127,41 @@ const RESPONSES: Record<string, { body: ReactNode; chips?: string[] }> = {
   "배송 정책 자세히 보기": {
     body: "평일 오전 11시 이전 결제 건은 당일 출고돼요. 자세한 정책 페이지를 안내해 드릴까요?",
   },
-  "예상 도착일": {
-    body: "지역에 따라 결제 후 1~3일 이내 도착해요. 도서산간 지역은 +1일이 추가될 수 있어요.",
+  "도착 예정일 확인": {
+    body: "지역에 따라 결제 후 1~3일 이내에 도착해요. 도서산간 지역은 하루 더 걸릴 수 있어요.",
   },
   "공지사항 보기": {
-    body: "킨더살몬 공식 공지 페이지를 안내해 드릴게요. 시즌 이벤트와 입고 일정을 확인하실 수 있어요.",
+    body: "킨더살몬 공식 공지 페이지를 안내해 드릴게요. 시즌 이벤트와 입고 일정을 확인할 수 있어요.",
   },
 
   // ── Card CTA labels ──
   "26 S/S 신상 보러가기": {
-    body: "이번 시즌은 살몬 톤을 메인으로 한 린넨·면 혼방 라인이 중심이에요. 카탈로그 링크를 보내드릴까요?",
+    body: "이번 시즌은 살몬 톤을 메인으로 한 린넨·면 혼방 라인이 중심이에요. 카탈로그 링크를 보내 드릴까요?",
     chips: ["카탈로그 받기", "베스트 보기"],
   },
   "킨더 뉴스레터 구독": {
-    body: "뉴스레터 구독이 완료됐어요! 매주 화요일 살몬 픽이 도착할 거예요 🌸",
+    body: "뉴스레터 구독이 완료됐어요. 매주 화요일에 살몬 픽이 도착할 거예요 🌸",
   },
   "15% 할인쿠폰 받기": {
-    body: "15% 쿠폰이 적립되었어요. 마이페이지 > 쿠폰함에서 확인하실 수 있어요.",
+    body: "15% 쿠폰이 적립됐어요. 마이페이지 > 쿠폰함에서 확인할 수 있어요.",
   },
   "사이즈 가이드 보기": {
-    body: "킨더살몬 핏 가이드 페이지를 안내해 드릴게요. 모델 착용 사이즈와 측정 팁이 정리되어 있어요.",
+    body: "킨더살몬 핏 가이드 페이지를 안내해 드릴게요. 모델 착용 사이즈와 측정 팁이 정리돼 있어요.",
   },
   "배송 정책 보기": {
-    body: "배송 정책을 안내드려요. 50,000원 이상 무료배송, 미만은 3,000원이에요.",
+    body: "배송 정책을 안내해 드릴게요. 50,000원 이상이면 무료배송, 미만이면 3,000원이에요.",
   },
   "도착 예정 안내": {
-    body: "결제 후 1~3일 이내 도착이에요. 송장은 출고 즉시 문자로 안내드려요.",
+    body: "결제 후 1~3일 이내에 도착해요. 송장은 출고 즉시 문자로 안내해 드릴게요.",
   },
   "주문 내역 확인": {
-    body: "마이페이지 > 주문 내역에서 확인하실 수 있어요. 최근 1년 내 주문이 표시돼요.",
+    body: "마이페이지 > 주문 내역에서 확인할 수 있어요. 최근 1년 내 주문이 표시돼요.",
   },
   "교환/반품 안내": {
-    body: "수령 후 7일 이내 교환·반품 가능해요. 단순 변심의 경우 왕복 배송비가 발생할 수 있어요.",
+    body: "수령 후 7일 이내 교환·반품할 수 있어요. 단순 변심일 때는 왕복 배송비가 발생할 수 있어요.",
   },
   "카탈로그 받기": {
-    body: "이메일로 카탈로그 PDF를 보내드릴게요. 주문하신 이메일로 5분 내 도착 예정이에요.",
+    body: "이메일로 카탈로그 PDF를 보내 드릴게요. 주문하신 이메일로 5분 안에 도착할 거예요.",
   },
   "베스트 보기": {
     body: "이번 주 베스트는 살몬 프린지 블라우스, 린넨 와이드 팬츠, 부클레 카디건이에요.",
@@ -169,7 +171,7 @@ const RESPONSES: Record<string, { body: ReactNode; chips?: string[] }> = {
 function getResponse(label: string): { body: ReactNode; chips?: string[] } {
   return (
     RESPONSES[label] ?? {
-      body: "확인해 드릴게요. 잠시만 기다려 주세요.",
+      body: "요청을 확인하고 있어요. 잠시만 기다려 주세요.",
     }
   );
 }
@@ -378,7 +380,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label="뒤로"
+      aria-label="뒤로 가기"
       className="ht-pressable ht-blur-backdrop absolute top-[9px] left-[9px] z-20 flex items-center justify-center w-[44px] h-[44px] rounded-[32px] border"
       style={{
         background: "rgba(255, 255, 255, 0.92)",
@@ -546,7 +548,7 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="메시지를 입력해주세요."
+        placeholder="문의 내용을 입력해 주세요"
         className="resize-none outline-none w-full text-[14px] leading-5 tracking-[-0.25px] bg-transparent placeholder:text-[var(--ht-text-muted)]"
         style={{
           color: "var(--ht-text-default)",
@@ -567,7 +569,7 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
           type="button"
           onClick={handleSend}
           disabled={!canSend}
-          aria-label="전송"
+          aria-label="메시지 전송하기"
           className="ht-pressable w-[32px] h-[32px] rounded-full flex items-center justify-center"
           style={{
             background: canSend ? "var(--ht-bg-inverted)" : "rgba(39, 39, 42, 0.25)",

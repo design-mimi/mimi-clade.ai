@@ -50,12 +50,12 @@ export type CardCarousel = {
 export type ChatCardData = CardImg01 | CardImg02 | CardImgWide | CardCarousel;
 
 const BRAND_BODY =
-  "안녕하세요, 살몬빛으로 봄을 짓는 킨더살몬입니다 🌸\n고객센터 운영 시간 : 평일 오전 09시~ 6시 (점심시간 12시~1시, 공휴일 휴무)";
+  "안녕하세요, 살몬빛으로 봄을 짓는 킨더살몬이에요 🌸\n고객센터 운영 시간은 평일 오전 9시~6시예요. (점심 12시~1시, 공휴일은 쉬어요.)";
 
 // Intro greeting agent message — shared between ChatScreen rendering and
 // EnduserFrame's "새 상담방 생성 즉시 리스트에 추가" preview default.
 export const INTRO_BODY =
-  "안녕하세요, 킨더살몬입니다 🌸 무엇을 도와드릴까요? 운영 시간은 평일 오전 09시~ 6시 (점심시간 12시~1시, 공휴일 휴무)입니다.";
+  "안녕하세요, 킨더살몬 챗봇이에요 🌸 무엇을 도와드릴까요? 운영 시간은 평일 오전 9시~6시예요. (점심 12시~1시, 공휴일은 쉬어요.)";
 
 const COUPON: CouponRow = { title: "킨더 멤버 환영 쿠폰", desc: "15% 할인쿠폰 받기" };
 

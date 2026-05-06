@@ -102,7 +102,7 @@ function TextSizeRow({
         className="text-[14px] leading-5 font-medium tracking-[-0.25px]"
         style={{ color: "var(--ht-text-default)" }}
       >
-        텍스트 크기
+        글자 크기
       </span>
       <SegmentedControl
         value={value}
@@ -208,12 +208,12 @@ function ProfileView({ onBack }: { onBack: () => void }) {
           <div className="flex justify-end gap-[8px] w-full">
             {saved ? (
               <>
-                <ProfileActionButton label="수정" onClick={handleEdit} />
-                <ProfileActionButton label="정보 삭제" onClick={handleDelete} />
+                <ProfileActionButton label="정보 수정하기" onClick={handleEdit} />
+                <ProfileActionButton label="정보 삭제하기" onClick={handleDelete} />
               </>
             ) : (
               <ProfileActionButton
-                label="저장"
+                label="저장하기"
                 onClick={handleSave}
                 disabled={!canSave}
               />
