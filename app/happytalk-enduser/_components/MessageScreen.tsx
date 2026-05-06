@@ -131,7 +131,7 @@ function InquireButton({ onClick }: { onClick?: () => void }) {
         className="font-semibold tracking-[-0.25px]"
         style={{ fontSize: 16, lineHeight: "24px" }}
       >
-        상담 시작하기
+        문의하기
       </span>
       <SendIcon width={16} height={16} />
     </button>

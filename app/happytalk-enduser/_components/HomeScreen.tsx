@@ -312,7 +312,7 @@ function PrimaryCTA({ onClick }: { onClick?: () => void }) {
           "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
       }}
     >
-      상담 시작하기
+      문의하기
     </button>
   );
 }
