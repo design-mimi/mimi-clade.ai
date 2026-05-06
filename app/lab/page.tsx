@@ -2,10 +2,11 @@
 
 /* /lab — design-system experiment hub.
    Each route applies a different design vocabulary (Apple / Airbnb /
-   Intercom) sourced from the corresponding md spec under
-   `happytalk-enduser/*.md`. These pages are intentionally independent of
-   the V2 (`/happytalk-enduser`) and V1 (`v1-archive` branch) code paths
-   — no shared components, no shared tokens. Local-only experiments. */
+   Intercom / Notion / Stripe) sourced from the corresponding md spec
+   under `happytalk-enduser/` (or `design-md-library/`). These pages are
+   intentionally independent of the V2 (`/happytalk-enduser`) and V1
+   (`v1-archive` branch) code paths — no shared components, no shared
+   tokens. Local-only experiments. */
 
 import Link from "next/link";
 
@@ -33,6 +34,22 @@ const ENTRIES = [
     bg: "#faf9f6",
     fg: "#111111",
     accent: "#ff5600",
+  },
+  {
+    href: "/lab/notion",
+    name: "Notion",
+    tagline: "Tinted neutral · Notion Sans · pastel feature cards · purple primary",
+    bg: "#fafaf9",
+    fg: "#1a1a1a",
+    accent: "#5645d4",
+  },
+  {
+    href: "/lab/stripe",
+    name: "Stripe",
+    tagline: "Sohne weight 300 · ss01 ligatures · blue-tinted shadows · 4px sharp",
+    bg: "#ffffff",
+    fg: "#061b31",
+    accent: "#533afd",
   },
 ];
 
