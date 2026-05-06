@@ -30,8 +30,17 @@ const NAV_LINKS = [
   "Support",
 ];
 
+type PanelVariant = "default" | "compact" | "gradient" | "image";
+const PANEL_VARIANTS: { id: PanelVariant; label: string }[] = [
+  { id: "default", label: "기본형" },
+  { id: "compact", label: "간단형" },
+  { id: "gradient", label: "그라디언트형" },
+  { id: "image", label: "이미지형" },
+];
+
 export default function AppleLab() {
   const [panelOpen, setPanelOpen] = useState(true);
+  const [variant, setVariant] = useState<PanelVariant>("default");
   return (
     <div style={{ background: "#000", color: "#fff", fontFamily: FONT_TEXT }}>
       <GlassNav />
@@ -39,9 +48,81 @@ export default function AppleLab() {
       <HeroLight />
       <ProductGrid />
       <FooterStrip />
-      {panelOpen && <SupportPanel />}
+      {panelOpen && <SupportPanel variant={variant} />}
       <SupportLauncher open={panelOpen} onClick={() => setPanelOpen((o) => !o)} />
+      {panelOpen && <VariantSelector value={variant} onChange={setVariant} />}
     </div>
+  );
+}
+
+/* Apple-skinned variant selector — `#fafafc` filter-button surface, 11px
+   radius, SF Pro Text, active option is a 980px pill in `#1d1d1f` (the
+   inverse of Apple's primary blue CTA so it doesn't compete with the
+   launcher). */
+function VariantSelector({
+  value,
+  onChange,
+}: {
+  value: PanelVariant;
+  onChange: (v: PanelVariant) => void;
+}) {
+  return (
+    <aside
+      style={{
+        position: "fixed",
+        left: 24,
+        bottom: 24,
+        zIndex: 95,
+        width: 200,
+        padding: "14px 12px",
+        background: "#fafafc",
+        border: "3px solid rgba(0,0,0,0.04)",
+        borderRadius: 11,
+        boxShadow: "rgba(0, 0, 0, 0.22) 3px 5px 30px 0px",
+        fontFamily: FONT_TEXT,
+      }}
+    >
+      <p
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: "-0.12px",
+          color: "rgba(0,0,0,0.48)",
+          margin: "0 0 8px",
+          paddingLeft: 4,
+        }}
+      >
+        홈 배리언트
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {PANEL_VARIANTS.map((v) => {
+          const active = value === v.id;
+          return (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => onChange(v.id)}
+              style={{
+                fontFamily: FONT_TEXT,
+                fontSize: 14,
+                fontWeight: 400,
+                letterSpacing: "-0.224px",
+                padding: "9px 14px",
+                borderRadius: 980,
+                border: "none",
+                cursor: "pointer",
+                background: active ? NEAR_BLACK : "transparent",
+                color: active ? "#fff" : "rgba(0,0,0,0.8)",
+                textAlign: "left",
+                transition: "background 200ms ease-out, color 200ms ease-out",
+              }}
+            >
+              {v.label}
+            </button>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 
@@ -109,7 +190,7 @@ function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void
   );
 }
 
-function SupportPanel() {
+function SupportPanel({ variant }: { variant: PanelVariant }) {
   return (
     <div
       style={{
@@ -132,17 +213,54 @@ function SupportPanel() {
         fontFamily: FONT_TEXT,
       }}
     >
-      <PanelBody />
+      <PanelBody variant={variant} />
       <PanelNav />
     </div>
   );
 }
 
-function PanelBody() {
+/* Variant rendering — Apple's strict palette doesn't naturally support a
+   gradient or hero-image background, so each variant is interpreted
+   through the spec's existing vocabulary:
+   - default: standard light-gray section
+   - compact: identical chrome, description hidden
+   - gradient: brand area inverts to a near-black fill (Apple's "scene
+     change" via solid section color, not a literal gradient)
+   - image: a black hero band sits above the brand area, mirroring the
+     "product on solid color field" pattern from §4 of the spec. */
+function PanelBody({ variant }: { variant: PanelVariant }) {
+  const showHero = variant === "image";
+  const showDescription = variant !== "compact";
+  const inverted = variant === "gradient";
   return (
     <div style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
-      {/* Brand area */}
-      <div style={{ padding: "32px 24px 20px" }}>
+      {showHero && (
+        <div
+          style={{
+            height: 160,
+            background: "#000",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "rgba(255,255,255,0.35)",
+            fontFamily: FONT_DISPLAY,
+            fontSize: 12,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+          aria-hidden
+        >
+          product imagery
+        </div>
+      )}
+      {/* Brand area — inverts to dark for the "gradient" variant */}
+      <div
+        style={{
+          padding: "32px 24px 20px",
+          background: inverted ? "#000" : "transparent",
+          color: inverted ? "#fff" : NEAR_BLACK,
+        }}
+      >
         <h2
           style={{
             fontSize: 28,
@@ -151,22 +269,25 @@ function PanelBody() {
             lineHeight: 1.07,
             letterSpacing: "-0.196px",
             margin: "0 0 8px",
+            color: inverted ? "#fff" : NEAR_BLACK,
           }}
         >
           브랜드명
         </h2>
-        <p
-          style={{
-            fontSize: 14,
-            lineHeight: 1.43,
-            letterSpacing: "-0.224px",
-            color: "rgba(0,0,0,0.8)",
-            margin: "0 0 16px",
-          }}
-        >
-          여기에 브랜드 한 줄 소개가 들어갑니다.
-        </p>
-        <PanelStatusRow />
+        {showDescription && (
+          <p
+            style={{
+              fontSize: 14,
+              lineHeight: 1.43,
+              letterSpacing: "-0.224px",
+              color: inverted ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)",
+              margin: "0 0 16px",
+            }}
+          >
+            여기에 브랜드 한 줄 소개가 들어갑니다.
+          </p>
+        )}
+        <PanelStatusRow inverted={inverted} />
       </div>
 
       {/* CTA group */}
@@ -215,7 +336,7 @@ function PanelBody() {
   );
 }
 
-function PanelStatusRow() {
+function PanelStatusRow({ inverted = false }: { inverted?: boolean }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <span
@@ -223,7 +344,7 @@ function PanelStatusRow() {
           fontSize: 14,
           fontWeight: 600,
           letterSpacing: "-0.224px",
-          color: "rgba(0,0,0,0.8)",
+          color: inverted ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)",
         }}
       >
         9–18시 운영 중
@@ -235,17 +356,19 @@ function PanelStatusRow() {
           gap: 6,
           padding: "4px 10px",
           borderRadius: 980,
-          background: "#e8f5ec",
-          border: "1px solid rgba(0,0,0,0.04)",
+          background: inverted ? "rgba(255,255,255,0.12)" : "#e8f5ec",
+          border: inverted
+            ? "1px solid rgba(255,255,255,0.18)"
+            : "1px solid rgba(0,0,0,0.04)",
           fontSize: 12,
           fontWeight: 600,
           letterSpacing: "-0.12px",
-          color: "#1f8a3a",
+          color: inverted ? "rgba(255,255,255,0.92)" : "#1f8a3a",
         }}
       >
         <span
           aria-hidden
-          style={{ width: 6, height: 6, borderRadius: "50%", background: "#1f8a3a" }}
+          style={{ width: 6, height: 6, borderRadius: "50%", background: inverted ? "#34c759" : "#1f8a3a" }}
         />
         상담 원활 · 2명
       </span>

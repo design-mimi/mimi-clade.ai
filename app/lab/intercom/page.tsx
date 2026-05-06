@@ -52,8 +52,17 @@ const STATS = [
   { value: "120+", label: "Languages" },
 ];
 
+type PanelVariant = "default" | "compact" | "gradient" | "image";
+const PANEL_VARIANTS: { id: PanelVariant; label: string }[] = [
+  { id: "default", label: "기본형" },
+  { id: "compact", label: "간단형" },
+  { id: "gradient", label: "그라디언트형" },
+  { id: "image", label: "이미지형" },
+];
+
 export default function IntercomLab() {
   const [panelOpen, setPanelOpen] = useState(true);
+  const [variant, setVariant] = useState<PanelVariant>("default");
   return (
     <div
       style={{
@@ -69,9 +78,81 @@ export default function IntercomLab() {
       <FeatureRow />
       <CTA />
       <Footer />
-      {panelOpen && <SupportPanel />}
+      {panelOpen && <SupportPanel variant={variant} />}
       <SupportLauncher open={panelOpen} onClick={() => setPanelOpen((o) => !o)} />
+      {panelOpen && <VariantSelector value={variant} onChange={setVariant} />}
     </div>
+  );
+}
+
+/* Intercom-skinned variant selector — warm cream surface with the
+   spec's oat border and 8px radius. Title is a Mono uppercase eyebrow
+   per Intercom's editorial labeling. Active option is the spec's
+   off-black 4px sharp button. */
+function VariantSelector({
+  value,
+  onChange,
+}: {
+  value: PanelVariant;
+  onChange: (v: PanelVariant) => void;
+}) {
+  return (
+    <aside
+      style={{
+        position: "fixed",
+        left: 24,
+        bottom: 24,
+        zIndex: 95,
+        width: 200,
+        padding: "16px 14px",
+        background: CREAM,
+        border: `1px solid ${OAT}`,
+        borderRadius: 8,
+        fontFamily: FONT_SAANS,
+      }}
+    >
+      <p
+        style={{
+          fontSize: 11,
+          fontFamily: FONT_MONO,
+          fontWeight: 500,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: MUTED,
+          margin: "0 0 10px",
+          paddingLeft: 4,
+        }}
+      >
+        Home Variant
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {PANEL_VARIANTS.map((v) => {
+          const active = value === v.id;
+          return (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => onChange(v.id)}
+              style={{
+                fontFamily: FONT_SAANS,
+                fontSize: 14,
+                fontWeight: 400,
+                padding: "8px 12px",
+                borderRadius: 4,
+                border: "none",
+                cursor: "pointer",
+                background: active ? OFF_BLACK : "transparent",
+                color: active ? "#fff" : OFF_BLACK,
+                textAlign: "left",
+                transition: "background 200ms ease-out, color 200ms ease-out",
+              }}
+            >
+              {v.label}
+            </button>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 
@@ -126,7 +207,7 @@ function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void
   );
 }
 
-function SupportPanel() {
+function SupportPanel({ variant }: { variant: PanelVariant }) {
   return (
     <div
       style={{
@@ -149,17 +230,72 @@ function SupportPanel() {
         fontFamily: FONT_SAANS,
       }}
     >
-      <PanelBody />
+      <PanelBody variant={variant} />
       <PanelNav />
     </div>
   );
 }
 
-function PanelBody() {
+/* Variant rendering — Intercom's editorial restraint shapes each
+   variant:
+   - default: standard cream brand area
+   - compact: same chrome, description hidden
+   - gradient: cream → warm sand vertical gradient on the brand area
+   - image: a warm dark abstract block above the brand area, mirroring
+     Intercom's report-color tile language. */
+function PanelBody({ variant }: { variant: PanelVariant }) {
+  const showHero = variant === "image";
+  const showDescription = variant !== "compact";
+  const isGradient = variant === "gradient";
   return (
     <div style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+      {showHero && (
+        <div
+          style={{
+            height: 160,
+            background: OFF_BLACK,
+            borderBottom: `1px solid ${OAT}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+          }}
+          aria-hidden
+        >
+          <span
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 4,
+              background: FIN,
+            }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              top: 16,
+              left: 16,
+              fontSize: 11,
+              fontFamily: FONT_MONO,
+              fontWeight: 500,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.6)",
+            }}
+          >
+            Hero Image
+          </span>
+        </div>
+      )}
       {/* Brand area */}
-      <div style={{ padding: "32px 24px 20px" }}>
+      <div
+        style={{
+          padding: "32px 24px 20px",
+          background: isGradient
+            ? "linear-gradient(180deg, #d3cec6 0%, #faf9f6 80%)"
+            : "transparent",
+        }}
+      >
         <p
           style={{
             fontSize: 11,
@@ -184,18 +320,20 @@ function PanelBody() {
         >
           브랜드명
         </h2>
-        <p
-          style={{
-            fontSize: 14,
-            fontWeight: 300,
-            lineHeight: 1.4,
-            color: OFF_BLACK,
-            opacity: 0.75,
-            margin: "0 0 20px",
-          }}
-        >
-          여기에 브랜드 한 줄 소개가 들어갑니다.
-        </p>
+        {showDescription && (
+          <p
+            style={{
+              fontSize: 14,
+              fontWeight: 300,
+              lineHeight: 1.4,
+              color: OFF_BLACK,
+              opacity: 0.75,
+              margin: "0 0 20px",
+            }}
+          >
+            여기에 브랜드 한 줄 소개가 들어갑니다.
+          </p>
+        )}
         <PanelStatusRow />
       </div>
 

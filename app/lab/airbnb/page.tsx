@@ -44,17 +44,94 @@ const LISTINGS = [
 const SHADOW_CARD =
   "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px 0px, rgba(0,0,0,0.1) 0px 4px 8px 0px";
 
+type PanelVariant = "default" | "compact" | "gradient" | "image";
+const PANEL_VARIANTS: { id: PanelVariant; label: string }[] = [
+  { id: "default", label: "기본형" },
+  { id: "compact", label: "간단형" },
+  { id: "gradient", label: "그라디언트형" },
+  { id: "image", label: "이미지형" },
+];
+
 export default function AirbnbLab() {
   const [panelOpen, setPanelOpen] = useState(true);
+  const [variant, setVariant] = useState<PanelVariant>("default");
   return (
     <div style={{ background: "#fff", color: NEAR_BLACK, fontFamily: FONT, minHeight: "100vh" }}>
       <Header />
       <CategoryBar />
       <ListingGrid />
       <Footer />
-      {panelOpen && <SupportPanel />}
+      {panelOpen && <SupportPanel variant={variant} />}
       <SupportLauncher open={panelOpen} onClick={() => setPanelOpen((o) => !o)} />
+      {panelOpen && <VariantSelector value={variant} onChange={setVariant} />}
     </div>
+  );
+}
+
+/* Airbnb-skinned variant selector — white card with the three-layer
+   warm shadow and 20px radius. Active option is the spec's "Primary
+   Dark" pill (#222 fill, white text) with 8px radius. */
+function VariantSelector({
+  value,
+  onChange,
+}: {
+  value: PanelVariant;
+  onChange: (v: PanelVariant) => void;
+}) {
+  return (
+    <aside
+      style={{
+        position: "fixed",
+        left: 24,
+        bottom: 24,
+        zIndex: 95,
+        width: 200,
+        padding: "16px 14px",
+        background: "#fff",
+        borderRadius: 20,
+        boxShadow: SHADOW_CARD,
+        fontFamily: FONT,
+      }}
+    >
+      <p
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: SECONDARY,
+          margin: "0 0 8px",
+          paddingLeft: 4,
+        }}
+      >
+        홈 배리언트
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {PANEL_VARIANTS.map((v) => {
+          const active = value === v.id;
+          return (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => onChange(v.id)}
+              style={{
+                fontFamily: FONT,
+                fontSize: 14,
+                fontWeight: active ? 600 : 500,
+                padding: "10px 14px",
+                borderRadius: 8,
+                border: "none",
+                cursor: "pointer",
+                background: active ? NEAR_BLACK : "transparent",
+                color: active ? "#fff" : NEAR_BLACK,
+                textAlign: "left",
+                transition: "background 200ms ease-out, color 200ms ease-out",
+              }}
+            >
+              {v.label}
+            </button>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 
@@ -98,7 +175,7 @@ function SupportLauncher({ open, onClick }: { open: boolean; onClick: () => void
   );
 }
 
-function SupportPanel() {
+function SupportPanel({ variant }: { variant: PanelVariant }) {
   return (
     <div
       style={{
@@ -120,17 +197,51 @@ function SupportPanel() {
         fontFamily: FONT,
       }}
     >
-      <PanelBody />
+      <PanelBody variant={variant} />
       <PanelNav />
     </div>
   );
 }
 
-function PanelBody() {
+/* Variant rendering — Airbnb's photo-first identity drives variant
+   interpretation:
+   - default: standard white brand area
+   - compact: same chrome, description hidden
+   - gradient: warm sand vertical gradient on the brand area, echoing
+     Airbnb's listing-card photography moods
+   - image: full-bleed photo placeholder above the brand area, like a
+     listing card's hero. */
+function PanelBody({ variant }: { variant: PanelVariant }) {
+  const showHero = variant === "image";
+  const showDescription = variant !== "compact";
+  const isGradient = variant === "gradient";
   return (
     <div style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
-      {/* Brand area */}
-      <div style={{ padding: "32px 24px 20px" }}>
+      {showHero && (
+        <div
+          style={{
+            height: 180,
+            background:
+              "linear-gradient(135deg, #f3e6d3 0%, #e8d4b8 50%, #d6b88f 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 80,
+          }}
+          aria-hidden
+        >
+          🏝️
+        </div>
+      )}
+      {/* Brand area — gradient variant overlays a warm sand fill */}
+      <div
+        style={{
+          padding: "32px 24px 20px",
+          background: isGradient
+            ? "linear-gradient(180deg, #f3e6d3 0%, #ffffff 100%)"
+            : "transparent",
+        }}
+      >
         <h2
           style={{
             fontSize: 22,
@@ -143,17 +254,19 @@ function PanelBody() {
         >
           브랜드명
         </h2>
-        <p
-          style={{
-            fontSize: 14,
-            fontWeight: 400,
-            lineHeight: 1.43,
-            color: SECONDARY,
-            margin: "0 0 20px",
-          }}
-        >
-          여기에 브랜드 한 줄 소개가 들어갑니다.
-        </p>
+        {showDescription && (
+          <p
+            style={{
+              fontSize: 14,
+              fontWeight: 400,
+              lineHeight: 1.43,
+              color: SECONDARY,
+              margin: "0 0 20px",
+            }}
+          >
+            여기에 브랜드 한 줄 소개가 들어갑니다.
+          </p>
+        )}
         <PanelStatusRow />
       </div>
 
