@@ -5,15 +5,22 @@ import { useState } from "react";
 import { EnduserFrame, type ActiveScreen } from "./_components/EnduserFrame";
 import { VariantSelector } from "./_components/VariantSelector";
 import { LauncherVariantSelector } from "./_components/LauncherVariantSelector";
+import { AdminToggleSelector } from "./_components/AdminToggleSelector";
 import { Launcher } from "./_components/Launcher";
 import type {
+  HomeBoxType,
   HomeVariant,
   LauncherStyle,
   LauncherVariant,
+  ResponseStatus,
 } from "./_components/types";
 
 export default function HappytalkEnduserPage() {
-  const [variant, setVariant] = useState<HomeVariant>("default");
+  const [variant, setVariant] = useState<HomeVariant>("none");
+  // 어드민 토글 — 홈 카드 모듈 조합. 시안 (Figma 27314:1562 / 27343:1126) 기준.
+  const [boxType, setBoxType] = useState<HomeBoxType>("ai-agent");
+  const [showNotice, setShowNotice] = useState(false);
+  const [responseStatus, setResponseStatus] = useState<ResponseStatus>("ai");
   // Always start fresh on pencil — new visitors see the signature drawing
   // motion first. Selector still toggles within the session, but page reload
   // returns to pencil (no localStorage persistence).
@@ -60,8 +67,8 @@ export default function HappytalkEnduserPage() {
       {/* Desktop (sm+): bottom-left stack. LauncherVariantSelector only while
           the launcher icon is showing (panel closed) — once the panel opens
           the launcher becomes an X close button and the variant picker has
-          nothing to preview. VariantSelector takes its place when the home
-          screen is the active surface. */}
+          nothing to preview. VariantSelector + AdminToggleSelector take its
+          place when the home screen is the active surface. */}
       <div className="hidden sm:flex fixed bottom-6 left-6 z-50 flex-col gap-4">
         {!panelOpen && (
           <LauncherVariantSelector
@@ -73,7 +80,18 @@ export default function HappytalkEnduserPage() {
           />
         )}
         {showVariantSelector && (
-          <VariantSelector value={variant} onChange={setVariant} embedded />
+          <>
+            <VariantSelector value={variant} onChange={setVariant} embedded />
+            <AdminToggleSelector
+              boxType={boxType}
+              onBoxTypeChange={setBoxType}
+              showNotice={showNotice}
+              onShowNoticeChange={setShowNotice}
+              responseStatus={responseStatus}
+              onResponseStatusChange={setResponseStatus}
+              embedded
+            />
+          </>
         )}
       </div>
 
@@ -89,10 +107,18 @@ export default function HappytalkEnduserPage() {
         </div>
       )}
 
-      {/* Mobile: existing VariantSelector at bottom-RIGHT — only when panel open + home. */}
+      {/* Mobile: VariantSelector + AdminToggleSelector at bottom-RIGHT — only when panel open + home. */}
       {showVariantSelector && (
         <div className="sm:hidden">
           <VariantSelector value={variant} onChange={setVariant} />
+          <AdminToggleSelector
+            boxType={boxType}
+            onBoxTypeChange={setBoxType}
+            showNotice={showNotice}
+            onShowNoticeChange={setShowNotice}
+            responseStatus={responseStatus}
+            onResponseStatusChange={setResponseStatus}
+          />
         </div>
       )}
 
@@ -100,6 +126,9 @@ export default function HappytalkEnduserPage() {
         <div className="fixed z-40 inset-0 sm:inset-auto sm:right-8 sm:bottom-[112px]">
           <EnduserFrame
             variant={variant}
+            boxType={boxType}
+            showNotice={showNotice}
+            responseStatus={responseStatus}
             onClose={() => setPanelOpen(false)}
             onActiveScreenChange={setActiveScreen}
           />

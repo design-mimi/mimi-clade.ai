@@ -7,7 +7,14 @@ import { SettingScreen } from "./SettingScreen";
 import { ChatScreen, type TranscriptItem } from "./ChatScreen";
 import { ChatSkeleton } from "./ChatSkeleton";
 import { BottomNav } from "./BottomNav";
-import type { ConversationSummary, HomeVariant, NavTab } from "./types";
+import { NoticeScreen } from "./NoticeScreen";
+import type {
+  ConversationSummary,
+  HomeBoxType,
+  HomeVariant,
+  NavTab,
+  ResponseStatus,
+} from "./types";
 import type { SettingView } from "./SettingScreen";
 import { INTRO_BODY } from "./chatCards";
 
@@ -15,6 +22,9 @@ export type ActiveScreen = NavTab | "chat";
 
 type Props = {
   variant: HomeVariant;
+  boxType: HomeBoxType;
+  showNotice: boolean;
+  responseStatus: ResponseStatus;
   onClose?: () => void;
   onActiveScreenChange?: (screen: ActiveScreen) => void;
 };
@@ -31,6 +41,9 @@ export type TextSize = "small" | "large";
 
 export function EnduserFrame({
   variant,
+  boxType,
+  showNotice,
+  responseStatus,
   onClose,
   onActiveScreenChange,
 }: Props) {
@@ -43,6 +56,21 @@ export function EnduserFrame({
   const [settingView, setSettingView] = useState<SettingView>("main");
   const [endChatConfirm, setEndChatConfirm] = useState(false);
   const [deleteAllConfirm, setDeleteAllConfirm] = useState(false);
+  // 알림 페이지 (Figma 27215:2300). ChatScreen 과 같은 슬라이드 오버레이.
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const [noticeClosing, setNoticeClosing] = useState(false);
+  // 사용자가 한 번 본 후엔 홈 NoticeCard 숨김 (in-memory). 어드민 showNotice 가
+  // false → true 로 전환 (= 새 알림 등록) 되면 read 상태 리셋.
+  const [noticeRead, setNoticeRead] = useState(false);
+  const [prevShowNotice, setPrevShowNotice] = useState(showNotice);
+  if (prevShowNotice !== showNotice) {
+    // React-recommended pattern: adjust state during render based on prop change,
+    // avoids the cascading-render lint hit of doing the same in useEffect.
+    setPrevShowNotice(showNotice);
+    if (!prevShowNotice && showNotice) {
+      setNoticeRead(false);
+    }
+  }
   const [textSize, setTextSize] = useState<TextSize>(() =>
     typeof window !== "undefined" &&
     !window.matchMedia("(min-width: 640px)").matches
@@ -98,6 +126,19 @@ export function EnduserFrame({
   useEffect(() => {
     onActiveScreenChange?.(chatOpen ? "chat" : tab);
   }, [tab, chatOpen, onActiveScreenChange]);
+
+  const openNotice = () => {
+    setNoticeOpen(true);
+  };
+
+  const closeNotice = () => {
+    setNoticeRead(true);
+    setNoticeClosing(true);
+    window.setTimeout(() => {
+      setNoticeOpen(false);
+      setNoticeClosing(false);
+    }, 350);
+  };
 
   useEffect(() => {
     const id = "ht-text-size-style";
@@ -219,7 +260,16 @@ export function EnduserFrame({
 
   const renderScreen = (t: NavTab) => {
     if (t === "home")
-      return <HomeScreen variant={variant} onOpenChat={() => openChat(true)} />;
+      return (
+        <HomeScreen
+          variant={variant}
+          boxType={boxType}
+          showNotice={showNotice && !noticeRead}
+          responseStatus={responseStatus}
+          onOpenChat={() => openChat(true)}
+          onOpenNotice={openNotice}
+        />
+      );
     if (t === "message")
       return (
         <MessageScreen
@@ -255,8 +305,11 @@ export function EnduserFrame({
         }}
       />
 
-      {/* Mobile-only close button — hidden on setting profile sub-view */}
-      {onClose && !(tab === "setting" && settingView === "profile") && (
+      {/* Mobile-only close button — hidden on setting profile sub-view and on
+          the notice overlay (back chevron in NoticeScreen replaces it). */}
+      {onClose &&
+        !(tab === "setting" && settingView === "profile") &&
+        !noticeOpen && (
         <button
           type="button"
           onClick={() => {
@@ -306,7 +359,26 @@ export function EnduserFrame({
         </div>
       </div>
 
-      {!chatOpen && <BottomNav active={tab} onChange={handleTabChange} />}
+      {!chatOpen && !noticeOpen && (
+        <BottomNav active={tab} onChange={handleTabChange} />
+      )}
+
+      {/* Notice overlay — slide-in from right (same pattern as chat). */}
+      {noticeOpen && (
+        <div
+          className={`absolute inset-0 z-30 ${
+            noticeClosing ? "ht-slide-out-right" : "ht-slide-in-right"
+          }`}
+        >
+          <NoticeScreen
+            onBack={closeNotice}
+            onOpenChat={() => {
+              closeNotice();
+              openChat(true);
+            }}
+          />
+        </div>
+      )}
 
       {/* Dim overlay behind chat */}
       {chatOpen && (

@@ -573,10 +573,13 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
           className="ht-pressable w-[32px] h-[32px] rounded-full flex items-center justify-center"
           style={{
             background: canSend ? "var(--ht-bg-inverted)" : "rgba(39, 39, 42, 0.25)",
+            boxShadow: canSend
+              ? "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)"
+              : "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
             transition: "background-color 150ms ease-out",
           }}
         >
-          <SendArrowIcon width={28} height={28} style={{ color: "#fff" }} />
+          <SendArrowIcon width={32} height={32} style={{ color: "#fff" }} />
         </button>
       </div>
     </div>
@@ -608,11 +611,12 @@ function PlusIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+// Figma 24229:34897 send-plane (32×32 viewBox, 시안 좌표 305/49 평행이동).
 function SendArrowIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 28 28" fill="none" {...props}>
+    <svg viewBox="0 0 32 32" fill="none" {...props}>
       <path
-        d="M8 14.6665H12V13.3332H8V7.23031C8 7.04621 8.149 6.89697 8.333 6.89697C8.389 6.89697 8.445 6.91117 8.494 6.93823L20.802 13.7078C20.964 13.7965 21.022 13.9992 20.934 14.1605C20.903 14.2159 20.858 14.2615 20.802 14.292L8.494 21.0615C8.333 21.1503 8.13 21.0914 8.041 20.9301C8.014 20.8809 8 20.8257 8 20.7695V14.6665Z"
+        d="M9.297 14.21C8.948 14.0939 8.945 13.9066 9.304 13.7871L22.028 9.5458C22.38 9.4283 22.582 9.6255 22.484 9.9711L18.848 22.6952C18.747 23.0475 18.544 23.0598 18.395 22.7248L15.999 17.3331L19.999 11.9998L14.666 15.9998L9.297 14.21Z"
         fill="currentColor"
       />
     </svg>

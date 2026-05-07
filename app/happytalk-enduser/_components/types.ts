@@ -1,18 +1,42 @@
 export type HomeVariant =
-  | "default"
-  | "default-compact"
-  | "gradient-line"
-  | "gradient-oval"
-  | "brand-image"
-  | "brand-image-tall";
+  | "none"
+  | "gra-onecolor"
+  | "gra-linear"
+  | "gra-radial"
+  | "img-01"
+  | "img-02";
 
 export const HOME_VARIANTS: { id: HomeVariant; label: string }[] = [
-  { id: "default", label: "기본형" },
-  { id: "default-compact", label: "기본형 (간단)" },
-  { id: "gradient-line", label: "그라데이션 직선형" },
-  { id: "gradient-oval", label: "그라데이션 오벌형" },
-  { id: "brand-image", label: "브랜드 이미지형" },
-  { id: "brand-image-tall", label: "브랜드 이미지형 (크게)" },
+  { id: "none", label: "기본 (단색 그레이)" },
+  { id: "gra-onecolor", label: "단색 (블루)" },
+  { id: "gra-linear", label: "그라데이션 선형" },
+  { id: "gra-radial", label: "그라데이션 방사형" },
+  { id: "img-01", label: "이미지 01" },
+  { id: "img-02", label: "이미지 02" },
+];
+
+// 어드민이 토글하는 홈 문의 박스 타입 (Figma 27314:1562).
+// AI 에이전트 = 인풋 + send / 문의하기 = 검정 CTA 버튼.
+export type HomeBoxType = "ai-agent" | "inquiry";
+
+export const HOME_BOX_TYPES: { id: HomeBoxType; label: string }[] = [
+  { id: "ai-agent", label: "AI 에이전트" },
+  { id: "inquiry", label: "문의하기" },
+];
+
+// 응답 상태 배지 (Figma 27343:1126). 5단계.
+export type ResponseStatus = "ai" | "fast" | "normal" | "slow" | "offline";
+
+export const RESPONSE_STATUSES: {
+  id: ResponseStatus;
+  label: string;
+  copy: string;
+}[] = [
+  { id: "ai", label: "AI", copy: "AI가 바로 답해드려요" },
+  { id: "fast", label: "빠름", copy: "빠르게 답해드려요" },
+  { id: "normal", label: "보통", copy: "문의가 많아 상담 연결까지 시간이 걸려요" },
+  { id: "slow", label: "지연", copy: "문의가 많아 상담 연결이 지연될 수 있어요" },
+  { id: "offline", label: "무응답", copy: "운영 시간에 문의해 주세요" },
 ];
 
 export type NavTab = "home" | "message" | "setting";

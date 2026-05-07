@@ -267,90 +267,144 @@ V1의 슬라이딩 흰 pill / 좌·우 transition 코드 전부 **삭제**. V2�
 
 ---
 
-## 8. Home 화면 — Figma 27215:1733
+## 8. Home 화면 — Figma 27314:1369 / 27313:18962
 
-`HomeScreen.tsx`. `variant: HomeVariant` prop 으로 6종 분기.
+`HomeScreen.tsx`. **카드 모듈 컴포지션** (인터콤·채널톡 패턴).
+회의 피드백 반영 (2026-05-07): 자잘한 요소·FAQ 미노출, 공지 → 알림 카드, 히어로 = 텍스트 박스 버튼, 채팅 유입 포커스 UX.
 
 ### 8.1 구조 (variant 공통)
 
 ```
-[Brand area]                                  px-20, pt-28, pb-20, gap-16
-├─ Group 1 (gap-12)
-│   ├─ 브랜드명 (24px SemiBold)
-│   ├─ 설명 (15px opacity-80)         ← default-compact는 숨김
-│   └─ StatusRow                       ← V1에서는 CTA 아래였음
-└─ Group 2 (gap-8)
-    ├─ PrimaryCTA (`문의하기`)
-    └─ ChannelRow (`다른 문의하기`)    ← V1에서는 QnA 섹션이었음
-
-[QnA area]                                    px-20, pb-12, gap-20
-├─ 공지 SectionGroup
-│   └─ NoticeCard
-└─ 자주 묻는 질문 SectionGroup
-    ├─ SearchInput
-    └─ FaqCard (max-h-280, overflow-y-auto)
-
-[푸터]
-└─ HappytalkLogo (62×12, opacity 65, pt-20)
-
-[하단 여백]
-└─ pb-100 (BottomNav 위 여백 확보)
+[VariantBackground]                    절대 레이어 (배경 단색/그라데이션)
+[Hero image]    img-01 / img-02 only — 420px 높이, dim 24% multiply
+[Scroller — flex-1, overflow-y-auto]
+  [Spacer]      img-* 만 (img-01 = 180 / img-02 = 360)
+  [Panel]       px-16 pt-16 pb-100, gap-14, img-* 는 rounded-t-16 bg #F5F5F5
+   ├─ BrandHeader            (브랜드명 24 + 운영시간 토글 fold/spread)
+   ├─ ChatLandingCard        (어드민 boxType: ai-agent / inquiry)
+   ├─ NoticeCard             (어드민 showNotice=true 일 때만)
+   ├─ ChannelRow             (다른 문의하기 + 3 채널 심볼)
+   └─ HappytalkLogo          (62×12, opacity 65, pt-20)
 ```
 
-### 8.2 StatusRow
+카드 4종 모두 `bg var(--ht-bg-card)` (white) + `rounded-16`. 자체 그림자 없음 (배경 그라데이션이 카드 면을 살림).
 
-좌측: 운영시간 토글 버튼. 우측: 두 배지.
+### 8.2 어드민 토글 (직교)
 
-| 요소 | 스타일 | 거동 |
+variant 6종은 **배경/이미지** 처리만 결정. 카드 컨텐츠는 어드민 토글 3개로 직교 분리.
+
+| Prop | 값 | 효과 |
 |---|---|---|
-| 운영시간 버튼 | `9-18시 운영 중 ⌄`, 14px medium subtle, ghost (`px-8 py-4 rounded-6`) + chevron 16 muted | 클릭 시 `open` 토글 — 200ms rotate, 펼침 시 평일/토/일 운영시간 3행 노출 |
-| 화이트 배지 | `22명 대기 · 5분 예상`, 12px medium subtle, white bg + 10% border, rounded-full, py-4 px-8, backdrop-blur 2px | **모바일(`<sm`)에서는 `hidden`** (시안 노출용 임시 정책, 4값 동시 노출 배치 문제는 보류) |
-| 그린 배지 | `상담 원활 · 2명`, 12px medium `#33803F`, `rgba(102,220,126,0.1)` bg + 10% border, rounded-full, py-4 px-8 | 항상 노출 |
+| `boxType` | `"ai-agent"` / `"inquiry"` | ChatLandingCard 의 inner textbox + action 변형 |
+| `showNotice` | `boolean` | NoticeCard 노출 여부 (기존 고객 마이그레이션 호환) |
+| `responseStatus` | `"ai"` / `"fast"` / `"normal"` / `"slow"` / `"offline"` | ResponseBadge 도트 색 + 카피 |
 
-### 8.3 PrimaryCTA — `문의하기`
+`page.tsx` 의 `AdminToggleSelector` 로 데모 시 토글. 실서비스에선 이 3 값을 어드민 콘솔에서 변경.
 
-| 속성 | 값 |
-|---|---|
-| 너비/높이 | full / `48px` |
-| 라운드 | `16px` |
-| 배경 | `#18181B` |
-| Border | `1px rgba(255,255,255,0.2)` |
-| Shadow | `0 1px 2px 0 rgba(0,0,0,0.08)` + inset `0 -1px 0 0 rgba(0,0,0,0.08)` |
-| Label | `md/SemiBold` white |
-| 클래스 | `ht-cta-button` (hover scale 1.02 + shadow 강화 + icon wobble 600ms) |
-| onClick | `openChat(true)` — fresh new chat, 활동 마킹 후 INTRO_BODY로 메시지 행 등재 |
+### 8.3 BrandHeader
 
-### 8.4 ChannelRow — `다른 문의하기`
+```
+브랜드명 "킨더살몬"  — 24px SemiBold default, leading-8
+운영시간 토글       — 14px Medium subtle, ghost (px-2 py-2 rounded-6)
+                     + chevron 16 muted (200ms rotate)
+펼침 시 추가 3행    — 평일 9-18시 / 토요일 10-17시 / 일요일 10-17시 (px-8 gap-2)
+```
 
-| 속성 | 값 |
-|---|---|
-| 컨테이너 | full, `rounded-16`, bg `rgba(245,245,245,0.88)`, border default, px-16 py-8 |
-| Label | 14px regular subtle |
-| 우측 아이콘 그룹 | NaverTalk / KakaoChannel / Phone (각 `36×36 rounded-12 ht-pressable`) |
+기존 V2의 `StatusRow` 우측 배지 (22명 대기 · 5분 예상, 상담 원활 · 2명) 는 **삭제됨** — 회의 피드백 "자잘한 요소 미노출". 대기 인원·응답 상태는 ChatLandingCard 하단의 ResponseBadge 한 줄로 통합.
 
-### 8.5 QnA — 자주 묻는 질문
+### 8.4 ChatLandingCard — Figma 27314:1562
 
-- **데이터셋**: `FAQS` 56 항목 / 8 카테고리 (배송 8 / 상품 10 / 교환·반품 8 / 주문 6 / 결제 5 / 회원·포인트 6 / 이벤트 4 / 매장 4 / 기타 5) — kindersalmon 테마
-- **검색 전**: 처음 2 항목 표시
-- **검색 입력 후**: question 또는 category 부분일치 (대소문자 무시)
-- **컨테이너**: `max-h-280 overflow-y-auto` — 결과가 길어도 페이지 스크롤은 그대로, 컨테이너 내부에서 스크롤
-- **빈 결과**: "검색 결과가 없습니다." (subtle)
+외곽 white 카드 (`rounded-16 px-10 py-8 gap-8`). 안쪽 3 영역:
 
-### 8.6 6 Variant
+#### 8.4.1 Inner Textbox Button
 
-| id | 배경 | hero 영역 | 비고 |
+`<button>`. 클릭 → `onOpenChat()` (채팅 진입).
+
+| boxType | 라벨 | greeting | 스타일 |
 |---|---|---|---|
-| `default` | white | — | 기본 |
-| `default-compact` | white | — | 설명 텍스트 숨김 |
-| `gradient-line` | 선형 `#FEFFCB → #F3FFEE → #FAFAFA` (180°) | — | |
-| `gradient-oval` | 방사형 ellipse 200% 100% from top | — | |
-| `brand-image` | white | hero 260px (스크롤 shrink scale → 0.8 / pull-down stretch up to 2x) | rounded-t-20 콘텐츠가 위로 슬라이드 |
-| `brand-image-tall` | white | hero 430px | brandName "KINDERSALMON" |
+| `ai-agent` | `AiSparkleIcon` 24 + "AI 에이전트" 12 medium 70% default | "안녕하세요, 킨더살몬이에요. 무엇을 도와드릴까요? AI에게 질문하고 빠른 답변을 받아 보세요." 15 default 80% — `pl-30` (sparkle 아이콘 너비만큼 들여쓰기) | bg transparent (외곽 카드 white 가 그대로 비침), p-8, gap-8 |
+| `inquiry` | "킨더살몬" 12 medium 70% subtle (아이콘 없음) | "안녕하세요, 고객님의 옷장에서 오래도록 남고 싶은 브랜드 킨더살몬이에요. 무엇을 도와드릴까요? 아래 버튼 선택 후 문의 내용을 남겨주시면 빠르게 상담을 도와드리겠습니다." 15 default 80% | bg `#F4F4F5` (살짝 muted 카드-안-카드), px-10 py-8, gap-6 |
 
-스크롤 인터랙션 (brand-image\* 만):
-- 다운스크롤 → 히어로 이미지/딤 동시 scale 1 → 0.8 (`requestAnimationFrame`)
-- 오버스크롤 (negative scrollTop / touch pull) → 히어로 영역 height 가 down으로 늘어남 (max +260)
+`ht-card-press` (hover 4% / active 6% black ::after, scale 0.98).
+
+#### 8.4.2 Action — Figma 27342:1064 / 27313:18693
+
+`boxType="ai-agent"` → **AI Input** (의사 인풋 + send 버튼)
+
+| 속성 | 값 |
+|---|---|
+| 컨테이너 | h-52, rounded-16, pl-16 pr-8 py-10, justify-between |
+| 배경 | `var(--ht-bg-subtle)` (#FAFAFA) |
+| 보더 | `1px solid #FFF100` (브랜드 옐로우 강조) |
+| 플레이스홀더 | "AI 에이전트에게 문의해 보세요." 14 hint, tracking -0.6px |
+| Send 버튼 | 36×36 rounded-12, bg `var(--ht-bg-inverted)`, 1px default border, `SendPlaneIcon` 20 white |
+
+→ 인풋 클릭 = send 클릭 = 전체 박스 클릭, 모두 `onOpenChat()` (채팅 진입). UX 의도: **타이핑 시도 = 채팅 시작 트리거**, 위젯이 본격 채팅 화면을 열어 거기서 입력.
+
+`boxType="inquiry"` → **검정 CTA 버튼**
+
+| 속성 | 값 |
+|---|---|
+| 컨테이너 | full, rounded-16, px-16 py-14 |
+| 배경 | `var(--ht-bg-inverted)` (#18181B) |
+| 보더 / 그림자 | 1px rgba(255,255,255,0.2) + `0 1px 2px rgba(0,0,0,0.08) + inset 0 -1px 0 rgba(0,0,0,0.08)` |
+| 라벨 | "문의하기" 16 SemiBold white |
+| 클래스 | `ht-cta-button` (hover scale 1.02 + shadow 강화 + icon wobble 600ms) |
+
+#### 8.4.3 ResponseBadge — Figma 27343:1126
+
+5 단계 응답 상태 표기. 8×8 도트 + 12px medium muted 카피.
+
+| status | 도트 | 카피 |
+|---|---|---|
+| `ai` | `#4FC660` | AI가 바로 답해드려요 |
+| `fast` | `#4FC660` | 빠르게 답해드려요 |
+| `normal` | `#FACC15` | 문의가 많아 상담 연결까지 시간이 걸려요 |
+| `slow` | `#FB923C` | 문의가 많아 상담 연결이 지연될 수 있어요 |
+| `offline` | `#A1A1AA` | 운영 시간에 문의해 주세요 |
+
+`ai-agent` 박스의 자연스러운 짝은 `ai` 상태이고 `inquiry` 박스는 운영 상황에 따라 fast/normal/slow/offline 중 하나. 어드민이 직접 매핑.
+
+### 8.5 NoticeCard
+
+기존 V2의 "공지 SectionGroup + NoticeCard" 가 **단일 카드**로 재편. 채널톡의 알림 카드 패턴.
+
+| 속성 | 값 |
+|---|---|
+| 컨테이너 | rounded-16, px-16 py-10, gap-4, bg white |
+| 라벨 | "알림" 12 subtle 70% + 빨간 점 4×4 (`#FF3D3D`, rounded-4) — 새 알림 표시 |
+| 본문 | 14 default `line-clamp-2` (예: 추석 명절 배송 일정 안내) |
+
+어드민 `showNotice=false` 면 통째로 숨김. 기본값 `false` (자잘한 요소 미노출 정책). 기존 고객 (V1 시안) 은 `true` 로 마이그레이션해서 호환.
+
+### 8.6 ChannelRow
+
+라벨 `다른 문의하기` (V2의 "다른 채널로 문의하기" → 시안 카피 그대로). bg white, rounded-16, px-16 py-8.
+
+| 채널 | 색 | 비고 |
+|---|---|---|
+| 네이버 톡톡 | 그라데이션 그린 (`#00d44d → #00e56d`) | 코드는 `NaverTalkIcon` 단색 그린 — 시안과 미세 차이 |
+| 카카오톡 채널 | `#FEE500` + 검정 TALK 로고 | `KakaoChannelIcon` |
+| 전화 | white + default border | `PhoneCircleIcon` |
+
+각 심볼: 36×36 rounded-12 `ht-pressable` + 1px default border. FAQ / 검색 영역은 통째로 **삭제됨**.
+
+### 8.7 6 Variant — 배경/이미지만 차이
+
+| id | 배경 | hero | 비고 |
+|---|---|---|---|
+| `none` | `#F5F5F5` 단색 | — | 기본 |
+| `gra-onecolor` | linear `#E2F5FF → #F5F5F5 64%` | — | 옅은 블루 |
+| `gra-linear` | linear `#FEFFCB → #F3FFEE 16% → #F5F5F5 50%` | — | 연두 → 노랑 |
+| `gra-radial` | radial ellipse 200%×100% top, `#FEFFCB → #F3FFEE 24% → #F5F5F5 64%` | — | 위 중앙 발광 |
+| `img-01` | `#F5F5F5` (panel) | hero 420px, 카드 영역 top-180 | hero 위 180px 노출 |
+| `img-02` | `#F5F5F5` (panel) | hero 420px, 카드 영역 top-360 | hero 거의 전부 노출 |
+
+스크롤 인터랙션 (img-* 만, 기존 V2 로직 유지):
+- 다운스크롤 → hero 이미지/딤 동시 scale 1 → 0.8 (`requestAnimationFrame`)
+- 오버스크롤 (negative scrollTop / touch pull) → hero height 가 down으로 늘어남 (max +420)
 - 터치 종료 시 cubic ease 280ms로 복귀
+- panel 은 `rounded-t-16 bg #F5F5F5` 로 hero 위에 슬라이드
 
 ---
 
@@ -590,6 +644,6 @@ app/happytalk-enduser/
 
 ## 16. 미해결 / 보류
 
-- **StatusRow 4값 동시 노출 배치** — 현재 모바일에서는 화이트 배지(대기/예상)를 숨기는 임시 정책. 설정값이 모두 노출될 때의 정돈된 레이아웃은 차후 정리.
 - **백엔드 연동** — 프로필 저장, 대화 영구화는 메모리 레벨만 구현. 새로고침 시 휘발.
-- **CEO 1차 보고 후속 피드백** — 문의하기 / 다른 문의하기 위계 정리, 상담 원활 배지를 브랜드명 영역으로 이동(부분 적용), 하단 플로팅 외 고정형 메뉴 옵션, 채팅 기본 아이콘 메타포 재고 → 이슈 트래킹은 별도.
+- **위젯 진입 = 채팅 직행 옵션** — 회의 피드백 #6 "홈버튼 → 채팅 화면 바로 나타나는 플로우". 현재는 홈 카드 모듈 클릭 시점에 채팅 진입. 위젯 첫 진입 자체를 홈 스킵하는 옵션은 어드민 토글로 별도 추가 검토.
+- **다른 문의하기 심볼 색** — 시안의 네이버 톡톡 그라데이션 (`#00d44d → #00e56d`) 은 코드의 `NaverTalkIcon` 단색 그린 (`#00C63B`) 으로 근사. 디테일 매칭은 차후.

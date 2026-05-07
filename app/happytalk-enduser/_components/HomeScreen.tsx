@@ -3,122 +3,89 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { SVGProps } from "react";
-import type { HomeVariant } from "./types";
 import {
-  SearchIcon,
-  NaverTalkIcon,
-  KakaoChannelIcon,
-  PhoneCircleIcon,
+  RESPONSE_STATUSES,
+  type HomeBoxType,
+  type HomeVariant,
+  type ResponseStatus,
+} from "./types";
+import {
+  AiSparkleIcon,
   HappytalkLogo,
+  KakaoChannelIcon,
+  NaverTalkIcon,
+  PhoneCircleIcon,
+  SendPlaneIcon,
 } from "./Icons";
 
-type Props = { variant: HomeVariant; onOpenChat?: () => void };
+type Props = {
+  variant: HomeVariant;
+  boxType: HomeBoxType;
+  showNotice: boolean;
+  responseStatus: ResponseStatus;
+  onOpenChat?: () => void;
+  onOpenNotice?: () => void;
+};
 
 const HERO_IMAGE = "/hero.jpg";
 
-type FaqEntry = { category: string; question: string };
+const NOTICE_BODY =
+  "풍요로운 한가위 보내세요. 🌕 연휴 기간 동안 배송 및 고객센터 운영이 일시 중단됩니다. 아래 일정 참고 부탁드립니다.";
+const AI_GREETING =
+  "안녕하세요, 킨더살몬이에요. 무엇을 도와드릴까요? AI에게 질문하고 빠른 답변을 받아 보세요.";
+const INQUIRY_GREETING =
+  "안녕하세요, 고객님의 옷장에서 오래도록 남고 싶은 브랜드 킨더살몬이에요. 무엇을 도와드릴까요? 아래 버튼 선택 후 문의 내용을 남겨주시면 빠르게 상담을 도와드리겠습니다.";
 
-// Kindersalmon-themed FAQ pool. Pre-search shows the first two; once the user
-// types into the search input, the gray box renders all matches (capped).
-const FAQS: FaqEntry[] = [
-  // 배송 (8)
-  { category: "배송", question: "당일배송은 무엇인가요?" },
-  { category: "배송", question: "주말 배송도 가능한가요?" },
-  { category: "배송", question: "도서산간 지역 배송비는 얼마인가요?" },
-  { category: "배송", question: "배송 조회는 어디서 할 수 있나요?" },
-  { category: "배송", question: "배송 받을 시간을 지정할 수 있나요?" },
-  { category: "배송", question: "무료 배송 기준은 어떻게 되나요?" },
-  { category: "배송", question: "부재 중일 경우 어떻게 처리되나요?" },
-  { category: "배송", question: "해외 배송도 가능한가요?" },
+// Response-status dot color → mirrors Figma 27313:18962 (AI 라임), 27343:1126
+// (빠름 그린, 보통 노랑, 지연 오렌지, 무응답 회색).
+const STATUS_DOT_COLOR: Record<ResponseStatus, string> = {
+  ai: "#C7F26C",
+  fast: "#4FC660",
+  normal: "#FACC15",
+  slow: "#FB923C",
+  offline: "#A1A1AA",
+};
 
-  // 상품 (10)
-  { category: "상품", question: "상품 품절인 경우 재입고는 언제 알 수 있나요?" },
-  { category: "상품", question: "사이즈 가이드는 어디서 확인할 수 있나요?" },
-  { category: "상품", question: "상품 소재와 세탁 방법이 궁금해요." },
-  { category: "상품", question: "모델 착용 사이즈가 궁금해요." },
-  { category: "상품", question: "신상품은 언제 업데이트되나요?" },
-  { category: "상품", question: "상품 색상이 실제와 다를 수 있나요?" },
-  { category: "상품", question: "상품 후기는 어디서 볼 수 있나요?" },
-  { category: "상품", question: "베스트 상품 카테고리는 어디인가요?" },
-  { category: "상품", question: "시즌 오프 세일은 언제 진행되나요?" },
-  { category: "상품", question: "키즈 라인도 운영하나요?" },
+// AI 인풋 그라데이션 보더 (Figma 27313:18962 paint2_linear).
+// padding-box bg 위에 border-box gradient 를 깔아 transparent 1px 보더가
+// 그라데이션을 비추도록 처리.
+const AI_INPUT_BG = "var(--ht-bg-subtle)";
+const AI_INPUT_GRADIENT_BORDER = {
+  background: `linear-gradient(${AI_INPUT_BG}, ${AI_INPUT_BG}) padding-box, linear-gradient(135deg, rgba(255, 241, 0, 0.6) 0%, rgba(97, 224, 151, 0.6) 50%, rgba(77, 178, 255, 0.6) 100%) border-box`,
+  border: "1px solid transparent",
+} as const;
 
-  // 교환/반품 (8)
-  { category: "교환/반품", question: "단순 변심으로도 교환·반품이 가능한가요?" },
-  { category: "교환/반품", question: "교환 시 사이즈 변경은 어떻게 진행되나요?" },
-  { category: "교환/반품", question: "수령 후 며칠까지 반품 신청이 가능한가요?" },
-  { category: "교환/반품", question: "반품 시 배송비는 누가 부담하나요?" },
-  { category: "교환/반품", question: "교환·반품 신청은 어디서 하나요?" },
-  { category: "교환/반품", question: "상품 불량인 경우 어떻게 처리되나요?" },
-  { category: "교환/반품", question: "환불은 언제까지 처리되나요?" },
-  { category: "교환/반품", question: "부분 환불도 가능한가요?" },
-
-  // 주문 (6)
-  { category: "주문", question: "주문 후 배송지를 변경할 수 있나요?" },
-  { category: "주문", question: "주문 취소는 언제까지 가능한가요?" },
-  { category: "주문", question: "비회원 주문도 가능한가요?" },
-  { category: "주문", question: "주문 내역은 어디서 확인하나요?" },
-  { category: "주문", question: "여러 상품을 합포장할 수 있나요?" },
-  { category: "주문", question: "선물용 주문이 가능한가요?" },
-
-  // 결제 (5)
-  { category: "결제", question: "어떤 결제 수단이 가능한가요?" },
-  { category: "결제", question: "무이자 할부는 어떤 카드사가 적용되나요?" },
-  { category: "결제", question: "카카오페이·네이버페이로 결제할 수 있나요?" },
-  { category: "결제", question: "결제 영수증은 어떻게 받나요?" },
-  { category: "결제", question: "결제 오류가 발생했을 때 어떻게 하나요?" },
-
-  // 회원/포인트 (6)
-  { category: "회원/포인트", question: "킨더 멤버십 등급은 어떻게 나뉘나요?" },
-  { category: "회원/포인트", question: "포인트 적립과 사용 조건이 궁금해요." },
-  { category: "회원/포인트", question: "회원 가입은 어떻게 하나요?" },
-  { category: "회원/포인트", question: "등급별 혜택이 어떻게 되나요?" },
-  { category: "회원/포인트", question: "생일 쿠폰은 어떻게 받을 수 있나요?" },
-  { category: "회원/포인트", question: "회원 탈퇴는 어떻게 하나요?" },
-
-  // 이벤트 (4)
-  { category: "이벤트", question: "현재 진행 중인 이벤트는 어디서 볼 수 있나요?" },
-  { category: "이벤트", question: "신규 회원 혜택이 있나요?" },
-  { category: "이벤트", question: "친구 추천 이벤트는 어떻게 참여하나요?" },
-  { category: "이벤트", question: "인플루언서 협업 이벤트는 어디에 공지되나요?" },
-
-  // 매장 (4)
-  { category: "매장", question: "오프라인 매장은 어디에 있나요?" },
-  { category: "매장", question: "매장 영업시간이 어떻게 되나요?" },
-  { category: "매장", question: "팝업 스토어 일정은 어디서 확인하나요?" },
-  { category: "매장", question: "매장과 온라인 상품 구성이 동일한가요?" },
-
-  // 기타 (5)
-  { category: "기타", question: "사은품은 언제 받을 수 있나요?" },
-  { category: "기타", question: "카탈로그 신청은 어떻게 하나요?" },
-  { category: "기타", question: "광고·협찬 제휴 문의는 어디로 하나요?" },
-  { category: "기타", question: "도매·B2B 문의가 가능한가요?" },
-  { category: "기타", question: "영수증 재발급이 가능한가요?" },
-];
-
-export function HomeScreen({ variant, onOpenChat }: Props) {
-  const isBrandImage = variant === "brand-image" || variant === "brand-image-tall";
-  const isTallHero = variant === "brand-image-tall";
-  const showDescription = variant !== "default-compact";
-  const brandName = isTallHero ? "KINDERSALMON" : "킨더살몬";
-  const brandAreaPt = 28;
+export function HomeScreen({
+  variant,
+  boxType,
+  showNotice,
+  responseStatus,
+  onOpenChat,
+  onOpenNotice,
+}: Props) {
+  const isImage = variant === "img-01" || variant === "img-02";
+  const isImg02 = variant === "img-02";
 
   const heroImageRef = useRef<HTMLDivElement>(null);
   const heroOuterRef = useRef<HTMLDivElement>(null);
   const heroDimRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
+  // Image hero is 420 tall. img-01 reveals top 180px; img-02 reveals top 360px
+  // (panel slides up over the rest).
+  const HERO_TOTAL = 420;
+  const HERO_VISIBLE = isImg02 ? 360 : 180;
+
   useEffect(() => {
-    if (!isBrandImage) return;
+    if (!isImage) return;
     const scroller = scrollerRef.current;
     const heroImage = heroImageRef.current;
     const heroOuter = heroOuterRef.current;
     const heroDim = heroDimRef.current;
     if (!scroller || !heroImage || !heroOuter || !heroDim) return;
 
-    const HERO_HEIGHT = isTallHero ? 430 : 260;
     const SCALE_MIN = 0.8;
-    const MAX_STRETCH = HERO_HEIGHT; // pull-down can up to double the hero
+    const MAX_STRETCH = HERO_TOTAL;
 
     let touchStartY = 0;
     let touchPullPx = 0;
@@ -128,21 +95,19 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
     const apply = () => {
       raf = 0;
       const st = scroller.scrollTop;
-      // Down-scroll → shrink image (centered scale); dim follows with same scale anchored to bottom
       if (st > 0) {
-        const progress = Math.min(1, st / HERO_HEIGHT);
+        const progress = Math.min(1, st / HERO_VISIBLE);
         const scale = 1 + (SCALE_MIN - 1) * progress;
         heroImage.style.transform = `scale(${scale})`;
         heroDim.style.transform = `scale(${scale})`;
-        heroOuter.style.height = HERO_HEIGHT + "px";
+        heroOuter.style.height = HERO_TOTAL + "px";
         return;
       }
-      // Overscroll (negative scrollTop or active touch pull) → grow hero downward
       const overscroll = Math.max(-st, touchPullPx);
       const extra = Math.min(MAX_STRETCH, overscroll);
       heroImage.style.transform = "scale(1)";
       heroDim.style.transform = "scale(1)";
-      heroOuter.style.height = HERO_HEIGHT + extra + "px";
+      heroOuter.style.height = HERO_TOTAL + extra + "px";
     };
 
     const queue = () => {
@@ -202,18 +167,23 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
       scroller.removeEventListener("touchcancel", onTouchEnd);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [isBrandImage, isTallHero]);
+  }, [isImage, HERO_VISIBLE]);
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
       <VariantBackground variant={variant} />
 
-      {/* Fixed hero image + dim — pinned to viewport, white panel slides over */}
-      {isBrandImage && (
+      {/* happytalk 워드마크 — BottomNav (64px) 위 46px 위치에 고정. 가장 낮은
+         레이어 (z-0) 라 panel 안 컨텐츠가 스크롤로 올라오면 가려진다. */}
+      <div className="absolute left-0 right-0 bottom-[110px] flex justify-center pointer-events-none z-0">
+        <HappytalkLogo width={343} height={12} />
+      </div>
+
+      {isImage && (
         <div
           ref={heroOuterRef}
           className="absolute top-0 left-0 right-0 z-0 overflow-hidden sm:rounded-t-[24px]"
-          style={{ height: isTallHero ? 430 : 260 }}
+          style={{ height: HERO_TOTAL }}
         >
           <div
             ref={heroImageRef}
@@ -235,140 +205,128 @@ export function HomeScreen({ variant, onOpenChat }: Props) {
           <div
             ref={heroDimRef}
             aria-hidden
-            className="absolute left-0 right-0 bottom-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none mix-blend-multiply"
             style={{
-              height: 184,
+              opacity: 0.24,
               transformOrigin: "center bottom",
               willChange: "transform",
               background:
-                "linear-gradient(180deg, rgba(0, 0, 0, 0) 27.92%, rgba(0, 0, 0, 0.2) 100%)",
+                "linear-gradient(180deg, rgba(255, 255, 255, 0) 27.92%, rgba(0, 0, 0, 0.8) 100%)",
             }}
           />
         </div>
       )}
 
-      <div ref={scrollerRef} className="relative flex-1 min-h-0 overflow-y-auto z-10">
-        {/* Spacer pushes white panel below the hero */}
-        {isBrandImage && <div style={{ height: isTallHero ? 410 : 240 }} />}
+      <div
+        ref={scrollerRef}
+        className="relative flex-1 min-h-0 overflow-y-auto z-10"
+      >
+        {isImage && <div style={{ height: HERO_VISIBLE }} />}
 
-        <div className={`pb-[100px] ${isBrandImage ? "rounded-t-[20px] bg-white" : ""}`}>
-          {/* Brand area — Figma 27215:1737. Status row now lives inside the
-             brand-name-area (title + desc + status as one unit), and the
-             button-area (CTA + 다른 문의하기) sits as a separate group below. */}
-          <div
-            className="flex flex-col gap-[16px] px-[20px] pb-[20px]"
-            style={{ paddingTop: brandAreaPt }}
-          >
-            <div className="flex flex-col gap-[12px] w-full">
-              <h1
-                className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap overflow-hidden"
-                style={{ color: "var(--ht-text-default)" }}
-              >
-                {brandName}
-              </h1>
-              {showDescription && (
-                <p
-                  className="text-[15px] leading-5 tracking-[-0.25px] opacity-80 w-full"
-                  style={{ color: "#121212" }}
-                >
-                  차별화된 감각과 세심한 디테일, 편안함을 원칙으로 하는 여성복 브랜드
-                </p>
-              )}
-              <StatusRow />
-            </div>
-            <div className="flex flex-col gap-[8px] w-full">
-              <PrimaryCTA onClick={onOpenChat} />
-              <ChannelRow />
-            </div>
-          </div>
-
-          {/* QnA area */}
-          <div className="flex flex-col gap-[20px] px-[20px] pb-[12px]">
-            <SectionGroup title="공지">
-              <NoticeCard text="2026 추석 명절 배송 일정을 안내해 드릴게요." />
-            </SectionGroup>
-            <FaqSection />
-          </div>
-
-          <div className="flex items-center justify-center pt-[20px] opacity-65">
-            <HappytalkLogo width={62} height={12} />
-          </div>
+        <div
+          className={`flex flex-col gap-[14px] px-[16px] pt-[16px] pb-[100px] ${
+            isImage ? "rounded-t-[24px] bg-[#F5F5F5]" : ""
+          }`}
+        >
+          <BrandHeader />
+          <ChatLandingCard
+            boxType={boxType}
+            responseStatus={responseStatus}
+            onOpenChat={onOpenChat}
+          />
+          {showNotice && (
+            <NoticeCard text={NOTICE_BODY} onClick={onOpenNotice} />
+          )}
+          <ChannelRow />
         </div>
       </div>
     </div>
   );
 }
 
-function PrimaryCTA({ onClick }: { onClick?: () => void }) {
+function VariantBackground({ variant }: { variant: HomeVariant }) {
+  // Single base color for all non-gradient variants — the panel above sits on
+  // #F5F5F5, so img-* / none share the same backdrop.
+  if (variant === "gra-onecolor") {
+    return (
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(180deg, #E2F5FF 0%, #F5F5F5 64%)",
+        }}
+      />
+    );
+  }
+  if (variant === "gra-linear") {
+    return (
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, #FEFFCB 0%, #F3FFEE 16%, #F5F5F5 50%)",
+        }}
+      />
+    );
+  }
+  if (variant === "gra-radial") {
+    return (
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 200% 100% at 50% 0%, #FEFFCB 0%, #F3FFEE 24%, #F5F5F5 64%)",
+        }}
+      />
+    );
+  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="ht-cta-button w-full h-[48px] flex items-center justify-center rounded-[16px] text-[16px] font-semibold leading-6 tracking-[-0.25px] text-white"
-      style={{
-        background: "#18181B",
-        border: "1px solid rgba(255, 255, 255, 0.2)",
-        boxShadow:
-          "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
-      }}
-    >
-      문의하기
-    </button>
+    <div
+      aria-hidden
+      className="absolute inset-0 pointer-events-none"
+      style={{ background: "#F5F5F5" }}
+    />
   );
 }
 
-function StatusRow() {
+function BrandHeader() {
+  return (
+    <div className="flex flex-col gap-[6px] w-full">
+      <h1
+        className="text-[24px] leading-8 font-semibold tracking-[-0.25px] whitespace-nowrap overflow-hidden"
+        style={{ color: "var(--ht-text-default)" }}
+      >
+        킨더살몬
+      </h1>
+      <OperatingHoursToggle />
+    </div>
+  );
+}
+
+function OperatingHoursToggle() {
   const [open, setOpen] = useState(false);
-  // Mobile (<sm) hides the white "대기/예상" badge to keep the row from
-  // overflowing at boosted text sizes — the priority signal "상담 원활"
-  // stays visible. Web shows both. The combinatorial layout problem at
-  // 4 status values × all-on-one-row is intentionally deferred.
   return (
     <div className="flex flex-col gap-[4px] w-full">
-      <div className="flex items-center justify-between w-full">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="ht-pressable flex items-center gap-[4px] px-[8px] py-[4px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
-          style={{ color: "var(--ht-text-subtle)" }}
-        >
-          9-18시 운영 중
-          <ChevronDownIcon
-            width={16}
-            height={16}
-            style={{
-              color: "var(--ht-icon-muted)",
-              transform: open ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 200ms ease-out",
-            }}
-          />
-        </button>
-        <div className="flex items-center gap-[8px]">
-          <span
-            className="hidden sm:inline-flex items-center justify-center rounded-full border py-[4px] px-[8px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
-            style={{
-              background: "var(--ht-bg-badge-default)",
-              borderColor: "var(--ht-border-default)",
-              color: "var(--ht-text-subtle)",
-              backdropFilter: "blur(2px)",
-              WebkitBackdropFilter: "blur(2px)",
-            }}
-          >
-            22명 대기 • 5분 예상
-          </span>
-          <span
-            className="inline-flex items-center justify-center rounded-full border py-[4px] px-[8px] text-[12px] leading-4 font-medium tracking-[-0.25px]"
-            style={{
-              background: "var(--ht-bg-badge-green)",
-              borderColor: "var(--ht-border-default)",
-              color: "#33803F",
-            }}
-          >
-            상담 원활 • 2명
-          </span>
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="ht-pressable inline-flex items-center gap-[4px] px-[2px] py-[2px] -ml-[2px] rounded-[6px] text-[14px] leading-5 font-medium tracking-[-0.25px] self-start"
+        style={{ color: "var(--ht-text-subtle)" }}
+      >
+        9-18시 운영 중
+        <ChevronDownIcon
+          width={16}
+          height={16}
+          style={{
+            color: "var(--ht-icon-muted)",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 200ms ease-out",
+          }}
+        />
+      </button>
       {open && (
         <div
           className="px-[8px] flex flex-col gap-[2px] text-[14px] leading-5 font-medium tracking-[-0.25px]"
@@ -383,208 +341,199 @@ function StatusRow() {
   );
 }
 
+function ChatLandingCard({
+  boxType,
+  responseStatus,
+  onOpenChat,
+}: {
+  boxType: HomeBoxType;
+  responseStatus: ResponseStatus;
+  onOpenChat?: () => void;
+}) {
+  const isAi = boxType === "ai-agent";
+  return (
+    <div
+      className="flex flex-col gap-[8px] items-start rounded-[16px] px-[10px] py-[8px] w-full"
+      style={{ background: "var(--ht-bg-card)" }}
+    >
+      <button
+        type="button"
+        onClick={onOpenChat}
+        className="ht-card-press flex flex-col items-start justify-center w-full rounded-[16px] overflow-hidden text-left"
+        style={{
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          padding: isAi ? "8px" : "8px 10px",
+          gap: isAi ? "8px" : "6px",
+        }}
+        aria-label={isAi ? "AI 에이전트 시작" : "문의 시작"}
+      >
+        <div className="flex items-center gap-[6px] w-full">
+          {isAi && <AiSparkleIcon width={24} height={24} />}
+          <span
+            className="text-[12px] leading-4 font-medium tracking-[-0.25px] opacity-70"
+            style={{
+              color: isAi
+                ? "var(--ht-text-default)"
+                : "var(--ht-text-subtle)",
+            }}
+          >
+            {isAi ? "AI 에이전트" : "킨더살몬"}
+          </span>
+        </div>
+        <p
+          className={`text-[15px] leading-5 tracking-[-0.25px] opacity-80 ${
+            isAi ? "pl-[30px]" : ""
+          }`}
+          style={{ color: "var(--ht-text-default)" }}
+        >
+          {isAi ? AI_GREETING : INQUIRY_GREETING}
+        </p>
+      </button>
+
+      {isAi ? (
+        <button
+          type="button"
+          onClick={onOpenChat}
+          className="ht-card-press flex h-[52px] items-center justify-between rounded-[16px] pl-[16px] pr-[8px] py-[10px] w-full overflow-hidden"
+          style={AI_INPUT_GRADIENT_BORDER}
+          aria-label="AI 에이전트 입력"
+        >
+          <span
+            className="text-[14px] leading-4 tracking-[-0.6px] truncate"
+            style={{ color: "var(--ht-text-hint)" }}
+          >
+            AI 에이전트에게 문의해 보세요.
+          </span>
+          <span
+            className="flex items-center justify-center w-[36px] h-[36px] rounded-[12px] shrink-0 overflow-hidden"
+            style={{
+              background: "var(--ht-bg-inverted)",
+              border: "1px solid var(--ht-border-default)",
+            }}
+          >
+            <SendPlaneIcon
+              width={20}
+              height={20}
+              style={{ color: "var(--ht-icon-white)" }}
+            />
+          </span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={onOpenChat}
+          className="ht-cta-button w-full flex items-center justify-center rounded-[16px] px-[16px] py-[14px] text-[16px] font-semibold leading-6 tracking-[-0.25px] text-white"
+          style={{
+            background: "var(--ht-bg-inverted)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            boxShadow:
+              "0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 0 rgba(0, 0, 0, 0.08)",
+          }}
+        >
+          문의하기
+        </button>
+      )}
+
+      <ResponseBadge status={responseStatus} />
+    </div>
+  );
+}
+
+function ResponseBadge({ status }: { status: ResponseStatus }) {
+  const copy =
+    RESPONSE_STATUSES.find((s) => s.id === status)?.copy ??
+    "AI가 바로 답해드려요";
+  return (
+    <div className="flex items-center justify-center gap-[4px] rounded-[6px] p-[2px] w-full">
+      <span
+        className="block w-[8px] h-[8px] rounded-full shrink-0"
+        style={{ background: STATUS_DOT_COLOR[status] }}
+      />
+      <span
+        className="text-[12px] leading-4 font-medium tracking-[-0.25px]"
+        style={{ color: "var(--ht-text-muted)" }}
+      >
+        {copy}
+      </span>
+    </div>
+  );
+}
+
+function NoticeCard({
+  text,
+  onClick,
+}: {
+  text: string;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col gap-[4px] items-start rounded-[16px] px-[16px] py-[10px] w-full text-left cursor-pointer"
+      style={{ background: "var(--ht-bg-card)" }}
+      aria-label="알림 자세히 보기"
+    >
+      <div className="flex items-center gap-[2px]">
+        <span
+          className="text-[12px] leading-4 tracking-[-0.25px] opacity-70"
+          style={{ color: "var(--ht-text-subtle)" }}
+        >
+          알림
+        </span>
+        <span
+          className="block w-[4px] h-[4px] rounded-[4px]"
+          style={{ background: "#FF3D3D" }}
+          aria-label="새 알림"
+        />
+      </div>
+      <p
+        className="text-[14px] leading-5 tracking-[-0.25px] line-clamp-2 w-full"
+        style={{ color: "var(--ht-text-default)" }}
+      >
+        {text}
+      </p>
+    </button>
+  );
+}
+
 function ChannelRow() {
   return (
     <div
-      className="w-full flex items-center justify-between rounded-[16px] px-[16px] py-[8px] border"
-      style={{
-        background: "rgba(245, 245, 245, 0.88)",
-        borderColor: "rgba(39, 39, 42, 0.1)",
-      }}
+      className="flex items-center justify-between rounded-[16px] px-[16px] py-[8px] w-full"
+      style={{ background: "var(--ht-bg-card)" }}
     >
       <span
         className="text-[14px] leading-5 tracking-[-0.25px]"
-        style={{ color: "#4E4E55" }}
+        style={{ color: "var(--ht-text-subtle)" }}
       >
-        다른 채널로 문의하기
+        다른 문의하기
       </span>
-      <div className="flex items-center gap-[6px]">
+      <div className="flex items-center gap-[8px]">
         <button
           type="button"
-          aria-label="네이버톡톡"
-          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+          aria-label="네이버 톡톡"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px] overflow-hidden"
         >
           <NaverTalkIcon width={36} height={36} />
         </button>
         <button
           type="button"
-          aria-label="카카오채널"
-          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+          aria-label="카카오톡 채널"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px] overflow-hidden"
         >
           <KakaoChannelIcon width={36} height={36} />
         </button>
         <button
           type="button"
-          aria-label="전화"
-          className="ht-pressable w-[36px] h-[36px] rounded-[12px]"
+          aria-label="전화 상담"
+          className="ht-pressable w-[36px] h-[36px] rounded-[12px] overflow-hidden"
         >
           <PhoneCircleIcon width={36} height={36} />
         </button>
       </div>
     </div>
   );
-}
-
-function FaqSection() {
-  const [query, setQuery] = useState("");
-  const trimmed = query.trim();
-  const lower = trimmed.toLowerCase();
-  const items =
-    trimmed === ""
-      ? FAQS.slice(0, 2)
-      : FAQS.filter(
-          (f) =>
-            f.question.toLowerCase().includes(lower) ||
-            f.category.toLowerCase().includes(lower),
-        );
-
-  return (
-    <SectionGroup title="자주 묻는 질문">
-      <SearchInput value={query} onChange={setQuery} />
-      <FaqCard items={items} hasQuery={trimmed !== ""} />
-    </SectionGroup>
-  );
-}
-
-function SearchInput({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="flex items-center px-[8px] min-h-[36px] rounded-[8px] gap-[2px] w-full">
-      <span className="flex items-center justify-center w-[20px] h-[20px]">
-        <SearchIcon width={16} height={16} style={{ color: "#6F6F77" }} />
-      </span>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="궁금한 내용을 검색해 보세요"
-        aria-label="자주 묻는 질문 검색"
-        className="flex-1 min-w-0 bg-transparent outline-none border-none px-[4px] text-[14px] leading-5 tracking-[-0.25px] placeholder:text-[rgba(39,39,42,0.3)]"
-        style={{ color: "var(--ht-text-default)" }}
-      />
-    </div>
-  );
-}
-
-function FaqCard({
-  items,
-  hasQuery,
-}: {
-  items: FaqEntry[];
-  hasQuery: boolean;
-}) {
-  return (
-    <div
-      className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px] max-h-[280px] overflow-y-auto"
-      style={{ background: "#F4F4F5" }}
-    >
-      {items.length === 0 ? (
-        <p
-          className="text-[14px] leading-5 tracking-[-0.25px]"
-          style={{ color: "#6F6F77" }}
-        >
-          {hasQuery
-            ? "검색 결과가 없어요."
-            : "질문이 아직 없어요."}
-        </p>
-      ) : (
-        items.map((item, i) => (
-          <FaqItem
-            key={`${item.category}-${i}`}
-            category={item.category}
-            question={item.question}
-          />
-        ))
-      )}
-    </div>
-  );
-}
-
-function SectionGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-[4px] w-full">
-      <span
-        className="pl-[12px] text-[12px] leading-4 tracking-[-0.25px] opacity-70"
-        style={{ color: "#404040" }}
-      >
-        {title}
-      </span>
-      {children}
-    </div>
-  );
-}
-
-function NoticeCard({ text }: { text: string }) {
-  return (
-    <div className="flex flex-col gap-[10px] rounded-[16px] px-[12px] py-[10px] w-full">
-      <p
-        className="h-[20px] text-[14px] leading-5 tracking-[-0.25px] truncate w-full"
-        style={{ color: "var(--ht-text-default)" }}
-      >
-        {text}
-      </p>
-    </div>
-  );
-}
-
-function FaqItem({ category, question }: { category: string; question: string }) {
-  return (
-    <div className="flex flex-col gap-[4px] justify-center">
-      <span
-        className="text-[12px] leading-4 font-medium tracking-[-0.25px]"
-        style={{ color: "#4E4E55" }}
-      >
-        {category}
-      </span>
-      <p
-        className="text-[14px] leading-5 tracking-[-0.25px]"
-        style={{ color: "#111115" }}
-      >
-        {question}
-      </p>
-    </div>
-  );
-}
-
-function VariantBackground({ variant }: { variant: HomeVariant }) {
-  if (variant === "gradient-line") {
-    return (
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(180deg, #FEFFCB 0%, #F3FFEE 20%, #FAFAFA 38%)",
-        }}
-      />
-    );
-  }
-
-  if (variant === "gradient-oval") {
-    return (
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 200% 100% at 50% 0%, #FEFFCB 0%, #F3FFEE 20%, #FAFAFA 38%)",
-        }}
-      />
-    );
-  }
-
-  return null;
 }
 
 function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
