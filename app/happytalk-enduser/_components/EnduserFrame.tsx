@@ -25,6 +25,8 @@ type Props = {
   boxType: HomeBoxType;
   showNotice: boolean;
   responseStatus: ResponseStatus;
+  // 마운트 시 자동으로 채팅 화면 진입 (홈버튼 클릭 → 위젯 + 바로 채팅 흐름).
+  initialOpenChat?: boolean;
   onClose?: () => void;
   onActiveScreenChange?: (screen: ActiveScreen) => void;
 };
@@ -44,6 +46,7 @@ export function EnduserFrame({
   boxType,
   showNotice,
   responseStatus,
+  initialOpenChat = false,
   onClose,
   onActiveScreenChange,
 }: Props) {
@@ -122,6 +125,15 @@ export function EnduserFrame({
       return () => clearTimeout(t);
     }
   }, [chatLoading]);
+
+  // 홈버튼 (launcher) 클릭으로 위젯이 열렸을 때 자동으로 채팅 진입.
+  // 마운트 시 한 번만 동작 — eslint-disable 로 ref 의존성 경고 회피.
+  useEffect(() => {
+    if (initialOpenChat) {
+      openChat(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     onActiveScreenChange?.(chatOpen ? "chat" : tab);

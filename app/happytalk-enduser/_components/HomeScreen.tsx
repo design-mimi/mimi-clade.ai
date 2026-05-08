@@ -15,7 +15,7 @@ import {
   KakaoChannelIcon,
   NaverTalkIcon,
   PhoneCircleIcon,
-  SendPlaneIcon,
+  PaperPlaneIcon,
 } from "./Icons";
 
 type Props = {
@@ -411,9 +411,9 @@ function ChatLandingCard({
               border: "1px solid var(--ht-border-default)",
             }}
           >
-            <SendPlaneIcon
-              width={20}
-              height={20}
+            <PaperPlaneIcon
+              width={36}
+              height={36}
               style={{ color: "var(--ht-icon-white)" }}
             />
           </span>

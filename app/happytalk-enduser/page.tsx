@@ -10,6 +10,7 @@ import { Launcher } from "./_components/Launcher";
 import type {
   HomeBoxType,
   HomeVariant,
+  LauncherForm,
   LauncherStyle,
   LauncherVariant,
   ResponseStatus,
@@ -28,6 +29,9 @@ export default function HappytalkEnduserPage() {
   // Launcher button skin (Figma 27158:30782). Light = current default white
   // button. Same no-persistence policy as variant.
   const [launcherStyle, setLauncherStyle] = useState<LauncherStyle>("light");
+  // Form sprite (Figma 24229:34897). null = motion 모드 (기본). 1~14 = sprite 모드.
+  // 색상은 launcherStyle (skin) 을 자동으로 따라감 (form 14 AI 제외).
+  const [launcherForm, setLauncherForm] = useState<LauncherForm | null>(null);
   const [panelOpen, setPanelOpen] = useState(true);
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
 
@@ -76,6 +80,8 @@ export default function HappytalkEnduserPage() {
             onChange={setLauncherVariant}
             styleValue={launcherStyle}
             onStyleChange={setLauncherStyle}
+            formValue={launcherForm}
+            onFormChange={setLauncherForm}
             embedded
           />
         )}
@@ -103,6 +109,8 @@ export default function HappytalkEnduserPage() {
             onChange={setLauncherVariant}
             styleValue={launcherStyle}
             onStyleChange={setLauncherStyle}
+            formValue={launcherForm}
+            onFormChange={setLauncherForm}
           />
         </div>
       )}
@@ -129,11 +137,16 @@ export default function HappytalkEnduserPage() {
             boxType={boxType}
             showNotice={showNotice}
             responseStatus={responseStatus}
+            initialOpenChat
             onClose={() => setPanelOpen(false)}
             onActiveScreenChange={setActiveScreen}
           />
         </div>
       )}
+      {/* 시안 데모용 버블 FAB (Figma 27386:1600) — launcher 위 두 frosted-glass
+         버블. pointer-events-none 으로 클릭 비활성, panel 닫혀 있을 때만 노출. */}
+      {!panelOpen && <BubbleFabPreview />}
+
       <div
         className={`fixed right-4 bottom-4 sm:right-8 sm:bottom-8 z-50 ${
           panelOpen ? "hidden sm:block" : ""
@@ -142,10 +155,39 @@ export default function HappytalkEnduserPage() {
         <Launcher
           variant={launcherVariant}
           style={launcherStyle}
+          form={launcherForm}
           closeMode={panelOpen}
           onClick={() => setPanelOpen((v) => !v)}
         />
       </div>
+    </div>
+  );
+}
+
+function BubbleFabPreview() {
+  const labels = ["AI 에이전트 알아보기", "새로운 기능을 알아보세요"];
+  const bubbleStyle = {
+    background:
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 100%), linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.12) 100%)",
+    border: "1px solid rgba(255, 255, 255, 0.35)",
+    boxShadow: "0 8px 20px 0 rgba(0, 0, 0, 0.1)",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+  } as const;
+  return (
+    <div
+      aria-hidden
+      className="fixed right-4 bottom-[92px] sm:right-8 sm:bottom-[96px] z-50 pointer-events-none flex flex-col items-end gap-[8px]"
+    >
+      {labels.map((label) => (
+        <div
+          key={label}
+          className="px-[14px] py-[10px] rounded-[16px] text-[16px] leading-6 font-semibold tracking-[-0.25px] text-black text-right whitespace-nowrap"
+          style={bubbleStyle}
+        >
+          {label}
+        </div>
+      ))}
     </div>
   );
 }

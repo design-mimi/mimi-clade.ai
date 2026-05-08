@@ -11,6 +11,7 @@ import {
 } from "react";
 import { ChatCard } from "./ChatCard";
 import { CARDS_BY_TOPIC, INTRO_BODY, type ChatTopic } from "./chatCards";
+import { PaperPlaneIcon, ReturnArrowIcon } from "./Icons";
 
 type Props = {
   onBack: () => void;
@@ -579,7 +580,19 @@ function InputBar({ onSend }: { onSend: (text: string) => void }) {
             transition: "background-color 150ms ease-out",
           }}
         >
-          <SendArrowIcon width={32} height={32} style={{ color: "#fff" }} />
+          {canSend ? (
+            <ReturnArrowIcon
+              width={32}
+              height={32}
+              style={{ color: "#fff" }}
+            />
+          ) : (
+            <PaperPlaneIcon
+              width={32}
+              height={32}
+              style={{ color: "#fff" }}
+            />
+          )}
         </button>
       </div>
     </div>
@@ -611,14 +624,3 @@ function PlusIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-// Figma 24229:34897 send-plane (32×32 viewBox, 시안 좌표 305/49 평행이동).
-function SendArrowIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 32 32" fill="none" {...props}>
-      <path
-        d="M9.297 14.21C8.948 14.0939 8.945 13.9066 9.304 13.7871L22.028 9.5458C22.38 9.4283 22.582 9.6255 22.484 9.9711L18.848 22.6952C18.747 23.0475 18.544 23.0598 18.395 22.7248L15.999 17.3331L19.999 11.9998L14.666 15.9998L9.297 14.21Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}

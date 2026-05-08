@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import type { SVGProps } from "react";
 import type { ConversationSummary } from "./types";
+import { PaperPlaneIconSm } from "./Icons";
 
 type Props = {
   // Conversation history rows. Empty list → empty state (Figma 27158:30643).
@@ -133,7 +133,7 @@ function InquireButton({ onClick }: { onClick?: () => void }) {
       >
         문의하기
       </span>
-      <SendIcon className="ht-cta-icon" width={16} height={16} />
+      <PaperPlaneIconSm className="ht-cta-icon" width={20} height={20} />
     </button>
   );
 }
@@ -194,16 +194,3 @@ function MessageRow({
   );
 }
 
-function SendIcon(props: SVGProps<SVGSVGElement>) {
-  // Path source: Figma 27158:30705 (문의하기 button lead-icon).
-  // Original coords are anchored to the parent button viewBox; viewBox here
-  // crops to the icon area so it renders cleanly at any width/height.
-  return (
-    <svg viewBox="102 17 16 16" fill="none" {...props}>
-      <path
-        d="M103.298 23.21C102.949 23.0939 102.946 22.9066 103.305 22.7871L116.029 18.5458C116.381 18.4283 116.583 18.6255 116.484 18.9711L112.849 31.6952C112.748 32.0475 112.545 32.0598 112.396 31.7248L110 26.3331L114 20.9998L108.667 24.9998L103.298 23.21Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}

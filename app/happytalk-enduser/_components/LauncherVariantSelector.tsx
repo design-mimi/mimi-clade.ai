@@ -1,18 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Launcher } from "./Launcher";
+import { LauncherForm } from "./LauncherForm";
 import {
+  LAUNCHER_FORMS,
   LAUNCHER_STYLES,
   LAUNCHER_VARIANTS,
+  type LauncherForm as LauncherFormId,
   type LauncherStyle,
   type LauncherVariant,
 } from "./types";
+
+// 모든 토글 (motion / skin / form) 미리보기 셀의 통일 size.
+const PREVIEW_SIZE = 40;
 
 type Props = {
   value: LauncherVariant;
   onChange: (v: LauncherVariant) => void;
   styleValue: LauncherStyle;
   onStyleChange: (s: LauncherStyle) => void;
+  formValue: LauncherFormId | null;
+  onFormChange: (f: LauncherFormId | null) => void;
   embedded?: boolean;
 };
 
@@ -21,14 +30,18 @@ export function LauncherVariantSelector({
   onChange,
   styleValue,
   onStyleChange,
+  formValue,
+  onFormChange,
   embedded = false,
 }: Props) {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 639px)").matches,
+  );
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
-    setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => {
       setIsMobile(e.matches);
       if (!e.matches) setExpanded(false);
@@ -64,41 +77,55 @@ export function LauncherVariantSelector({
           </button>
         )}
       </div>
-      {LAUNCHER_VARIANTS.map(({ id, label }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => onChange(id)}
-          className={`text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
-            id === value
-              ? "bg-zinc-900 text-white"
-              : "bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
+      {/* 모든 launcher 옵션 — motion 3종 + form 14종 — 한 그리드. motion
+         셀 클릭 시 form 자동 null (motion 모드), form 셀 클릭 시 sprite 모드.
+         색상은 "버튼 타입" (skin) 선택값을 form sprite 에 그대로 적용. */}
+      <div className="grid grid-cols-5 gap-[6px]">
+        {LAUNCHER_VARIANTS.map(({ id, label }) => (
+          <PreviewCell
+            key={`motion-${id}`}
+            active={formValue === null && id === value}
+            onClick={() => {
+              onChange(id);
+              onFormChange(null);
+            }}
+            title={label}
+          >
+            <Launcher
+              variant={id}
+              style={styleValue}
+              size={PREVIEW_SIZE}
+            />
+          </PreviewCell>
+        ))}
+        {LAUNCHER_FORMS.map(({ id, label }) => (
+          <PreviewCell
+            key={`form-${id}`}
+            active={id === formValue}
+            onClick={() => onFormChange(id)}
+            title={label}
+          >
+            <LauncherForm form={id} skin={styleValue} size={PREVIEW_SIZE} />
+          </PreviewCell>
+        ))}
+      </div>
 
-      {/* Button type sheet — shown together with the variant picker since the
-          motion + skin combo is what's being previewed on the launcher icon. */}
       <div className="mt-1 mb-1 border-t border-zinc-200/70" />
       <div className="px-1 pb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">
         버튼 타입
       </div>
-      {LAUNCHER_STYLES.map(({ id, label }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => onStyleChange(id)}
-          className={`text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
-            id === styleValue
-              ? "bg-zinc-900 text-white"
-              : "bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
+      <div className="grid grid-cols-5 gap-[6px]">
+        {LAUNCHER_STYLES.map(({ id, label }) => (
+          <PreviewCell
+            key={id}
+            active={id === styleValue}
+            onClick={() => onStyleChange(id)}
+            title={label}
+          >
+            <Launcher variant={value} style={id} size={PREVIEW_SIZE} />
+          </PreviewCell>
+        ))}
+      </div>
     </div>
   );
 
@@ -135,5 +162,47 @@ export function LauncherVariantSelector({
     <div className="fixed bottom-4 left-4 z-50">
       {panel}
     </div>
+  );
+}
+
+// 모든 토글 셀 통일 — PREVIEW_SIZE × PREVIEW_SIZE 안에 미리보기 + active ring.
+// 클릭 영역은 미리보기 외곽 padding 까지 포함해 셀 = preview + 6px padding.
+function PreviewCell({
+  active,
+  onClick,
+  title,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      aria-pressed={active}
+      className={`flex items-center justify-center rounded-[10px] transition-colors ${
+        active
+          ? "ring-2 ring-zinc-900 bg-white"
+          : "bg-zinc-50 hover:bg-zinc-100"
+      }`}
+      style={{
+        width: PREVIEW_SIZE + 6,
+        height: PREVIEW_SIZE + 6,
+        // pointer 통과 막기 위해 inner Launcher 의 button 클릭 무력화.
+        position: "relative",
+      }}
+    >
+      <div
+        aria-hidden
+        style={{ pointerEvents: "none", display: "inline-flex" }}
+      >
+        {children}
+      </div>
+    </button>
   );
 }

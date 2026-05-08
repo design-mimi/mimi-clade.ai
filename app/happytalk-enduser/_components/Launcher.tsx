@@ -1,13 +1,22 @@
 "use client";
 
 import "./launcher.css";
-import type { LauncherStyle, LauncherVariant } from "./types";
+import { LauncherForm } from "./LauncherForm";
+import type {
+  LauncherForm as LauncherFormId,
+  LauncherStyle,
+  LauncherVariant,
+} from "./types";
 
 type Props = {
   variant: LauncherVariant;
   style?: LauncherStyle;
   closeMode?: boolean;
   onClick?: () => void;
+  // 형태 sprite 모드 — 지정 시 motion 무시하고 sprite 렌더 (skin 색상은 유지).
+  form?: LauncherFormId | null;
+  // 셀렉터 안 작은 미리보기에서 size 줄여서 사용 (default 60).
+  size?: number;
 };
 
 const STYLE_CLASS: Record<LauncherStyle, string> = {
@@ -23,7 +32,28 @@ export function Launcher({
   style: launcherStyle = "light",
   closeMode = false,
   onClick,
+  form,
+  size = 56,
 }: Props) {
+  // 운영 56×56 / rounded ≈ 19 비율 (selector mini preview 도 동일 비율).
+  const factor = size / 56;
+  const radius = Math.round(19 * factor);
+
+  // form sprite 모드 (closeMode 가 아닐 때만) — wrapper bg/border 없이 sprite 자체로 렌더.
+  if (form && !closeMode) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label="상담 열기"
+        className="ht-launcher flex items-center justify-center relative bg-transparent"
+        style={{ width: size, height: size }}
+      >
+        <LauncherForm form={form} skin={launcherStyle} size={size} />
+      </button>
+    );
+  }
+
   const variantClass = closeMode
     ? ""
     : variant === "pencil"
@@ -39,10 +69,17 @@ export function Launcher({
       type="button"
       onClick={onClick}
       aria-label={closeMode ? "상담 닫기" : "상담 열기"}
-      className={`ht-launcher ${styleClass} ${variantClass} w-[60px] h-[60px] rounded-[20px] flex items-center justify-center relative overflow-hidden`}
+      className={`ht-launcher ${styleClass} ${variantClass} flex items-center justify-center relative overflow-hidden`}
+      style={{ width: size, height: size, borderRadius: radius }}
     >
       {closeMode && (
-        <svg className="ht-launcher-close" width={24} height={24} viewBox="0 0 24 24" fill="none">
+        <svg
+          className="ht-launcher-close"
+          width={24 * factor}
+          height={24 * factor}
+          viewBox="0 0 24 24"
+          fill="none"
+        >
           <path
             d="M5 5L19 19M19 5L5 19"
             stroke="#231916"
@@ -52,7 +89,13 @@ export function Launcher({
         </svg>
       )}
       {!closeMode && variant === "pencil" && (
-        <svg width={26} height={44} viewBox="0 -2 39 65" fill="none" style={{ overflow: "visible" }}>
+        <svg
+          width={26 * factor}
+          height={44 * factor}
+          viewBox="0 -2 39 65"
+          fill="none"
+          style={{ overflow: "visible" }}
+        >
           <path
             className="body"
             pathLength={100}
@@ -71,7 +114,13 @@ export function Launcher({
         </svg>
       )}
       {!closeMode && variant === "infinity" && (
-        <svg width={38} height={32} viewBox="0 0 45 38" fill="none" style={{ overflow: "visible" }}>
+        <svg
+          width={38 * factor}
+          height={32 * factor}
+          viewBox="0 0 45 38"
+          fill="none"
+          style={{ overflow: "visible" }}
+        >
           <path
             className="stroke-path"
             pathLength={100}
@@ -80,7 +129,13 @@ export function Launcher({
         </svg>
       )}
       {!closeMode && variant === "heart" && (
-        <svg width={38} height={34} viewBox="0 0 45 40" fill="none" style={{ overflow: "visible" }}>
+        <svg
+          width={38 * factor}
+          height={34 * factor}
+          viewBox="0 0 45 40"
+          fill="none"
+          style={{ overflow: "visible" }}
+        >
           <path className="p1" pathLength={100} d="M31.9678 12.0836C31.9678 12.0836 37.1995 14.3759 38.8408 15.3056C43.1729 17.7821 43.0625 12.9492 41.0582 11.8271" />
           <path className="p2" pathLength={100} d="M38.3271 19.3451C42.32 21.6533 41.9728 16.8444 39.6607 15.7144" />
           <path className="p3" pathLength={100} d="M38.4617 19.5853C38.4617 19.5853 32.1095 25.0834 19.6575 24.0495C-9.20762 21.6611 2.38421 1.67219 20.5887 1.26343C34.5557 0.950856 39.8978 6.18452 41.3419 7.45887C42.3204 8.32447 43.5592 9.72706 43.2357 11.0014C42.9595 12.0754 42.3519 12.9169 40.2214 11.2499C36.4495 8.30042 33.159 7.77145 33.159 7.77145" />

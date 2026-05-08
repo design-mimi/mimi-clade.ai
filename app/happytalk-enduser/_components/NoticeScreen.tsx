@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { SendPlaneIcon } from "./Icons";
+import { PaperPlaneIconSm } from "./Icons";
 
 type Props = {
   onBack: () => void;
@@ -72,9 +72,9 @@ export function NoticeScreen({ onBack, onOpenChat }: Props) {
           }}
         >
           문의하기
-          <SendPlaneIcon
-            width={16}
-            height={16}
+          <PaperPlaneIconSm
+            width={20}
+            height={20}
             style={{ color: "var(--ht-icon-white)" }}
           />
         </button>
