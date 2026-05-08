@@ -32,7 +32,7 @@ export default function HappytalkEnduserPage() {
   // Form sprite (Figma 24229:34897). null = motion 모드 (기본). 1~14 = sprite 모드.
   // 색상은 launcherStyle (skin) 을 자동으로 따라감 (form 14 AI 제외).
   const [launcherForm, setLauncherForm] = useState<LauncherForm | null>(null);
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(false);
   const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
 
   // VariantSelector is a dev affordance — only useful while the user is
